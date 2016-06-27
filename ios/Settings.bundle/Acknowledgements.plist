@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>StringsTable</key>
+	<string>Acknowledgements</string>
+	<key>PreferenceSpecifiers</key>
+	<array>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>FooterText</key>
+			<string>Nautilus - mobile shell for OctoPrint (simplified interface optimized for mobile devices)
+
+Licenses for Octoprint, JQuerry, Bootstrap,
+bootstrap-notify, bootstrap-slider, bootbox,
+Knockout, Loadash, sprintf, sockjs, font-awsome,
+google-fonts, glyphicons available on their
+respective pages.
+
+Logo based on:
+https://openclipart.org/detail/176534/nautilus-shell
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT
+WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT
+OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE
+USE OR OTHER DEALINGS IN THE SOFTWARE.
+                </string>
+		</dict>
+	</array>
+</dict>
+</plist>
