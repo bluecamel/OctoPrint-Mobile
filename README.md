@@ -22,7 +22,7 @@ plugins:
 
 `pyprowl` included from https://github.com/babs/pyrowl/tree/master
 
-
+`settings.ini` under the plugin folder or it's coresponding data folder (`.octoprint/data/nautilus`) provides the gcode sequences for most of the functions provided. Make sure they are configured properly for your machine.
 
 ##screenshots
 Setting page (under iOS Settings app)
