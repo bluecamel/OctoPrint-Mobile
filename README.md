@@ -1,16 +1,17 @@
 # Nautilus - mobile shell for OctoPrint
 
 
-Octoprint simplified interface optimised for mobile devices (only works on dev branch of Octoprint)
+Octoprint simplified interface optimized for mobile devices (only works on dev branch of Octoprint)
 
 The iOS app is needed to force landscape, load the API key and switch on/off the socket. 
 Bonus feature: shake to refresh.
 
-NEW: iOS app bow available on appstore: https://itunes.apple.com/us/app/id1125992543
+The iOS app is available on appstore: https://itunes.apple.com/us/app/id1125992543
 
 When using the browser you can create a shortcut by using "Add to Home Screen" (it will be shown as "Nautilus")
+Without the app constrains, the webapp has some alignment problems
 
-As long as octoprint is avalable over the internet, the UI changes to full screen webcam for pure monitoring. 
+As long as octoprint is available over the internet, the UI changes to full screen webcam for pure monitoring. 
 
 For notifications via Prowl, change settings by manually editing `config.yaml` under "plugins"
 
@@ -22,7 +23,8 @@ plugins:
 
 `pyprowl` included from https://github.com/babs/pyrowl/tree/master
 
-`settings.ini` under the plugin folder or it's coresponding data folder (`.octoprint/data/nautilus`) provides the gcode sequences for most of the functions provided. Make sure they are configured properly for your machine.
+`settings.ini` under the plugin folder or it's corresponding data folder (`.octoprint/data/nautilus`) provides the gcode sequences for most of the functions provided. Make sure they are configured properly for your machine.
+
 
 ##screenshots
 Setting page (under iOS Settings app)
