@@ -55,6 +55,8 @@ bool load_webapp = NO;
                         [self showMessage: error.localizedDescription];
                     } else if ([httpResponse statusCode] == 404) {
                             [self showMessage: @"This application requires the plugin \"Nautilus\" to be installed on OctoPrint." ];
+                    } else if ([httpResponse statusCode] == 503) {
+                        [self showMessage: @"OctoPrint is currently not running. If you just started up your printer, please wait a couple of seconds, then try again. (shake your device)" ];
                         } else {
                             load_webapp = YES;
                             NSString *webapp_url = [NSString stringWithFormat: @"%@?apikey=%@", url, apikey];
