@@ -73,6 +73,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = BE526F431B6E991600005B15 /* Build configuration list for PBXNativeTarget "Nautilus" */;
 			buildPhases = (
+				A5F63D3E1D34B97200EC5191 /* ShellScript */,
 				BE526F1C1B6E991600005B15 /* Sources */,
 				BE526F1D1B6E991600005B15 /* Frameworks */,
 				BE526F1E1B6E991600005B15 /* Resources */,
@@ -132,6 +133,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A5F63D3E1D34B97200EC5191 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "buildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${PRODUCT_SETTINGS_PATH}\")\nbuildNumber=$(($buildNumber + 1))\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"${PRODUCT_SETTINGS_PATH}\"";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		BE526F1C1B6E991600005B15 /* Sources */ = {
@@ -201,8 +219,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Ovidiu Valer Hossu (WHS6U6C44G)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Ovidiu Valer Hossu (WHS6U6C44G)";
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				CURRENT_PROJECT_VERSION = 1.1;
 				DEPLOYMENT_LOCATION = NO;
 				ENABLE_TESTABILITY = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/Nautilus/Info.plist";
@@ -211,7 +230,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = mobile.octoprint;
 				PRODUCT_NAME = Nautilus;
-				PROVISIONING_PROFILE = "01e38bb2-2133-4cca-a950-a08eebba85c6";
+				PROVISIONING_PROFILE = "30f8f067-d152-4220-ab88-3a348f9508c5";
 				SDKROOT = iphoneos9.3;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
