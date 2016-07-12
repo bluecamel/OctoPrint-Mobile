@@ -17,7 +17,7 @@
     NSString *buildNumber = [infoDict objectForKey:@"CFBundleVersion"];
     NSString* version =  [NSString stringWithFormat: @"%@.%@", appVersion, buildNumber];
 
-    NSString* useragent = [NSString stringWithFormat: @"Nautilus /%@", version];
+    NSString* useragent = [NSString stringWithFormat: @"Nautilus/%@", version];
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
