@@ -211,7 +211,6 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		)
 
 __plugin_name__ = "Nautilus"
-__plugin_version__ = "1.0"
 __plugin_description__ = "Nautilus - OctoPrint mobile shell (simplified interface optimised for mobile devices)"
 
 def __plugin_load__():

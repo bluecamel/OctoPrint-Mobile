@@ -14,7 +14,6 @@ $(function() {
 			} else {
 				//small link next to version at the bottom
 				var element = $(".footer li:eq(1)");
-				console.log(element);
 				if (element.length) {
 					element.after("<li><a href='/?apikey="+self.global_settings.api_key()+"&nautilus=true'><i class='icon-mobile-phone'></i> Nautilus</a></li>");
 				}

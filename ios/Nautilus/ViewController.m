@@ -110,10 +110,18 @@ bool load_webapp = NO;
     return YES;
 }
 
-- (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event
+- (void)motionBegan:(UIEventSubtype)motion withEvent:(UIEvent *)event
 {
     if (motion == UIEventSubtypeMotionShake) {
-       [self loadWebView];
+        [self loadWebView];
+        
+        CABasicAnimation *animation =[CABasicAnimation animationWithKeyPath:@"position"];
+        [animation setDuration:0.05];
+        [animation setRepeatCount:4];
+        [animation setAutoreverses:YES];
+        [animation setFromValue:[NSValue valueWithCGPoint: CGPointMake([self.webView center].x, [self.webView center].y - 10.0f)]];
+        [animation setToValue:[NSValue valueWithCGPoint: CGPointMake([self.webView center].x, [self.webView center].y + 10.0f)]];
+        [[self.webView layer] addAnimation:animation forKey:@"position"];
     }
 }
 
