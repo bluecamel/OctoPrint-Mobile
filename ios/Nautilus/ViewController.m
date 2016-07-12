@@ -54,12 +54,12 @@ bool load_webapp = NO;
 
                     if (error) {
                         [self showMessage: error.localizedDescription];
-                    } else if ([httpResponse statusCode] == 200) {
+                    } else if ([httpResponse statusCode] == 404) {
+                            [self showMessage: @"This application requires the plugin \"Nautilus\" to be installed on OctoPrint." ];
+                        } else {
                             load_webapp = YES;
                             NSString *webapp_url = [NSString stringWithFormat: @"%@?apikey=%@", url, apikey];
                             [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:webapp_url]]];
-                        } else {
-                            [self showMessage: @"This application requires the plugin \"Nautilus\" to be installed on OctoPrint." ];
                         }
                 }] resume];
     }
