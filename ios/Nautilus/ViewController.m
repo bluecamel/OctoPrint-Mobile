@@ -51,7 +51,6 @@ bool load_webapp = NO;
                                     NSURLResponse *response,
                                     NSError *error) {
                     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
-
                     if (error) {
                         [self showMessage: error.localizedDescription];
                     } else if ([httpResponse statusCode] == 404) {
@@ -59,7 +58,7 @@ bool load_webapp = NO;
                         } else {
                             load_webapp = YES;
                             NSString *webapp_url = [NSString stringWithFormat: @"%@?apikey=%@", url, apikey];
-                            [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:webapp_url]]];
+                            [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:webapp_url] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:20.0]];
                         }
                 }] resume];
     }
@@ -109,7 +108,7 @@ bool load_webapp = NO;
     return YES;
 }
 
-- (void)motionBegan:(UIEventSubtype)motion withEvent:(UIEvent *)event
+- (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event
 {
     if (motion == UIEventSubtypeMotionShake) {
        [self loadWebView];
