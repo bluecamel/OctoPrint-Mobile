@@ -114,7 +114,7 @@ webcam in full screen with pinch zoom enabled (this is the only screen available
 
 ###Setup
 
-1. Manually install the plugin from `octoprint_mobile` to ~/.octoprint/plugins/mobile
+1. Manually install the plugin using this URL: [https://github.com/MoonshineSG/Octoprint-Mobile/archive/master.zip](https://github.com/MoonshineSG/Octoprint-Mobile/archive/master.zip)
 
 2. Compile, sign and install the ios app (free developer license from Apple needed), or get it from [Apple AppStore](https://itunes.apple.com/us/app/id1125992543)
 
