@@ -55,12 +55,13 @@ bool load_webapp = NO;
                         [self showMessage: error.localizedDescription];
                     } else if ([httpResponse statusCode] == 404) {
                             [self showMessage: @"This application requires the plugin \"Nautilus\" to be installed on OctoPrint." ];
-                    } else if ([httpResponse statusCode] == 503) {
+                    } else if ([httpResponse statusCode] == 503 || [httpResponse statusCode] == 502) {
                         [self showMessage: @"OctoPrint is currently not running. If you just started up your printer, please wait a couple of seconds, then try again. (shake your device)" ];
                         } else {
                             load_webapp = YES;
-                            NSString *webapp_url = [NSString stringWithFormat: @"%@?apikey=%@", url, apikey];
-                            [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:webapp_url] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:20.0]];
+                            NSMutableURLRequest* request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:10.0];
+                            [request addValue:apikey forHTTPHeaderField:@"API_KEY"];
+                            [self.webView loadRequest:request];
                         }
                 }] resume];
     }
@@ -116,10 +117,10 @@ bool load_webapp = NO;
         [self loadWebView];
         
         CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation"];
-        [animation setToValue:[NSNumber numberWithFloat:-0.025f]];
-        [animation setFromValue:[NSNumber numberWithFloat:0.025f]];
+        [animation setToValue:[NSNumber numberWithFloat:-0.03f]];
+        [animation setFromValue:[NSNumber numberWithFloat:0.03f]];
         [animation setDuration:0.05];
-        [animation setRepeatCount:5];
+        [animation setRepeatCount:6];
         [animation setAutoreverses:YES];
         [[self.webView layer] addAnimation:animation forKey:nil];
     }

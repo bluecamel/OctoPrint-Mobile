@@ -279,7 +279,7 @@
 	<script type="text/javascript">
 	var home = false;
 	var BASE_URL = location.protocol + '//' + location.host + "/";
-	var API_KEY = "{{ request.args.get('apikey') }}";
+	var API_KEY = "{{ request.headers.get('API_KEY') }}";
 	var MOBILE_URL = BASE_URL+"{{ nautilus_url }}";
 	var has_switch = ko.observable({{ has_switch }});
 	if ( window.innerHeight > window.innerWidth ) {
