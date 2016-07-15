@@ -46,7 +46,7 @@
 						<div class="status_bar extruder_temp"><div data-bind="visible: temp_visible">
 							<span class='fa fa-lg fa-fire'></span><span data-bind="html:extruder_temp"></span></div>
 						</div>
-						<div class="status_bar bed_temp"><div data-bind="visible: printer.bed_actual() > 0 "><span class='fa fa-lg fa-bed'></span><span data-bind="html:bed_temp"></span></div><div class="desktop" data-bind="visible: {{ browser }}"><a href="/"><i class='fa fa-desktop'></i> OctoPrint</a></div></div>
+						<div class="status_bar bed_temp"><div data-bind="visible: printer.bed_actual() > 0 "><span class='fa fa-lg fa-bed'></span><span data-bind="html:bed_temp"></span></div></div>
 					</div>
 
 					<div id="printer_panel" class="panel">
@@ -260,12 +260,6 @@
 	<div id="disconnected_view" class="view">
 			<div id="disconnected_message">Disconnected</div>
 			<button type="button" class="btn btn-lg btn-default" id="reconnect"><span class="fa fa-lg fa-chain-broken"></span> Attempt to reconnect</button>
-			<div class="desktop" data-bind="visible: {{ browser }}"><a href="/"><i class='fa fa-desktop'></i> OctoPrint</a></div>
-	</div>
-
-	<div id="portrait_view" class="view">
-			<div id="disconnected_message">Please use only in landscape mode!</div>
-			<div class="desktop" data-bind="visible: {{ browser }}"><a href="/"><i class='fa fa-desktop'></i> OctoPrint</a></div>
 	</div>
 	
 	<div id="loading_view" class="view"></div>
@@ -282,13 +276,8 @@
 	var API_KEY = "{{ request.headers.get('API_KEY') }}";
 	var MOBILE_URL = BASE_URL+"{{ nautilus_url }}";
 	var has_switch = ko.observable({{ has_switch }});
-	if ( window.innerHeight > window.innerWidth ) {
-		var SCREEN_HEIGHT = window.innerWidth + "px";
-		var SCREEN_WIDTH = window.innerHeight + "px";
-	} else {
-		var SCREEN_WIDTH = window.innerWidth + "px";
-		var SCREEN_HEIGHT = window.innerHeight + "px";
-	}
+	var SCREEN_WIDTH = window.innerWidth + "px";
+	var SCREEN_HEIGHT = window.innerHeight + "px";
 	</script>
     
     {% include 'nautilus_javascripts.jinja2' %}

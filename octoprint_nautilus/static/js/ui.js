@@ -107,23 +107,6 @@ function touch_ui(touch) {
 	setup_camera_click();
 }
 
-function force_landscape(){
-	setTimeout(function(){
-		touch_ui(false);
-		
-		if( window.innerHeight > window.innerWidth ){
-			landscape = false;
-			$(".view").hide();
-			$("#portrait_view").show();
-		} else {
-			landscape = true;
-			$("#"+currentView+"_view").show();
-			$("#portrait_view").hide();
-			SCREEN_WIDTH = window.innerWidth + "px";
-			SCREEN_HEIGHT = window.innerHeight + "px";
-		}
-	}, 200);
-}
 
 //remap click after add/remove html element
 function setup_camera_click() {

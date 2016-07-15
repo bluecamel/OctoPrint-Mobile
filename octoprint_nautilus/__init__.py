@@ -67,10 +67,6 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		)
 
 	def will_handle_ui(self, request):
-		#can be forced to show mobile UI
-		if request.args.get('nautilus') == "true" :
-			return True
-		
 		return request.user_agent.string.startswith("Nautilus")
 		
 	def on_ui_render(self, now, request, render_kwargs):
@@ -81,13 +77,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		else:
 			has_switch="false"
 
-		#identify browser vs mobile app to show/hide 'desktop' ui link 	
-		if request.user_agent.string.startswith("Nautilus") :
-			browser="false"
-		else:
-			browser="true"
-
-		return make_response(render_template("nautilus_index.jinja2", nautilus_url=nautilus_url, has_switch=has_switch, browser=browser) )
+		return make_response(render_template("nautilus_index.jinja2", nautilus_url=nautilus_url, has_switch=has_switch) )
 
 	@octoprint.plugin.BlueprintPlugin.route("/home", methods=["GET"])
 	def check_home(self):

@@ -29,11 +29,7 @@ $(document).ready(function() {
 			 printer.zoom(true);
 			 printer.zoom(false);
 			 setup_camera_click();
-			 
- 			 // Listen for orientation changes
-			 window.addEventListener("resize", force_landscape , false);
-			 force_landscape();
-			 
+			 			 
 		} else {
 			// allow scrolling
 			document.ontouchmove = function(event){
