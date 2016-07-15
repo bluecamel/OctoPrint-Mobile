@@ -1,16 +1,13 @@
 var currentView;
 var currentPanel;
-var landscape = true;
 
 function switchView(view) {
 	if ( currentView != view ){
 		if (view == "main") {
 			switchPanel("status");
 		}
-		if (landscape) {
-			$(".view").hide();
-			$("#"+view+"_view").show();
-		}
+		$(".view").hide();
+		$("#"+view+"_view").show();
 		currentView = view;
 	}
 }

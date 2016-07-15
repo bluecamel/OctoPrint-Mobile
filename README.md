@@ -1,9 +1,9 @@
 # Nautilus - mobile shell for OctoPrint
 
 
-Octoprint simplified interface optimized for mobile devices (only works on dev branch of Octoprint)
+Octoprint simplified interface optimized for ios devices (only works on dev branch of Octoprint)
 
-The iOS app is needed to load the API key, force device on landscape and switch on/off the socket. 
+The ios app is needed to load the API key, force device on landscape and switch on/off the socket. 
 Bonus feature: shake to refresh.
 
 The iOS app is available on [Apple AppStore](https://itunes.apple.com/us/app/id1125992543)
