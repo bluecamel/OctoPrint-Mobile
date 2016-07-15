@@ -45,7 +45,6 @@ connection to octoprint server lost. it will retry 60 times every 2 seconds (2 m
 
 printer status screen (printer powered off). port and type of hotend (chimera/cyclops), dual nozzle and bed temperatures. 
 
-the link to desktop version appears only on the browser (not when using the iOS app)
 
 ![screenshot](screenshots/3.main_operational.png)
 
