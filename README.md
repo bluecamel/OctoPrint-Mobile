@@ -6,11 +6,7 @@ Octoprint simplified interface optimized for mobile devices (only works on dev b
 The iOS app is needed to load the API key, force device on landscape and switch on/off the socket. 
 Bonus feature: shake to refresh.
 
-The iOS app is available on appstore: https://itunes.apple.com/us/app/id1125992543
-
-UPDATE: For security reasons (API_KEY sent in clear) access is only allowed via the iOS app
-~~ When using the browser you can create a shortcut by using "Add to Home Screen" (it will be shown as "Nautilus")
-Without the app constrains, the webapp has some alignment problems ~~ 
+The iOS app is available on [Apple AppStore](https://itunes.apple.com/us/app/id1125992543)
 
 As long as octoprint is available over the internet, the UI changes to full screen webcam for pure monitoring. 
 
@@ -26,6 +22,9 @@ plugins:
 
 `settings.ini` under the plugin folder or it's corresponding data folder (`.octoprint/data/nautilus`) provides the gcode sequences for most of the functions provided. Make sure they are configured properly for your machine.
 
+##Updates
+ 
+ - ver 1.2 : For security reasons (API_KEY sent in clear), access is only allowed via the iOS app
 
 ##screenshots
 Setting page (under iOS Settings app)
@@ -117,7 +116,7 @@ webcam in full screen with pinch zoom enabled (this is the only screen available
 
 1. Manually install the plugin from `octoprint_mobile` to ~/.octoprint/plugins/mobile
 
-2. Compile, sign and install the ios app. Free developer license from Apple needed or get it from [Apple AppStore](https://itunes.apple.com/us/app/id1125992543)
+2. Compile, sign and install the ios app (free developer license from Apple needed), or get it from [Apple AppStore](https://itunes.apple.com/us/app/id1125992543)
 
 
 
