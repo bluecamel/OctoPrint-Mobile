@@ -27,6 +27,8 @@ function initialize(){
 			 printer.power(false);
 			 printer.power(t);
 			 printer.acceptsCommands.extend({ notify: 'dirty' });
+			 printer.alwaysAcceptsCommands.extend({ notify: 'dirty' });
+			 
 			 
 			 printer.zoom(false);
 			 printer.zoom(true);

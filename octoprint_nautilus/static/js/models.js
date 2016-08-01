@@ -360,6 +360,9 @@ function PrinterModel(){
 		}
 	});
 	
+	self.alwaysAcceptsCommands.extend({ notify: 'always' }); 
+	
+	
 	self.operational.subscribe(function(value) {		
 		if (!value) {
 			self.bed_actual(0);
@@ -372,7 +375,6 @@ function PrinterModel(){
 			$(".status_bar").css({"height": "33.34vh", "line-height": "33.34vh"});
 		}
 	});
-	
 	
 	self.inProgress = ko.computed(function(){
 		if ( self.printing() || self.paused() ){
