@@ -144,9 +144,6 @@ function onPluginData(name, data){
 					printer.zchange(data.zchange+"mm");
 				}
 			} 
-			if ( typeof(data.marlin_estimate) !== "undefined") { 
-				printer.marlin_estimate(data.marlin_estimate);
-			}
 			if ( typeof(data.port) !== "undefined") { 
 				printer.port(data.port);
 			}

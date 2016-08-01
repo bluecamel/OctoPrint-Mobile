@@ -33,39 +33,29 @@ def display_time(seconds, granularity=2):
 	return ' and '.join(result[:granularity])
 	
 class NautilusPlugin(octoprint.plugin.UiPlugin,
-	 		octoprint.plugin.TemplatePlugin,
-			octoprint.plugin.AssetPlugin,
+			octoprint.plugin.TemplatePlugin,
 			octoprint.plugin.BlueprintPlugin,
 			octoprint.plugin.EventHandlerPlugin,
 			octoprint.plugin.SettingsPlugin):
-					
+
+  ##octoprint.plugin.core.Plugin
 	def initialize(self):
-		#remember this value to send it when we reconnect
+		#self._logger.setLevel(logging.DEBUG)
+		
+		#remember this values to send it when we reconnect
 		self.zchange = ""
 		self.tool = 0
-		self.hotend = "chimera"
-		self.original_marlin_estimate = 0.0
-		self.marlin_estimate = 0.0
-		self.warmup = 0.0
-		self.almost_alert = True
+		self.hotend = ""
 		
-		#self._logger.setLevel(logging.DEBUG)
 		self._logger.info("Nautilus - OctoPrint mobile shell, started.")
 
-	def get_assets(self):
-		return dict(
-			js=[
-				"js/nautilus.js"
-			],
-			less=[],
-			css= []
-		)
-
+	##octoprint.plugin.SettingsPlugin
 	def get_settings_defaults(self):
 		return dict(
 			prowl_key = None
 		)
 
+	##octoprint.plugin.UiPlugin
 	def will_handle_ui(self, request):
 		return request.user_agent.string.startswith("Nautilus")
 		
@@ -78,6 +68,10 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			has_switch="false"
 
 		return make_response(render_template("nautilus_index.jinja2", nautilus_url=nautilus_url, has_switch=has_switch) )
+
+	##octoprint.plugin.BlueprintPlugin
+	def is_blueprint_protected(self):
+		return True
 
 	@octoprint.plugin.BlueprintPlugin.route("/home", methods=["GET"])
 	def check_home(self):
@@ -116,6 +110,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 				retval.update({section: commands})
 			return jsonify(retval)
 
+	##plugin hook
 	def custom_action_handler(self, comm, line, action, *args, **kwargs):
 		if action[:7] == "zchange":
 			self.zchange = action[8:]
@@ -128,30 +123,19 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			if self._printer.is_printing():
 				current = self._printer.get_current_data()
 				printTime = current.get("progress").get("printTime")
-				self._logger.info("Warmup done. Adding %ssec to the estimation."%current.get("progress").get("printTime"))
-				self.warmup = float(printTime)
-				self.marlin_estimate += self.warmup
-				self._plugin_manager.send_plugin_message(self._identifier, dict(marlin_estimate = self.marlin_estimate))
-		
+
+	##octoprint.plugin.EventHandlerPlugin
 	def on_event(self, event, payload):
 		if event == Events.CLIENT_OPENED:
-			self._plugin_manager.send_plugin_message(self._identifier, dict(zchange = self.zchange, marlin_estimate = self.marlin_estimate, port=self._printer.get_current_connection()[1], tool = self.tool, hotend = self.hotend))
+			self._plugin_manager.send_plugin_message(self._identifier, dict(zchange = self.zchange, port=self._printer.get_current_connection()[1], tool = self.tool, hotend = self.hotend))
 			
 		elif event == Events.PRINT_DONE:
-			message="Printed '{0}' in {1}. Estimated {2} ({3} + {4}) ".format( os.path.basename(payload.get("file")), display_time(payload.get("time")), display_time(self.marlin_estimate), display_time(self.original_marlin_estimate), display_time(self.warmup) )
+			message="Printed '{0}' in {1}".format( os.path.basename(payload.get("file")), display_time(payload.get("time")) )
 			title = "Print Done"
 			self.send_prowl(title, message)
 		elif event == Events.PRINT_STARTED:
-			self.almost_alert = True
-			
 			meta = self._file_manager.get_metadata("local", payload.get("file"))
 			self._logger.info(meta)
-			try:
-				self.marlin_estimate = meta.get("userdata").get("estimation").get("machine")
-				self.original_marlin_estimate = self.marlin_estimate
-			except Exception as e:
-				self._logger.error(e)
-				self._logger.info("marlin_estimate can't be found")
 				
 			try:
 				hotend = meta.get("userdata").get("hotend")
@@ -163,7 +147,8 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			except Exception as e:
 				self._logger.error(e)
 				self._logger.info("hotend can't be found")
-						
+
+	## Prowl notification
 	def send_prowl(self, title, message):
 		prowl_key = self._settings.get(["prowl_key"])
 		self._logger.info("Sending message '{0}':'{1}'".format(title, message))
@@ -180,6 +165,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		else:
 			self._logger.info("Prowl not yet setup. Add your prowl_key in the config file.")	
 
+	##plugin auto update 
 	def get_version(self):
 		return self._plugin_version
 

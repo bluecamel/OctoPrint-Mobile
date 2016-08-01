@@ -213,14 +213,19 @@ function unselect(){
 function protocol_error(reason) {
 	$("#disconnected_message").text(reason.responseText);
 	switchView("disconnected");
-	disconnect();
-	if (reason.status == 99){ //socket failed, retry for a while
-		if (retry_count > 0) {
-			retry_count = retry_count - 1;
-			setTimeout(function(){
-				connect();
-			}, 2000);
-		}
+	disconnect(); //just in case
+	switch (reason.status) {
+		case 99: //socket failed, retry for a while
+			if (retry_count > 0) {
+				retry_count = retry_count - 1;
+				setTimeout(function(){
+					connect();
+				}, 2000);
+			}
+		case 401:  //UNAUTHORIZED
+			$("#reconnect").click(function(){
+				initialize();
+			});
 	}
 	
 }

@@ -1,7 +1,10 @@
 $(document).ready(function() {
 	switchView("loading");
 	applyBindings();
-	
+	initialize();
+});
+
+function initialize(){
 	checkHome(function(data){
 		home = data.home;
 		if ( home ) {
@@ -41,8 +44,7 @@ $(document).ready(function() {
 			start_camera(true);
 		}
 	});
-});
-
+}
 $("#reconnect").click(function(){
 	connect();
 });

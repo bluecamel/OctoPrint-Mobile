@@ -111,7 +111,7 @@ function ActionModel(){
 
 	self.showInfo = function(){
 		var data = printer.fileInfo();
-		var message = "Material : " + data.material +"<br/>Hotend : " + data.hotend +"<br/>Nozzle : " + data.nozzle +" mm<br/>Layer height : " +data.layer+" mm<br/>Extrusion width : " +data.width+" mm<br/>Speed : " + data.speed +" mm/min<br/>Estimation : "+data.estimation.human 
+		var message = "Material : " + data.material +"<br/>Hotend : " + data.hotend +"<br/>Nozzle : " + data.nozzle +" mm<br/>Layer height : " +data.layer+" mm<br/>Extrusion width : " +data.width+" mm<br/>Speed : " + data.speed +" mm/min"
 		info( message );
 	}
 
@@ -262,22 +262,17 @@ function PrinterModel(){
 	self.zoom =  ko.observable(false);
 	
 	self.zchange =  ko.observable("");
-	self.marlin_estimate =  ko.observable(0);
 	
 	self.progress = ko.observable(0);
 	self.time_elapsed = ko.observable(0);
 	self.time_left =  ko.observable(0);
 	
 	self.aprox_time_left =  ko.computed(function(){
-		if (self.marlin_estimate()) {
-			return self.marlin_estimate() - self.time_elapsed();	
+		if (self.time_left() >= 0) {
+			return self.time_left();
 		} else {
-			if (self.time_left() >= 0) {
-				return self.time_left();
-			} else {
-				//aproximate based on percentage
-				return self.time_elapsed() * 100 / self.progress() - self.time_elapsed();
-			}
+			//aproximate based on percentage
+			return self.time_elapsed() * 100 / self.progress() - self.time_elapsed();
 		}
 	});
 	
@@ -326,7 +321,6 @@ function PrinterModel(){
 	self.fileInfo = ko.observable(null);
 	self.fileInfo.subscribe(function(value) {
 		if (value != null) {
-			self.marlin_estimate(value.estimation.machine);		
 			self.hotend_config(value.material +" on "+ value.nozzle + "mm "+ value.hotend);
 			if (value.hotend.startsWith("cyclops")){
 				sendCommand("M890 N1")
