@@ -1,52 +1,54 @@
 $(document).ready(function() {
 	switchView("loading");
 	applyBindings();
-	initialize();
-});
-
-function initialize(){
+	
 	checkHome(function(data){
 		home = data.home;
-		if ( home ) {
-			// no scrolling
-			document.ontouchmove = function(event){
-				return false;
-			};
-
-			getConnectionStatus(function(data) {
-				printer.status(data.current.state);
-				printer.port(data.current.port);
-			 });
-
-			 connect();
-			 
-			//part of the hack to enable/disable sliders. must be called after biding 
-			// and will trigger the "subscribe" function. Only needs to happen once.
-			 var t = printer.power();
-			 printer.power(true);
-			 printer.power(false);
-			 printer.power(t);
-			 printer.acceptsCommands.extend({ notify: 'dirty' });
-			 printer.alwaysAcceptsCommands.extend({ notify: 'dirty' });
-			 
-			 
-			 printer.zoom(false);
-			 printer.zoom(true);
-			 printer.zoom(false);
-			 setup_camera_click();
-			 			 
-		} else {
-			// allow scrolling
-			document.ontouchmove = function(event){
-				return true;
-			};
-			var vp = document.getElementById('vp');
-			vp.content = "width=device-width, maximum-scale=10,user-scalable=yes";
-			
-			start_camera(true);
-		}
+		initialize();
 	});
+	
+});
+
+function initialize() {
+	if ( home ) {
+		// no scrolling
+		document.ontouchmove = function(event){
+			return false;
+		};
+
+		getConnectionStatus(function(data) {
+			printer.status(data.current.state);
+			printer.port(data.current.port);
+		 });
+
+		 connect();
+		 
+		//part of the hack to enable/disable sliders. must be called after biding 
+		// and will trigger the "subscribe" function. Only needs to happen once.
+		 var t = printer.power();
+		 printer.power(true);
+		 printer.power(false);
+		 printer.power(t);
+		 printer.acceptsCommands.extend({ notify: 'dirty' });
+		 printer.alwaysAcceptsCommands.extend({ notify: 'dirty' });
+		 
+		 
+		 printer.zoom(false);
+		 printer.zoom(true);
+		 printer.zoom(false);
+		 setup_camera_click();
+	} else {
+		// allow scrolling
+		document.ontouchmove = function(event){
+			return true;
+		};
+		var vp = document.getElementById('vp');
+		vp.content = "width=device-width, maximum-scale=10,user-scalable=yes";
+		
+		start_camera(true);
+	}
 }
+
 $("#reconnect").click(function(){
 	connect();
 });
@@ -103,9 +105,9 @@ function onForeground(){
 			} else {
 				connect();
 			}
-		} else { //we moved in or out the house... reload the app
-			home = new_home;		
-			location.reload();
+		} else { //we moved in or out the house, run setup for new environment
+			home = new_home;
+			initialize();
 		}
 	});
 }

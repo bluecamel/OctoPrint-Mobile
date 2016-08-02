@@ -224,7 +224,10 @@ function protocol_error(reason) {
 			}
 		case 401:  //UNAUTHORIZED
 			$("#reconnect").click(function(){
-				initialize();
+				checkHome(function(data){
+					home = data.home;
+					initialize();
+				});
 			});
 	}
 	
