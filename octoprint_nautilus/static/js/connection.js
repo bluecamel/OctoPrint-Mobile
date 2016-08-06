@@ -195,6 +195,9 @@ function getSettings(){
 			gcodes_offset = JSON.parse(localStorage.getItem("mobile.gcodes.offset"));
 			gcodes_action = JSON.parse(localStorage.getItem("mobile.gcodes.action"));
 		}
+		offset.m1(gcodes_offset.macro_1);
+		offset.m2(gcodes_offset.macro_2);
+		offset.m3(gcodes_offset.macro_3);
 	});
 }
 

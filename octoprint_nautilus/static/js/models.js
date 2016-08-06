@@ -192,6 +192,10 @@ function OffsetModel() {
 		
 	self.prepared = ko.observable(false);
 	
+	self.m1 = ko.observable();
+	self.m2 = ko.observable();
+	self.m3 = ko.observable();
+	
 	self.update = function(){
 		if (!self.prepared()) {
 			self.current_z("reading...");	
