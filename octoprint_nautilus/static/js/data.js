@@ -28,7 +28,7 @@ function onHistoryData(history){
  	updateFlasgs(history.state.flags);
 	
 	if (printer.error()){
-		printer.status("<marquee behavior='alternate' scrolldelay=10 scrollamount=2>"+history.state.text+"</marquee>");
+		printer.status("<marquee behavior='alternate' scrolldelay=5 scrollamount=2>"+history.state.text+"</marquee>");
 		printer.operational(false);
 	} else {
 		printer.status(history.state.text);
@@ -41,7 +41,7 @@ function onCurrentData(current){
 	updateFlasgs(current.state.flags);
 	
 	if (printer.error()){
-		printer.status("<marquee behavior='alternate' scrolldelay=10 scrollamount=2>"+current.state.text+"</marquee>");
+		printer.status("<marquee behavior='alternate' scrolldelay=5 scrollamount=2>"+current.state.text+"</marquee>");
 		printer.operational(false);
 	} else {
 		printer.status(current.state.text);
