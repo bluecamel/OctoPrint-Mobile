@@ -17,6 +17,16 @@ bool load_webapp = NO;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onForeground:) name:@"onForeground" object: nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onBackground:) name:@"onBackground" object: nil];
     
+    self.webView.frame = [[UIScreen mainScreen] bounds];
+    [self.webView setOpaque:NO];
+
+    UIGraphicsBeginImageContext(self.webView.frame.size);
+    [[UIImage imageNamed:@"www/loading.png"] drawInRect:self.webView.bounds];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    self.webView.backgroundColor = [UIColor colorWithPatternImage:image ];
+    
     [self loadWebView];
 }
 

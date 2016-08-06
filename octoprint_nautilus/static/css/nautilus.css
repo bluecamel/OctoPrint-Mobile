@@ -5,12 +5,8 @@
 }
 
 body {
-  background-color: #223847;
+  background-color: transparent;
   font-family: 'Nunito', sans-serif;
-  background: url("../img/background.png");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-color: #22527B;
   height: 100vh;
 	font-size: 3.8vh;
   line-height: 5vh;
@@ -40,7 +36,8 @@ body {
 }
 
 .view {
- display:none;
+ display: none;
+ height: 100vh;
  border: 0;
  padding: 0;
 }
@@ -63,19 +60,14 @@ body {
 .sidebar-nav {  
 	text-align: center;
 	height: 20vh;
-	font-size: 15vh;
+	font-size: 13vh;
   line-height: 20vh;
 	background-color: #22527B;
 	color: #EEE;
-  padding-top: 10px !important;
-  padding-right: 0 !important;
-  padding-bottom: 0 !important;
-  padding-left: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
-.sidebar-nav span {
-	vertical-align: text-top;
-}
 
 .sidebar-nav-selected {
 	background-color: #EEE;
@@ -144,8 +136,8 @@ body {
 
 .offset_value, .offset_label  {
   padding-top: 2vh;
-  font-size: 5vh !important;
-  line-height: 6vh !important;
+  font-size: 4vh !important;
+  line-height: 5vh !important;
 }
 
 .offset_label {
@@ -237,16 +229,16 @@ body {
 	font-size: 15vh;
 }
 
-
 #disconnected_view {
 	text-align: center;
-	font-size: 20vh;
+	font-size: 15vh;
 	background-color: #ed2b36;
 	color: white;
 	font-family: 'Nunito', sans-serif;
 	line-height: 50vh;
 	padding: 0;
 	margin:0;
+  
 }
 
 #portrait_view {
