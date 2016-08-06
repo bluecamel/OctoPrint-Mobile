@@ -26,9 +26,7 @@ plugins:
  
  - ver 1.2  (plugin & ios) : For security reasons (API_KEY sent in clear), access is only allowed via the iOS app
  - ver 1.2.1 (plugin) : OctoPrint improved estimations, so own estimations based on marlin firmware have been removed
- 
- ### WIP ###
- - ver 1.3 (plugin) : fix fan slider on disconnect
+ - ver 1.3 (plugin & ios) : fix fan slider on disconnect, minor change to improve load time, camera pinch-zoom bug fix
  
 ##screenshots
 Setting page (under iOS Settings app)
