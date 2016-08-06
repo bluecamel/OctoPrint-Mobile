@@ -1,5 +1,5 @@
 var socket;
-var retry_count = 60;
+var retry_count = -1;
 var gcodes_offset;
 var gcodes_action;
 
@@ -15,7 +15,7 @@ function connect(){
 		getSettings();
 		switchView("main");
 		sendSwitchCommand("status");
-		retry_count = 60;
+		retry_count = -1;
 	};
 	
 	socket.onmessage = function(e) {
@@ -30,7 +30,7 @@ function connect(){
 			switchView("disconnected");
 			stop_camera(true); //stop camera imediatly
 		} else { //{type: "close", code: 1006, reason: "WebSocket connection broken", wasClean: false}
-			protocol_error({status: 99, responseText:"Server is offline."})
+			protocol_error({status: 503, statusText:"Service Unavailable", responseText:"Server is offline."})
 		}
 	};
 
@@ -211,24 +211,38 @@ function unselect(){
 
 //error handling
 function protocol_error(reason) {
-	$("#disconnected_message").text(reason.responseText);
-	switchView("disconnected");
 	disconnect(); //just in case
+	switchView("disconnected");	
 	switch (reason.status) {
-		case 99: //socket failed, retry for a while
-			if (retry_count > 0) {
-				retry_count = retry_count - 1;
-				setTimeout(function(){
-					connect();
-				}, 2000);
-			}
 		case 401:  //UNAUTHORIZED
+			$("#disconnected_message").html(reason.responseText);
 			$("#reconnect").click(function(){
 				checkHome(function(data){
 					home = data.home;
 					initialize();
 				});
 			});
+			break;
+		case 503:  //Service Unavailable
+			$("#disconnected_message").html("Server is offline.");
+			if (retry_count == -1) retry_count = 10;
+			if (retry_count > 0) {
+				$("#reconnect_message").html(sprintf(" Attempt to reconnect (%s)", retry_count) );
+				retry_count = retry_count - 1;
+				setTimeout(function(){
+					connect();
+				}, 10000);
+			} else $("#reconnect_message").html(" Attempt to reconnect");
+			break;
+		default: //retry for a while
+			$("#disconnected_message").html("Server is offline.");
+			if (retry_count == -1) retry_count = 20;
+			if (retry_count > 0) {
+				$("#reconnect_message").html(sprintf(" Attempt to reconnect (%s)", retry_count) );
+				retry_count = retry_count - 1;
+				setTimeout(function(){
+					connect();
+				}, 5000);
+			} else $("#reconnect_message").html(" Attempt to reconnect");
 	}
-	
 }
