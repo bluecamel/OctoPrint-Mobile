@@ -12,10 +12,8 @@ $(document).ready(function() {
 function initialize() {
 	if ( home ) {
 		// no scrolling
-		document.ontouchmove = function(event){
-			return false;
-		};
-
+		touch_ui(false);
+		
 		getConnectionStatus(function(data) {
 			printer.status(data.current.state);
 			printer.port(data.current.port);
@@ -36,7 +34,7 @@ function initialize() {
 		 printer.zoom(false);
 		 printer.zoom(true);
 		 printer.zoom(false);
-		 setup_camera_click();
+		 
 	} else {
 		// allow scrolling
 		document.ontouchmove = function(event){

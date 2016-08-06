@@ -32,6 +32,7 @@ bool load_webapp = NO;
 
 - (void) loadWebView
 {
+
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *url = [defaults stringForKey:@"serverURL"];
     NSString *apikey = [defaults stringForKey:@"apikey"];
@@ -90,9 +91,7 @@ bool load_webapp = NO;
 -(void)onForeground:(NSNotification*) notification
 {
     if ( load_webapp ) {
-        NSString* javaScript =  @"onForeground()";
-        self.webView.scrollView.zoomScale = 1.0f;
-        [self.webView stringByEvaluatingJavaScriptFromString:javaScript];
+        [self.webView stringByEvaluatingJavaScriptFromString:@"onForeground()"];
     } else {
         [self loadWebView];
     }
@@ -101,11 +100,11 @@ bool load_webapp = NO;
 -(void)onBackground:(NSNotification*) notification
 {
     if ( load_webapp ) {
-        NSString* javaScript = @"onBackground();";
-        [self.webView stringByEvaluatingJavaScriptFromString:javaScript];
+        [self.webView stringByEvaluatingJavaScriptFromString:@"onBackground();"];
+        [self.webView.scrollView zoomToRect:[[UIScreen mainScreen] bounds] animated:YES];
+        self.webView.scrollView.zoomScale = 1.0;
     }
 }
-
 
 -(void)viewDidUnload
 {
@@ -127,8 +126,8 @@ bool load_webapp = NO;
         [self loadWebView];
         
         CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation"];
-        [animation setToValue:[NSNumber numberWithFloat:-0.03f]];
-        [animation setFromValue:[NSNumber numberWithFloat:0.03f]];
+        [animation setToValue:[NSNumber numberWithFloat:-0.04f]];
+        [animation setFromValue:[NSNumber numberWithFloat:0.04f]];
         [animation setDuration:0.05];
         [animation setRepeatCount:6];
         [animation setAutoreverses:YES];
