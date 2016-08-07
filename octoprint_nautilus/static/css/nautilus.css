@@ -350,9 +350,14 @@ body {
 	line-height: 6vh;
 }
 
-.btn-link span, .btn-link i {
+.info-file {
     color:green;
 }
+
+.info-macro {
+    color:#22527B;
+}
+
 
 .slider.slider-horizontal {
 	width: 95%;
@@ -402,6 +407,11 @@ body {
 .btn-group-justified {
   width: 90%;
   margin-left: 5%;
+}
+
+[data-notify="container"] {
+  max-height: 90vh;
+  overflow: auto;
 }
 
 [data-notify="message"] {

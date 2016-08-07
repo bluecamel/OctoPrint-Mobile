@@ -214,6 +214,22 @@ function OffsetModel() {
 		self.prepared(false);
 	}
 
+
+	self.showMacro = function (){
+		var message = "";
+		if (gcodes_offset.macro_1 != "") {
+			message += "M1 :<br/>&nbsp;&nbsp;&nbsp;" + gcodes_offset.macro_1.split(",").join("<br/>&nbsp;&nbsp;&nbsp;")+"<br/>";
+		}
+		if (gcodes_offset.macro_2 != "") {
+			message += "M2 :<br/>&nbsp;&nbsp;&nbsp;" + gcodes_offset.macro_2.split(",").join("<br/>&nbsp;&nbsp;&nbsp;")+"<br/>";
+		}
+		if (gcodes_offset.macro_3 != "") {
+			message += "M3 :<br/>&nbsp;&nbsp;&nbsp;" + gcodes_offset.macro_3.split(",").join("<br/>&nbsp;&nbsp;&nbsp;")+"<br/>";
+		}
+		
+		info( message );
+	}
+	
 	self.macro1 = function(){
 		sendCommand( gcodes_offset.macro_1.split(","));
 	}

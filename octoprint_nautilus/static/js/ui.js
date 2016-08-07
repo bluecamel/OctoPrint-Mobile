@@ -75,7 +75,8 @@ $("#tool_select").bootstrapSwitch({
 			}
 		}
 	});
-	
+
+var touch_start;	
 function touch_ui(touch) {
 	if (touch){
 		document.ontouchmove = function(event){
@@ -90,9 +91,32 @@ function touch_ui(touch) {
 		$("#webcam").css({"height": "100%", "width": SCREEN_WIDTH});
 		
 	} else {
+
+		document.ontouchstart = function(event) {
+			if ( $(event.target).attr('data-notify') === "container" ) {
+				touch_start = event.touches[0].clientY;
+			}
+		}
+
 		document.ontouchmove = function(event){
-			return false;
+			if ( $(event.target).attr('data-notify') === "container" ) {
+				var t = $(event.target);
+				if (touch_start > event.changedTouches[0].clientY) {
+					//scrool down
+					return t.scrollTop() < t.get(0).scrollHeight - t.get(0).offsetHeight;
+				} else {
+					//scrool up
+					if ( t.scrollTop() == 0 ) {
+						return false;
+					} else {
+						return true;
+					}
+				}
+			} else {
+				return false;
+			}
 		};
+
 		var vp = document.getElementById('vp');
 		vp.content = "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no";
 	

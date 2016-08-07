@@ -100,7 +100,7 @@
 						<div class="row printer_row_3">
 							<button type="button" class="btn btn-success" data-bind="enable:printer.ready, visible: !printer.isFileLoaded(), click: loadLatestFile"><span class="fa fa-lg fa-file-text"></span> Load latest file</button>
 							<button type="button" class="btn btn-link" data-bind="click:deselectFile, visible: printer.isFileLoaded()"><span class="fa fa-lg fa-file-text"></span>&nbsp;<span data-bind="text: printer.fileToPrint"><span></button>
-							<button type="button" class="btn btn-link" data-bind="click:showInfo, visible: printer.fileInfo() != null"><span class="fa fa-lg fa-info-circle"></span></button>
+							<button type="button" class="btn btn-link" data-bind="click:showInfo, visible: printer.fileInfo() != null"><span class="fa fa-lg fa-info-circle info-file"></span></button>
 						</div>
 						<div class="row printer_row_4">
 							<div class="btn-group btn-group-justified">
@@ -226,6 +226,7 @@
 									<button type="button" class="btn btn-lg btn-default" data-bind="click: macro1, enable: !prepared() && m1()"><span class='fa fa-lg fa-file-o'></span> M1</button>
 									<button type="button" class="btn btn-lg btn-default" data-bind="click: macro2, enable: !prepared() && m2()"><span class='fa fa-lg fa-file-o'></span> M2</button>
 									<button type="button" class="btn btn-lg btn-default" data-bind="click: macro3, enable: !prepared() && m3()"><span class='fa fa-lg fa-file-o'></span> M3</button>
+                                                                        <button type="button" class="btn btn-link" data-bind="click:showMacro, visible: m1() || m2() || m3()"><span class="fa fa-lg fa-info-circle info-macro"></span></button>
 								</div>
 							</div>
 							<div class="offset_bar top-border">
