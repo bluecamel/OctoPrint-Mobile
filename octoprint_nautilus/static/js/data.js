@@ -24,15 +24,10 @@ function onReceivedData(data){
 }
 
 function onHistoryData(history){
- 	//console.log(history);
- 	updateFlasgs(history.state.flags);
-	
-	if (printer.error()){
-		printer.status("<marquee behavior='alternate' scrolldelay=5 scrollamount=2>"+history.state.text+"</marquee>");
-		printer.operational(false);
-	} else {
-		printer.status(history.state.text);
-	}	
+	//console.log(history);
+	updateFlasgs(history.state.flags);	
+
+	printer.status(history.state.text);
 }
 
 function onCurrentData(current){
@@ -40,12 +35,7 @@ function onCurrentData(current){
 	//console.log(current);	
 	updateFlasgs(current.state.flags);
 	
-	if (printer.error()){
-		printer.status("<marquee behavior='alternate' scrolldelay=5 scrollamount=2>"+current.state.text+"</marquee>");
-		printer.operational(false);
-	} else {
-		printer.status(current.state.text);
-	}
+	printer.status(current.state.text);
 	
 	printer.fileToPrint(current.job.file.name);
 

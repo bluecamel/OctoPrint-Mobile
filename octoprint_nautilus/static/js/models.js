@@ -279,6 +279,16 @@ function PrinterModel(){
 	self.version = ko.observable("");
 	self.status =  ko.observable("Offline");
 	
+	self.status.subscribe(function(value) {	 	
+		if (self.error() || self.closedOrError() && value != "Offline"){
+			$(".status_bar").css({"line-height": "20vh"});
+			self.operational(false);
+		} else {
+			$(".status_bar").css({"line-height": $(".status_bar").css("height")});
+		}
+		
+	});
+	
 	self.zoom =  ko.observable(false);
 	
 	self.zchange =  ko.observable("");
