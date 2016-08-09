@@ -350,7 +350,7 @@ body {
 	line-height: 6vh;
 }
 
-.info-file {
+.btn-link span, .info-file {
     color:green;
 }
 
