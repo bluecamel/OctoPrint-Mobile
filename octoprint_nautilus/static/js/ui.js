@@ -93,13 +93,13 @@ function touch_ui(touch) {
 	} else {
 
 		document.ontouchstart = function(event) {
-			if ( $(event.target).attr('data-notify') === "container" ) {
+			if ( $(event.target).hasClass("bootbox-body") ) {
 				touch_start = event.touches[0].clientY;
 			}
 		}
 
 		document.ontouchmove = function(event){
-			if ( $(event.target).attr('data-notify') === "container" ) {
+			if ( $(event.target).hasClass("bootbox-body") ) {
 				var t = $(event.target);
 				if (touch_start > event.changedTouches[0].clientY) {
 					//scrool down

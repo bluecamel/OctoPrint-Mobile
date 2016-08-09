@@ -5,27 +5,9 @@ function formatSeconds(s){
 }
 
 function message(message){
-	settings = {
-		type: 'danger',
-		allow_dismiss: true,
-		delay: 30000,
-		placement: {
-				from: "bottom",
-				align: "center"
-			}
-	};
-	$.notify(message, settings);
+	bootbox.alert({ closeButton: false, className: "bootbox-message", message: message});
 }
 
 function info(message){
-	settings = {
-		type: 'info',
-		allow_dismiss: true,
-		delay: 30000,
-		placement: {
-				from: "bottom",
-				align: "center"
-			}
-	};
-	$.notify(message, settings);
+	bootbox.alert({ closeButton: false, className: "bootbox-info", message: message});
 }

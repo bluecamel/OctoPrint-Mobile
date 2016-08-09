@@ -329,21 +329,24 @@ body {
 	font-size: 6vh;
 	line-height: 6vh;
 	text-align: center;
-  height: 95vh;
-  width: 95vw;
+  max-height: 96vh;
 }
-
-.modal-body {
-	height: 70vh;
-	}
 
 .bootbox-body {
-	padding-top: 10vh;
+	padding-top: 5vh;
+  padding-bottom: 5vh;
 }
 
-.modal-footer {
-	height: 20vh;
+.bootbox-info .bootbox-body {
+  text-align: left;
+  max-height: 70vh;
+  overflow-y: auto;
 }
+
+.bootbox-message .modal-content  {
+  background: #fbe7eb;
+}
+
 
 .modal-body .bootbox-close-button, .modal-footer .btn {
 	font-size: 6vh;

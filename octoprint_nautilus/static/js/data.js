@@ -108,6 +108,7 @@ function onEventData(type, payload) {
 	switch (type) {
 		case "Connected":
 			printer.port(payload.port);
+			bootbox.hideAll();
 			break;
 	}
 }
