@@ -90,7 +90,7 @@ function setCameraTimeout(){
 		//console.log("triggered");
 		camera_timeout = undefined; 
 		window.stop();
-	}, 30000); //stop after X seconds
+	}, 10000); //stop after X seconds
 } 
 
 //called by ios app 
