@@ -27,10 +27,10 @@ bool load_webapp = NO;
     
     self.webView.backgroundColor = [UIColor colorWithPatternImage:image ];
     
-    [self loadWebView];
+    [self loadWebApp];
 }
 
-- (void) loadWebView
+- (void) loadWebApp
 {
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -40,9 +40,7 @@ bool load_webapp = NO;
     
     if ( [apikey length] == 0 || [url length] == 0 ) {
         
-        [self showMessage: @"Please setup the server URL and the API KEY."];
-        
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+        [self showMessage: @"Please setup the server URL and the API KEY.<br/><br/>(shake to load the application settings)"];
         
     } else {
 
@@ -67,7 +65,7 @@ bool load_webapp = NO;
                     } else if ([httpResponse statusCode] == 404) {
                             [self showMessage: @"This application requires the plugin \"Nautilus\" to be installed on OctoPrint." ];
                     } else if ([httpResponse statusCode] == 503 || [httpResponse statusCode] == 502) {
-                        [self showMessage: @"OctoPrint is currently not running. If you just started up your printer, please wait a couple of seconds, then try again. (shake your device)" ];
+                        [self showMessage: @"OctoPrint is currently not running. If you just started up your printer, please wait a couple of seconds, then shake to try again." ];
                         } else {
                             load_webapp = YES;
                             NSMutableURLRequest* request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:10.0];
@@ -93,7 +91,7 @@ bool load_webapp = NO;
     if ( load_webapp ) {
         [self.webView stringByEvaluatingJavaScriptFromString:@"onForeground()"];
     } else {
-        [self loadWebView];
+        [self loadWebApp];
     }
 }
 
@@ -123,15 +121,19 @@ bool load_webapp = NO;
 - (void)motionBegan:(UIEventSubtype)motion withEvent:(UIEvent *)event
 {
     if (motion == UIEventSubtypeMotionShake) {
-        [self loadWebView];
-        
-        CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation"];
-        [animation setToValue:[NSNumber numberWithFloat:-0.04f]];
-        [animation setFromValue:[NSNumber numberWithFloat:0.04f]];
-        [animation setDuration:0.05];
-        [animation setRepeatCount:6];
-        [animation setAutoreverses:YES];
-        [[self.webView layer] addAnimation:animation forKey:nil];
+        if (load_webapp) {
+            [self loadWebApp];
+            
+            CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation"];
+            [animation setToValue:[NSNumber numberWithFloat:-0.04f]];
+            [animation setFromValue:[NSNumber numberWithFloat:0.04f]];
+            [animation setDuration:0.05];
+            [animation setRepeatCount:6];
+            [animation setAutoreverses:YES];
+            [[self.webView layer] addAnimation:animation forKey:nil];
+        } else {
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+        }
     }
 }
 
