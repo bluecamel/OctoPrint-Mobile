@@ -8,6 +8,7 @@
 @implementation ViewController
 
 bool load_webapp = NO;
+bool need_setup = NO;
 
 - (void)viewDidLoad
 {
@@ -37,13 +38,16 @@ bool load_webapp = NO;
     NSString *url = [defaults stringForKey:@"serverURL"];
     NSString *apikey = [defaults stringForKey:@"apikey"];
     load_webapp = NO;
+    need_setup = NO;
     
     if ( [apikey length] == 0 || [url length] == 0 ) {
+        
+        need_setup = YES;
         
         [self showMessage: @"Before you can use this app, the \"Nautilus\" plugin needs to be installed on OctoPrint and you need to setup the OctoPrint server URL and the API KEY in the settings of this app.<br/><br/>(shake to load the app settings)"];
         
     } else {
-
+        
         if (![url hasSuffix:@"/"] ) {
             url = [NSString stringWithFormat: @"%@/", url];
         }
@@ -121,7 +125,9 @@ bool load_webapp = NO;
 - (void)motionBegan:(UIEventSubtype)motion withEvent:(UIEvent *)event
 {
     if (motion == UIEventSubtypeMotionShake) {
-        if (load_webapp) {
+        if (need_setup) {
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+        } else {
             [self loadWebApp];
             
             CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation"];
@@ -131,8 +137,6 @@ bool load_webapp = NO;
             [animation setRepeatCount:6];
             [animation setAutoreverses:YES];
             [[self.webView layer] addAnimation:animation forKey:nil];
-        } else {
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
         }
     }
 }
