@@ -40,7 +40,7 @@ bool load_webapp = NO;
     
     if ( [apikey length] == 0 || [url length] == 0 ) {
         
-        [self showMessage: @"Please setup the server URL and the API KEY.<br/><br/>(shake to load the application settings)"];
+        [self showMessage: @"Before you can use this app, the \"Nautilus\" plugin needs to be installed on OctoPrint and you need to setup the OctoPrint server URL and the API KEY in the settings of this app.<br/><br/>(shake to load the app settings)"];
         
     } else {
 
