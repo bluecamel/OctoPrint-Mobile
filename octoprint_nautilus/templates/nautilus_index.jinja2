@@ -40,9 +40,12 @@
 							<div class="port" data-bind="text: printer.port"></div>
 							<div class="nozzle" data-bind="text: printer.cyclops()?'single nozzle':'dual nozzle', visible: printer.dual_extruder()"></div>
 							<div data-bind="html: printer.status"></div>
-						</div>						
+						</div>
 						<div class="status_bar printing_time_elapsed" data-bind="visible: printer.inProgress, text: formatSeconds(printer.time_elapsed())"></div>
-						<div class="status_bar printing_time_left" data-bind="visible: printer.inProgress, text: formatSeconds(printer.aprox_time_left()), style: { color: printer.time_left() < 0 ? '#ffabab' : '' }"></div>
+						<div class="status_bar printing_time_left" data-bind="visible: printer.inProgress, style: { color: printer.printTimeLeftOriginClass}">
+							<div data-bind="text: formatSeconds(printer.aprox_time_left())"></div>
+							<div class="print_time_origin" style="display: none" data-bind="visible: printer.printTimeLeftOrigin, text: printer.printTimeLeftOriginString"></div>
+						</div>
 						<div class="status_bar extruder_temp"><div data-bind="visible: temp_visible">
 							<span class='fa fa-lg fa-fire'></span><span data-bind="html:extruder_temp"></span></div>
 						</div>

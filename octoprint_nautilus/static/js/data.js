@@ -5,7 +5,7 @@ function onReceivedData(data){
 	if (typeof(data) === "string") {
 		data = JSON.parse(data);
 	}
-	//console.log(data);
+  
 	if(typeof(data.current) !== "undefined"){
 		onCurrentData(data.current);
 	} 
@@ -25,20 +25,22 @@ function onReceivedData(data){
 
 function onHistoryData(history){
 	//console.log(history);
-	updateFlasgs(history.state.flags);	
 
-	printer.status(history.state.text);
+	updateFlasgs(history.state);	
+
 }
 
 function onCurrentData(current){
 	// uppdate printer status
-	//console.log(current);	
-	updateFlasgs(current.state.flags);
-	
-	printer.status(current.state.text);
-	
-	printer.fileToPrint(current.job.file.name);
-
+	//console.log(current);
+	updateFlasgs(current.state);
+  
+  if ( printer.error() || printer.closedOrError() ) {
+	  printer.fileToPrint(null);
+  } else {
+    printer.fileToPrint(current.job.file.name);
+  }
+  
 	onMessageData(current.messages);
 	
 	if(typeof(current.temps[0]) !== "undefined"){
@@ -60,28 +62,30 @@ function onCurrentData(current){
 	if(current.state.flags.printing){
 		//console.log(formatSeconds(current.progress.printTimeLeft));
 		printer.progress(parseFloat(current.progress.completion));
-		
 		printer.time_elapsed(parseInt(current.progress.printTime));
 		
 		if(current.progress.printTimeLeft != null){
 			printer.time_left(parseInt(current.progress.printTimeLeft));
+      printer.printTimeLeftOrigin(current.progress.printTimeLeftOrigin);
 		}
 	}
 }
 
-function updateFlasgs(flags){
+function updateFlasgs(state){
+
 	//whether the printer is currently connected and responding
-	printer.operational(flags.operational);
+	printer.operational(state.flags.operational);
 	//whether the printer is currently printing>
-	printer.printing(flags.printing);
+	printer.printing(state.flags.printing);
 	//whether the printer is currently disconnected and/or in an error state	
-	printer.closedOrError(flags.closedOrError);
+	printer.closedOrError(state.flags.closedOrError);
 	//whether the printer is currently in an error state
-	printer.error(flags.error);
+	printer.error(state.flags.error);
 	//whether the printer is currently paused
-	printer.paused(flags.paused);
+	printer.paused(state.flags.paused);
 	//whether the printer is operational and ready for jobs
-	printer.ready(flags.ready);
+	printer.ready(state.flags.ready);
+  printer.status(state.text);
 }
 
 function onMessageData(messages){

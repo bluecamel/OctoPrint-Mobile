@@ -378,7 +378,7 @@ body {
 	margin-left: -3vw !important;
 }
 
-.port, .nozzle, .zchange, .hotend, .desktop{
+.port, .nozzle, .zchange, .hotend, .desktop, .print_time_origin {
   text-align: right;
   font-size: 4vh;
   position: absolute;
@@ -403,6 +403,12 @@ body {
 
 .desktop {
 	bottom: 1vh;
+}
+
+.print_time_origin {
+  bottom: 40vh;
+  font-size: 3vh;
+  color: #fff;
 }
 
 .desktop a{

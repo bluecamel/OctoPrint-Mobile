@@ -279,14 +279,13 @@ function PrinterModel(){
 	self.version = ko.observable("");
 	self.status =  ko.observable("Offline");
 	
-	self.status.subscribe(function(value) {	 	
+	self.status.subscribe(function(value) {
 		if (self.error() || self.closedOrError() && value != "Offline"){
 			$(".status_bar").css({"line-height": "20vh"});
 			self.operational(false);
 		} else {
 			$(".status_bar").css({"line-height": $(".status_bar").css("height")});
 		}
-		
 	});
 	
 	self.zoom =  ko.observable(false);
@@ -305,6 +304,54 @@ function PrinterModel(){
 			return self.time_elapsed() * 100 / self.progress() - self.time_elapsed();
 		}
 	});
+  
+   self.printTimeLeftOrigin = ko.observable(undefined);
+   
+  self.printTimeLeftOriginString = ko.pureComputed(function() {
+      var value = self.printTimeLeftOrigin();
+      switch (value) {
+          case "linear": {
+              return "Based on a linear approximation (accuracy highly dependent on the model)";
+          }
+          case "analysis": {
+              return "Based on the estimate from analysis of file (medium accuracy)";
+          }
+          case "mixed-analysis": {
+              return "Based on a mix of estimate from analysis and calculation (medium accuracy)";
+          }
+          case "average": {
+              return "Based on the average total of past prints of this model with the same printer profile (usually good accuracy)";
+          }
+          case "mixed-average": {
+              return "Based on a mix of average total from past prints and calculation (usually good accuracy)";
+          }
+          case "estimate": {
+              return "Based on the calculated estimate (best accuracy)";
+          }
+          default: {
+              return "";
+          }
+      }
+  });
+  
+  self.printTimeLeftOriginClass = ko.pureComputed(function() {
+      var value = self.printTimeLeftOrigin();
+      switch (value) {
+          default:
+          case "linear": {
+              return "#ff4f49";
+          }
+          case "analysis":
+          case "mixed-analysis": {
+              return "#ffabab";
+          }
+          case "average":
+          case "mixed-average":
+          case "estimate": {
+              return "#fff";
+          }
+      }
+  });
 	
 	self.power = ko.observable(true);
 	self.lights = ko.observable(false);

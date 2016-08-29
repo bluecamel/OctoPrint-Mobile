@@ -15,7 +15,6 @@ function initialize() {
 		touch_ui(false);
 		
 		getConnectionStatus(function(data) {
-			printer.status(data.current.state);
 			printer.port(data.current.port);
 		 });
 
