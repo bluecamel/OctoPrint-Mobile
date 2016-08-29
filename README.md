@@ -28,7 +28,7 @@ plugins:
  - ver 1.2.1 (plugin) : OctoPrint improved estimations, so own estimations based on marlin firmware have been removed
  - ver 1.3 (plugin & ios) : fix fan slider on disconnect, minor change to improve load time, camera pinch-zoom bug fix
  - ver 1.3.1 (plugin) : added macro info button, change the  way error messages are displayed, replace bootstrap-notify with bootbox.alert
-
+ - ver 1.3.2 (plugin) : added estimate explanation
  
 ##screenshots
 Setting page (under iOS Settings app)
