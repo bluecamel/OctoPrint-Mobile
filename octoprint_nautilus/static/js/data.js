@@ -64,10 +64,10 @@ function onCurrentData(current){
 		printer.progress(parseFloat(current.progress.completion));
 		printer.time_elapsed(parseInt(current.progress.printTime));
 		
-		if(current.progress.printTimeLeft != null){
+	  if(current.progress.printTimeLeft != null){
 			printer.time_left(parseInt(current.progress.printTimeLeft));
-      printer.printTimeLeftOrigin(current.progress.printTimeLeftOrigin);
-		}
+		} 
+    printer.printTimeLeftOrigin(current.progress.printTimeLeftOrigin);
 	}
 }
 

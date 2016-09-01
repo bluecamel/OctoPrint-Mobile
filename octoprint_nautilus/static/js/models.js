@@ -195,6 +195,7 @@ function OffsetModel() {
 	self.m1 = ko.observable();
 	self.m2 = ko.observable();
 	self.m3 = ko.observable();
+  self.m4 = ko.observable();
 	
 	self.update = function(){
 		if (!self.prepared()) {
@@ -226,6 +227,9 @@ function OffsetModel() {
 		if (gcodes_offset.macro_3 != "") {
 			message += "M3 :<br/>&nbsp;&nbsp;&nbsp;" + gcodes_offset.macro_3.split(",").join("<br/>&nbsp;&nbsp;&nbsp;")+"<br/>";
 		}
+		if (gcodes_offset.macro_4 != "") {
+			message += "M4 :<br/>&nbsp;&nbsp;&nbsp;" + gcodes_offset.macro_4.split(",").join("<br/>&nbsp;&nbsp;&nbsp;")+"<br/>";
+		}
 		
 		info( message );
 	}
@@ -238,6 +242,10 @@ function OffsetModel() {
 	}
 	self.macro3 = function(){
 		sendCommand( gcodes_offset.macro_3.split(","));
+	}
+
+	self.macro4 = function(){
+		sendCommand( gcodes_offset.macro_4.split(","));
 	}
 
 
@@ -297,21 +305,22 @@ function PrinterModel(){
 	self.time_left =  ko.observable(0);
 	
 	self.aprox_time_left =  ko.computed(function(){
-		if (self.time_left() >= 0) {
-			return self.time_left();
+		if (self.time_left() > 0) {
+			return formatSeconds(self.time_left());
 		} else {
 			//aproximate based on percentage
-			return self.time_elapsed() * 100 / self.progress() - self.time_elapsed();
+			//return self.time_elapsed() * 100 / self.progress() - self.time_elapsed();
+			return "Still stabilizing...";
 		}
 	});
   
-   self.printTimeLeftOrigin = ko.observable(undefined);
+	self.printTimeLeftOrigin = ko.observable(undefined);
    
-  self.printTimeLeftOriginString = ko.pureComputed(function() {
+	self.printTimeLeftOriginString = ko.pureComputed(function() {
       var value = self.printTimeLeftOrigin();
       switch (value) {
           case "linear": {
-              return "Based on a linear approximation (accuracy highly dependent on the model)";
+              return "Based on a linear approximation (very low accuracy, especially at the beginning of the print)";
           }
           case "analysis": {
               return "Based on the estimate from analysis of file (medium accuracy)";

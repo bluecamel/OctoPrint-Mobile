@@ -43,7 +43,7 @@
 						</div>
 						<div class="status_bar printing_time_elapsed" data-bind="visible: printer.inProgress, text: formatSeconds(printer.time_elapsed())"></div>
 						<div class="status_bar printing_time_left" data-bind="visible: printer.inProgress, style: { color: printer.printTimeLeftOriginClass}">
-							<div data-bind="text: formatSeconds(printer.aprox_time_left())"></div>
+							<div data-bind="text: printer.aprox_time_left"></div>
 							<div class="print_time_origin" style="display: none" data-bind="visible: printer.printTimeLeftOrigin, text: printer.printTimeLeftOriginString"></div>
 						</div>
 						<div class="status_bar extruder_temp"><div data-bind="visible: temp_visible">
@@ -229,7 +229,8 @@
 									<button type="button" class="btn btn-lg btn-default" data-bind="click: macro1, enable: !prepared() && m1()"><span class='fa fa-lg fa-file-o'></span> M1</button>
 									<button type="button" class="btn btn-lg btn-default" data-bind="click: macro2, enable: !prepared() && m2()"><span class='fa fa-lg fa-file-o'></span> M2</button>
 									<button type="button" class="btn btn-lg btn-default" data-bind="click: macro3, enable: !prepared() && m3()"><span class='fa fa-lg fa-file-o'></span> M3</button>
-                                                                        <button type="button" class="btn btn-link" data-bind="click:showMacro, visible: m1() || m2() || m3()"><span class="fa fa-lg fa-info-circle info-macro"></span></button>
+									<button type="button" class="btn btn-lg btn-default" data-bind="click: macro4, enable: !prepared() && m4()"><span class='fa fa-lg fa-file-o'></span> M4</button>
+									<button type="button" class="btn btn-link" data-bind="click:showMacro, visible: m1() || m2() || m3() || m4()"><span class="fa fa-lg fa-info-circle info-macro"></span></button>
 								</div>
 							</div>
 							<div class="offset_bar top-border">

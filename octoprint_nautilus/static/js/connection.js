@@ -198,6 +198,7 @@ function getSettings(){
 		offset.m1(gcodes_offset.macro_1);
 		offset.m2(gcodes_offset.macro_2);
 		offset.m3(gcodes_offset.macro_3);
+    offset.m4(gcodes_offset.macro_4);
 	});
 }
 
