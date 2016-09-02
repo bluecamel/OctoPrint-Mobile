@@ -42,7 +42,7 @@
 							<div data-bind="html: printer.status"></div>
 						</div>
 						<div class="status_bar printing_time_elapsed" data-bind="visible: printer.inProgress, text: formatSeconds(printer.time_elapsed())"></div>
-						<div class="status_bar printing_time_left" data-bind="visible: printer.inProgress, style: { color: printer.printTimeLeftOriginClass}">
+						<div class="status_bar printing_time_left" data-bind="visible: printer.inProgress, style: { backgroundColor: printer.printTimeLeftOriginClass}">
 							<div data-bind="text: printer.aprox_time_left"></div>
 							<div class="print_time_origin" style="display: none" data-bind="visible: printer.printTimeLeftOrigin, text: printer.printTimeLeftOriginString"></div>
 						</div>

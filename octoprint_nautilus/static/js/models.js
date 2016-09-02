@@ -348,16 +348,16 @@ function PrinterModel(){
       switch (value) {
           default:
           case "linear": {
-              return "#ff4f49";
+              return "#f0555e";
           }
           case "analysis":
           case "mixed-analysis": {
-              return "#ffabab";
+              return "#ee404a";
           }
           case "average":
           case "mixed-average":
           case "estimate": {
-              return "#fff";
+              return "#ed2b36";
           }
       }
   });
