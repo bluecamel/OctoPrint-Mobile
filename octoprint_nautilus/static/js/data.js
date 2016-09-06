@@ -128,7 +128,7 @@ function onPluginData(name, data){
 			printer.unload(JSON.parse(data.unload));
 			printer.poweroff(JSON.parse(data.poweroff));
 			break;
-		case "mobile":
+		case "nautilus":
 			if ( typeof(data.message) !== "undefined") {
 				message(data.message);
 			} 
