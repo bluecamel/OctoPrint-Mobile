@@ -29,6 +29,7 @@ plugins:
  - ver 1.3 (plugin & ios) : fix fan slider on disconnect, minor change to improve load time, camera pinch-zoom bug fix
  - ver 1.3.1 (plugin) : added macro info button, change the  way error messages are displayed, replace bootstrap-notify with bootbox.alert
  - ver 1.3.2 (plugin) : added estimate explanation
+ - ver 1.3.3 (plugin) : fix info screen, time estimation bachground color changes, additional maco (why not?)
  
 ##screenshots
 Setting page (under iOS Settings app)
