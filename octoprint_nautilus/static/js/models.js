@@ -306,7 +306,7 @@ function PrinterModel(){
 	
 	self.aprox_time_left =  ko.computed(function(){
 		if (self.time_left() > 0) {
-			return formatSeconds(self.time_left());
+			return formatFuzzyPrintTime(self.time_left());
 		} else {
 			//aproximate based on percentage
 			//return self.time_elapsed() * 100 / self.progress() - self.time_elapsed();
