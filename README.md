@@ -30,6 +30,7 @@ plugins:
  - ver 1.3.1 (plugin) : added macro info button, change the  way error messages are displayed, replace bootstrap-notify with bootbox.alert
  - ver 1.3.2 (plugin) : added estimate explanation
  - ver 1.3.3 (plugin) : fix info screen, time estimation background colour changes, additional macro (why not?)
+ - ver 1.3.4 (plugin) : fix internal address checking
  
 ##screenshots
 Setting page (under iOS Settings app)
