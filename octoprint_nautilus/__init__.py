@@ -64,13 +64,47 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		self.hotend = ""
 		
 		self._logger.info("Nautilus - OctoPrint mobile shell, started.")
+
+	##octoprint.plugin.TemplatePlugin
+	def get_template_configs(self):
+		return [
+			dict(type="settings", template="nautilus_settings.jinja2", custom_bindings=False)
+		]
 	
 	##octoprint.plugin.SettingsPlugin
 	def get_settings_defaults(self):
 		return dict(
 			prowl_key = None
 		)
-	
+
+	def on_settings_load(self):
+		octoprint.plugin.SettingsPlugin.on_settings_load(self)
+		
+		inifile = os.path.join(self._basefolder, "settings.ini")
+		if os.path.isfile(os.path.join(self.get_plugin_data_folder(), "settings.ini")):
+			inifile = os.path.join(self.get_plugin_data_folder(), "settings.ini")
+
+		with open(inifile) as f:
+			gcodes = f.read()
+		
+		return dict(
+			prowl_key = self._settings.get(["prowl_key"]),
+			gcodes = gcodes
+		)
+		
+		
+	def on_settings_save(self, data):
+		if 'gcodes' in data:
+			gcodes = data.pop('gcodes')
+			inifile = os.path.join(self.get_plugin_data_folder(), "settings.ini")
+			f = open(inifile, 'w')
+			f.write(gcodes)
+			f.close()
+			self._plugin_manager.send_plugin_message(self._identifier, dict(action = "settings"))
+
+		octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
+
+
 	##octoprint.plugin.UiPlugin
 	def will_handle_ui(self, request):
 		return request.user_agent.string.startswith("Nautilus")

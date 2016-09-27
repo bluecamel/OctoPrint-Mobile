@@ -132,6 +132,13 @@ function onPluginData(name, data){
 			if ( typeof(data.message) !== "undefined") {
 				message(data.message);
 			} 
+			if ( typeof(data.action) !== "undefined") {
+				switch (data.action) {
+					case "settings":
+						getSettings();
+						break;
+				}
+			} 
 			if ( typeof(data.zchange) !== "undefined") {
 				if (data.zchange == "") {
 					printer.zchange("");
