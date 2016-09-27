@@ -31,6 +31,7 @@ plugins:
  - ver 1.3.2 (plugin) : added estimate explanation
  - ver 1.3.3 (plugin) : fix info screen, time estimation background colour changes, additional macro (why not?)
  - ver 1.3.4 (plugin) : fix internal address checking
+ - ver 1.3.5 (plugin) : allow editing "settings.ini" via the OctoPrint UI (under settings)
  
 ##screenshots
 Setting page (under iOS Settings app)
