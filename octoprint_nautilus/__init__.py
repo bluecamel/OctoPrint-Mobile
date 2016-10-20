@@ -80,7 +80,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 	def on_settings_load(self):
 		octoprint.plugin.SettingsPlugin.on_settings_load(self)
 		
-		inifile = os.path.join(self._basefolder, "settings.ini")
+		inifile = os.path.join(self._basefolder, "default", "settings.ini")
 		if os.path.isfile(os.path.join(self.get_plugin_data_folder(), "settings.ini")):
 			inifile = os.path.join(self.get_plugin_data_folder(), "settings.ini")
 
@@ -139,7 +139,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 	@octoprint.plugin.BlueprintPlugin.route("/settings/<identifier>", methods=["GET"])
 	def get_ini_settings(self, identifier):
 		ini_settings = ConfigParser.ConfigParser()
-		inifile = os.path.join(self._basefolder, "settings.ini")
+		inifile = os.path.join(self._basefolder, "default", "settings.ini")
 		if os.path.isfile(os.path.join(self.get_plugin_data_folder(), "settings.ini")):
 			inifile = os.path.join(self.get_plugin_data_folder(), "settings.ini")
 		
