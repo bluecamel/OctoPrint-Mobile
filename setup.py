@@ -41,7 +41,8 @@ plugin_requires = []
 
 # Additional package data to install for this plugin. The subfolders "templates", "static" and "translations" will
 # already be installed automatically if they exist.
-plugin_additional_data = []
+plugin_additional_data = ["settings.ini"]
+
 
 # Any additional python packages you need to install with your plugin that are not contains in <plugin_package>.*
 plugin_addtional_packages = []
