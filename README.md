@@ -3,7 +3,8 @@
 
 Octoprint simplified interface optimized for ios devices (only works on dev branch of Octoprint)
 
-The ios app is needed to load the API key, force device on landscape and switch on/off the socket. 
+The iOS app will force landscape, maintain the API key and handle the server connection.
+
 Bonus feature: shake to refresh.
 
 The iOS app is available on [Apple AppStore](https://itunes.apple.com/us/app/id1125992543)
@@ -20,7 +21,7 @@ plugins:
 
 `pyprowl` included from https://github.com/babs/pyrowl/tree/master
 
-`settings.ini` under the plugin `default` folder or it's corresponding data folder (`.octoprint/data/nautilus`) provides the gcode sequences for most of the functions provided. Make sure they are configured properly for your machine.
+`settings.ini` under the plugin folder or it's corresponding data folder (`.octoprint/data/nautilus`) provides the gcode sequences for most of the functions provided. Make sure they are configured properly for your machine.
 
 Some supplementary, non-core switch functions depend on a additional plugin which can be install separatly from [https://github.com/MoonshineSG/OctoPrint-Switch/archive/master.zip](https://github.com/MoonshineSG/OctoPrint-Switch/archive/master.zip). If the Switch plugin is not detected, the respective buttons are grey out and the printer is assumed to be powered on.
 
@@ -35,7 +36,6 @@ Some supplementary, non-core switch functions depend on a additional plugin whic
  - ver 1.3.3 (plugin) : fix info screen, time estimation background colour changes, additional macro (why not?)
  - ver 1.3.4 (plugin) : fix internal address checking
  - ver 1.3.5 (plugin) : allow editing "settings.ini" via the OctoPrint UI (under settings)
-
  
 ##screenshots
 Setting page (under iOS Settings app)
@@ -131,8 +131,4 @@ webcam in full screen with pinch zoom enabled (this is the only screen available
 3. Edit the gcodes via OctoPrint settings. Optionally the prowl key.
 
 4. Configure the iOS app key in your iPhone/iPad settings.
-
-
-
-
 
