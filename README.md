@@ -20,7 +20,10 @@ plugins:
 
 `pyprowl` included from https://github.com/babs/pyrowl/tree/master
 
-`settings.ini` under the plugin folder or it's corresponding data folder (`.octoprint/data/nautilus`) provides the gcode sequences for most of the functions provided. Make sure they are configured properly for your machine.
+`settings.ini` under the plugin `default` folder or it's corresponding data folder (`.octoprint/data/nautilus`) provides the gcode sequences for most of the functions provided. Make sure they are configured properly for your machine.
+
+Some supplementary, non-core switch functions depend on a additional plugin which can be install separatly from [https://github.com/MoonshineSG/OctoPrint-Switch/archive/master.zip](https://github.com/MoonshineSG/OctoPrint-Switch/archive/master.zip). If the Switch plugin is not detected, the respective buttons are grey out and the printer is assumed to be powered on.
+
 
 ##Updates
  
@@ -32,6 +35,7 @@ plugins:
  - ver 1.3.3 (plugin) : fix info screen, time estimation background colour changes, additional macro (why not?)
  - ver 1.3.4 (plugin) : fix internal address checking
  - ver 1.3.5 (plugin) : allow editing "settings.ini" via the OctoPrint UI (under settings)
+
  
 ##screenshots
 Setting page (under iOS Settings app)
@@ -50,13 +54,13 @@ connection to octoprint server lost. it will retry 60 times every 2 seconds (2 m
 
 ![screenshot](screenshots/2.diconnected.png)
 
-printer status screen (printer powered off). port and type of hotend (chimera/cyclops), dual nozzle and bed temperatures. 
+printer status screen (printer powered off). port and type of hotend (information taken from OctoPrint profile), dual nozzle and bed temperatures. 
 
 
 ![screenshot](screenshots/3.main_operational.png)
 
-printer command pannel. IR lights, sound, unload fillament when printing done, turn off printer when printing done (these require https://github.com/MoonshineSG/OctoPrint-Switch plugin)
-reset printer (GPIO), disconnect and power on/off (GPIO relay). umbrela indicates commands with confirmation.  
+printer command pannel. IR lights, sound, unload fillament when printing done, turn off printer when printing done (these require teh [Switch Pluing](https://github.com/MoonshineSG/OctoPrint-Switch plugin) )
+reset printer (via GPIO - requires RPi GPIO - Printer Restet pin connection), disconnect and power on/off (GPIO relay). umbrela indicates commands with confirmation.  
 
 temperature controls, load/unload file and print commands
 
@@ -120,73 +124,15 @@ webcam in full screen with pinch zoom enabled (this is the only screen available
 
 ###Setup
 
-1. Manually install the plugin using this URL: [https://github.com/MoonshineSG/Octoprint-Mobile/archive/master.zip](https://github.com/MoonshineSG/Octoprint-Mobile/archive/master.zip)
+1. Install via Plugin Manager or manually using this URL: [https://github.com/MoonshineSG/Octoprint-Mobile/archive/master.zip](https://github.com/MoonshineSG/Octoprint-Mobile/archive/master.zip)
 
-2. Compile, sign and install the ios app (free developer license from Apple needed), or get it from [Apple AppStore](https://itunes.apple.com/us/app/id1125992543)
+2. Get iOS application from [Apple AppStore](https://itunes.apple.com/us/app/id1125992543) (or compile, sign and install the ios app - developer license from Apple needed)
+
+3. Edit the gcodes via OctoPrint settings. Optionally the prowl key.
+
+4. Configure the iOS app key in your iPhone/iPad settings.
 
 
 
-#More....
 
 
-_This is part of a integrated solution to create a smooth 3D printing experience by "gluing" the individual software and hardware players_
-
-##Simplify3D - the slicer
-
-Models (downloaded or created by Fusion360) are loaded and sliced based on selected material/quality/extruder-nozzle combo.
-
-The "auto-select" `material` and `extruders` have names that will eventually be displyed in the "Info" tab of the mobile octoprint
-
-The "Starting Script" ends with `"; ------------ START GCODE ----------"`. This will be used later.
-
-Once the code file gets generated, Simplify3D executes the postprocessing sequence 
-
-```
-{REPLACE "; layer" "M808 zchange Layer"} 
-{REPLACE " Z = " " "}
-/full_path_to/toctoprint.py  trash select --gcode "[output_filepath]"
-```
-
-See https://github.com/MoonshineSG/Simplify3D-to-OctoPrint
-
-## RaspberryPi - the brain 
-
-runs Octoprint and has a couple of opto relays connected to the GPIO pins as well as direct control over the reset PIN 
-of the 3D printer board (see  https://github.com/MoonshineSG/emergency-button).
-
-## Octoprint - the controler 
-
-A few plugins assist the main software:
-
-* replacemnt UI for octoprint on mobile devices mobile https://github.com/MoonshineSG/OctoPrint-Mobile
-
-* GPIO are controlled by https://github.com/MoonshineSG/OctoPrint-Switch
-
-* MP3 sounds https://github.com/MoonshineSG/OctoPrint-Sound
-
-* additional tiny helpers https://github.com/MoonshineSG/OctoPrint-Plugins
-
-## Marlin - the firmware
-
-customised firmware with additional commands
-
-* M808: echo parameters as `//action:`
-
-* M889: cooling fan for end of print sequence (works with `TEMP_STAT_LEDS`)
-
-around line #8372
-```
-digitalWrite(STAT_LED_BLUE, new_led ? LOW : HIGH);
-if (! new_led ) {
-  enqueue_and_echo_commands_P(PSTR("M889 C0"));
-  SERIAL_PROTOCOLLN("//action:cooled");
-}
-
-```
-
-* M890: swappable extruder (see https://github.com/MarlinFirmware/Marlin/issues/3980)
-
-_All changes available at_ https://github.com/MoonshineSG/Marlin
-
-## Opto relays the workers
-used as printer power and IR lights switches
