@@ -36,9 +36,9 @@
 					<div id="status_panel" class="panel">
 						<div class="status_bar printer_status" data-bind="style: { background: printer.progress() > 0 ? 'linear-gradient(90deg, #17b566 '+printer.progress()+'%, #ed2b36 0%)':printer.power()?'#17b566':'#ed2b36' }">
 							<div class="zchange" data-bind="visible: printer.inProgress, text: printer.zchange"></div>
-							<div class="hotend" data-bind="visible: !printer.inProgress(), text: printer.hotend_config"></div>
+							<div class="hotend" data-bind="visible: !printer.inProgress(), text: printer.slicer_config"></div>
 							<div class="port" data-bind="text: printer.port"></div>
-							<div class="nozzle" data-bind="text: printer.cyclops()?'single nozzle':'dual nozzle', visible: printer.dual_extruder()"></div>
+							<div class="nozzle" data-bind="text: printer.hotend_config"></div>
 							<div data-bind="html: printer.status"></div>
 						</div>
 						<div class="status_bar printing_time_elapsed" data-bind="visible: printer.inProgress, text: formatSeconds(printer.time_elapsed())"></div>
@@ -72,15 +72,15 @@
 									<input class="temp_slider" type="text" data-bind="sliderValue: {value: extruder0_slider_value, ticks: [0, 100, 160, 180, 200, 210, 230, 250], ticks_positions: [0, 10, 25, 40, 55, 70, 85, 100], ticks_labels: ['Off', '100', '160', '180', '200', '210', '230', '250'], ticks_snap_bounds: 3, tooltip: 'hide'}"/>
 								</div>
 								<div class="col-xs-4">
-									<button type="button" class="btn btn-default" data-bind="enable: printer.acceptsCommands, click: sendExtruder0Temperature, style: { color: extruder0_slider_value() == 0  ? '#17b566' : '#ed2b36' }"><span>left&nbsp;</span><span class="fa fa-lg fa-fire"></span><span data-bind="text: extruder0_slider_value() == 0  ? ' off': ' to ' + extruder0_slider_value() + 'ºC'"></span></button>
+									<button type="button" class="btn btn-default" data-bind="enable: printer.acceptsCommands, click: sendExtruder0Temperature, style: { color: extruder0_slider_value() == 0  ? '#17b566' : '#ed2b36' }"><span data-bind="visible: printer.dual_nozzle()">left&nbsp;</span><span class="fa fa-lg fa-fire"></span><span data-bind="text: extruder0_slider_value() == 0  ? ' off': ' to ' + extruder0_slider_value() + 'ºC'"></span></button>
 								</div>
 							</div>
-							<div class="row slider-row">
+							<div class="row slider-row" data-bind="visible: printer.dual_nozzle()">
 								<div class="col-xs-8">
 									<input class="temp_slider temp_slider_dual" type="text" data-bind="sliderValue: {value: extruder1_slider_value, ticks: [0, 100, 160, 180, 200, 210, 230, 250], ticks_positions: [0, 10, 25, 40, 55, 70, 85, 100], ticks_labels: ['Off', '100', '160', '180', '200', '210', '230', '250'], ticks_snap_bounds: 3, tooltip: 'hide'}"/>
 								</div>
 								<div class="col-xs-4">
-									<button type="button" class="btn btn-default" data-bind="enable: printer.dual_extruder() && !printer.cyclops() && printer.acceptsCommands(), click: sendExtruder1Temperature, style: { color: extruder1_slider_value() == 0  ? '#17b566' : '#ed2b36' }"><span>right&nbsp;</span><span class="fa fa-lg fa-fire"></span><span data-bind="text: extruder1_slider_value() == 0  ? ' off': ' to ' + extruder1_slider_value() + 'ºC'"></span></button>
+									<button type="button" class="btn btn-default" data-bind="enable: printer.dual_nozzle() && printer.acceptsCommands(), click: sendExtruder1Temperature, style: { color: extruder1_slider_value() == 0  ? '#17b566' : '#ed2b36' }"><span>right&nbsp;</span><span class="fa fa-lg fa-fire"></span><span data-bind="text: extruder1_slider_value() == 0  ? ' off': ' to ' + extruder1_slider_value() + 'ºC'"></span></button>
 								</div>
 							</div>
 							<div class="row  slider-row">
@@ -160,7 +160,7 @@
 							<div class="col-xs-6 no-padding">
 							<button type="button" class="btn btn-default" data-bind="click: sendCommandByName.bind($data, 'motors_off')"><span class="fa fa-lg fa-gears"></span> Motors Off</button>
 							</div>
-							<div class="col-xs-6 no-padding">
+							<div class="col-xs-6 no-padding" data-bind="visible: printer.dual_extruder()">
 								<input id="tool_select" type="checkbox" checked>
 							</div>	
 						</div>

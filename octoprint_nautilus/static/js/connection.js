@@ -64,6 +64,16 @@ function getConnectionStatus(callback){
 		}).done(function(data){if (typeof callback === "function") callback(data);});
 }
 
+function getExtruderCountFromProfile(callback){
+		$.ajax({
+			url:  BASE_URL+"api/printerprofiles",
+			headers: {"X-Api-Key": API_KEY},
+			method: "GET",
+			timeout: 10000,
+			contentType: "application/json"
+		}).done(function(data){if (typeof callback === "function") callback(data);});
+}
+
 //files commands
 function sendLoadFile(filename){
 		$.ajax({
@@ -250,3 +260,4 @@ function protocol_error(reason) {
 			} else $("#reconnect_message").html(" Attempt to reconnect");
 	}
 }
+

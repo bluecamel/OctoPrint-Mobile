@@ -15,6 +15,8 @@ from . import pyrowl
 from struct import unpack
 from socket import AF_INET, inet_pton
 
+home_folder = os.path.expanduser("~")
+
 intervals = (
 	('weeks', 604800),  # 60 * 60 * 24 * 7
 	('days', 86400),	# 60 * 60 * 24
@@ -61,10 +63,47 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		#remember this values to send it when we reconnect
 		self.zchange = ""
 		self.tool = 0
-		self.hotend = ""
-		
 		self._logger.info("Nautilus - OctoPrint mobile shell, started.")
 
+	
+	def read_profile(self):
+		#hotend info from profile
+		self.extruders = self._printer_profile_manager.get_current_or_default().get('extruder').get('count')
+		#nozzle not yet supported by octoprint profile so assume if offset is 0 there's only one nozzle
+		offsets = self._printer_profile_manager.get_current_or_default().get('extruder').get('offsets')
+		if offsets == [(0.0, 0.0)]:
+			self.nozzles = 1
+		else:
+			self.nozzles = self.extruders
+		self.nozzle_size = self._printer_profile_manager.get_current_or_default().get('extruder').get('nozzleDiameter')
+		if self.extruders == 2 and self.nozzles == 1:
+			self.nozzle_name = "cyclops"
+		elif self.extruders == 2 and self.nozzles == 2:
+			self.nozzle_name = "dual extruder"
+		else:
+			self.nozzle_name = ""
+		
+		#get values from RID file if available
+		self.read_rid()
+		
+		
+	##RID from smart head
+	def read_rid(self):
+		#format: extruders|nozzles|nozzle_size|name (ex: 2|2|0.8|volcano)
+		hotend_file_config = os.path.join(home_folder, ".hotend")
+		first_line = None
+		if os.path.isfile(hotend_file_config):
+			with open(hotend_file_config, 'r') as f:
+				first_line = f.readline()
+		if first_line:
+			try:
+				self.extruders, self.nozzles, self.nozzle_size, self.nozzle_name = first_line.split("|")
+				self._logger.info( "Hotend config: %s extruder(s), %s %smm (%s) nozzle(s)."%(self.extruders, self.nozzles, self.nozzle_size,  self.nozzle_name))
+			except:
+				self._logger.error( "Hotend config file contains invalid data [%s]. Should be 'extruders|nozzles|nozzle_size|name'."%first_line )
+		else:
+			self._logger.info( "Can't read the hotend config file. Default values used.")
+		
 	##octoprint.plugin.TemplatePlugin
 	def get_template_configs(self):
 		return [
@@ -167,36 +206,22 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			self._plugin_manager.send_plugin_message(self._identifier, dict(zchange = self.zchange))
 		if action[:4] == "tool":
 			self.tool = action[5]
-			self.hotend = action[7:]
-			self._plugin_manager.send_plugin_message(self._identifier, dict(tool = self.tool, hotend = self.hotend))
-		elif action == "start":
-			if self._printer.is_printing():
-				current = self._printer.get_current_data()
-				printTime = current.get("progress").get("printTime")
+			self._plugin_manager.send_plugin_message(self._identifier, dict(tool = self.tool))
+
 	
 	##octoprint.plugin.EventHandlerPlugin
 	def on_event(self, event, payload):
+		if event == Events.CONNECTED:
+			self.read_profile()
+			self._plugin_manager.send_plugin_message(self._identifier, dict(zchange = self.zchange, port=self._printer.get_current_connection()[1], tool = self.tool, nozzles = self.nozzles, nozzle_size = self.nozzle_size, extruders = self.extruders, nozzle_name = self.nozzle_name))
 		if event == Events.CLIENT_OPENED:
-			self._plugin_manager.send_plugin_message(self._identifier, dict(zchange = self.zchange, port=self._printer.get_current_connection()[1], tool = self.tool, hotend = self.hotend))
-		
+			self.read_profile()
+			self._plugin_manager.send_plugin_message(self._identifier, dict(zchange = self.zchange, port=self._printer.get_current_connection()[1], tool = self.tool, nozzles = self.nozzles, nozzle_size = self.nozzle_size, extruders = self.extruders, nozzle_name = self.nozzle_name))
 		elif event == Events.PRINT_DONE:
 			message="Printed '{0}' in {1}".format( os.path.basename(payload.get("file")), display_time(payload.get("time")) )
 			title = "Print Done"
 			self.send_prowl(title, message)
-		elif event == Events.PRINT_STARTED:
-			meta = self._file_manager.get_metadata("local", payload.get("file"))
-			self._logger.info(meta)
-			
-			try:
-				hotend = meta.get("userdata").get("hotend")
-				self._logger.info("hotend %s"%hotend)
-				if hotend.startswith("cyclops"):
-					self._printer.commands("M890 N1")
-				elif hotend.startswith("chimera"):
-					self._printer.commands("M890 N2")
-			except Exception as e:
-				self._logger.error(e)
-				self._logger.info("hotend can't be found")
+	
 	
 	## Prowl notification
 	def send_prowl(self, title, message):

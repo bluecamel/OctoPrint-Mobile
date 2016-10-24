@@ -56,7 +56,7 @@ function ActionModel(){
 				}
 				if (temp == " ") {
 					temp += sprintf("%0.1fºC", printer.extruder0_actual());
-					if ( printer.dual_extruder() && !printer.cyclops() ) {
+					if ( printer.dual_nozzle() ) {
 						temp += sprintf(" | %0.1fºC", printer.extruder1_actual());	
 					}
 				}
@@ -70,7 +70,7 @@ function ActionModel(){
 					temp += sprintf("%0.1fºC &neArr; %sºC", printer.extruder0_actual(),  printer.extruder0_target());
 				}
 			}
-			if ( printer.dual_extruder() && !printer.cyclops() ) {
+			if ( printer.dual_nozzle() ) {
 				temp += " | ";
 				if (printer.extruder1_target() == 0) {
 					temp += sprintf("%0.1fºC", printer.extruder1_actual());
@@ -389,16 +389,21 @@ function PrinterModel(){
 	self.extruder1_actual = ko.observable(0);
 	self.extruder1_target = ko.observable(0);
 	
+	self.slicer_config = ko.observable(null);
+	
+	//hotend config
 	self.dual_extruder =  ko.observable(false);
-	self.cyclops =  ko.observable(false);	
-	self.active_extruder =  ko.observable(0);	
-	self.hotend_config = ko.observable(null);
+	self.dual_nozzle =  ko.observable(false);
+	self.nozzle_size =  ko.observable(null);
+	self.nozzle_name =  ko.observable(null);
+		
+	self.active_tool =  ko.observable(0);	
 	
 	self.fileToPrint = ko.observable(null);
 	self.fileToPrint.subscribe(function(value) {
 		if (value == null) {
 			self.fileInfo(null);
-			self.hotend_config(null)
+			self.slicer_config(null)
 		} else {
 			getFileInfo(value);
 		}
@@ -407,15 +412,10 @@ function PrinterModel(){
 	self.fileInfo = ko.observable(null);
 	self.fileInfo.subscribe(function(value) {
 		if (value != null) {
-			self.hotend_config(value.material +" on "+ value.nozzle + "mm "+ value.hotend);
-			if (value.hotend.startsWith("cyclops")){
-				sendCommand("M890 N1")
-			} else {
-				sendCommand("M890 N2")
-			}
+			//TODO: alert user if there is a mismatch between slicer profile and current hotend
+			self.slicer_config(value.material +" on "+ value.nozzle + "mm "+ value.hotend);
 		}
 	});
-	
 	
 	self.isFileLoaded = ko.computed(function(){
 		if ( self.fileToPrint() == null){
@@ -449,12 +449,11 @@ function PrinterModel(){
 	self.alwaysAcceptsCommands.extend({ notify: 'always' }); 
 	
 	
-	self.operational.subscribe(function(value) {		
+	self.operational.subscribe(function(value) {
 		if (!value) {
 			self.bed_actual(0);
 			self.extruder0_actual(0);
 			self.extruder1_actual(0);
-			self.hotend_config("");
 			self.zchange("");
 			$(".status_bar").css({"height": "100vh", "line-height": "100vh"});
 		} else {
@@ -487,16 +486,18 @@ function PrinterModel(){
 	self.acceptsCommands.subscribe(function(value) {
 		if (value) {
 			$("input.temp_slider").slider('enable');
-			if (! self.dual_extruder() ) {
+			if (! self.dual_nozzle() ) {
 				$("input.temp_slider_dual").slider('disable');
+				$(".slider-row").css({"height": "20vh"});
 			} else {
-				if (self.cyclops()){
-					$("input.temp_slider_dual").slider('disable');
-				} else  {
+				if (self.dual_nozzle()){
 					$("input.temp_slider_dual").slider('enable');
+				} else  {
+					$("input.temp_slider_dual").slider('disable');
 				}
+				$(".slider-row").css({"height": "15vh"});
 			}
-			$("#tool_select").bootstrapSwitch('disabled', !self.dual_extruder() );
+			$("#tool_select").bootstrapSwitch('disabled', false );
 
 			$(".status_bar").css({"height": "33.34vh", "line-height": "33.34vh"});
 			self.progress(0);
@@ -508,27 +509,28 @@ function PrinterModel(){
 			if (currentPanel == 'movement' || currentPanel == 'offset') switchPanel("status");
 		}
 	});
-	
+
 	self.dual_extruder.subscribe(function(value) {
-		if (value && self.acceptsCommands()) { 
-			if (self.cyclops()){
-				$("input.temp_slider_dual").slider('disable');
-			} else  {
-				$("input.temp_slider_dual").slider('enable');
-			}
-			$("#tool_select").bootstrapSwitch('disabled', false);
-		} 	
-	});
-	
-	self.cyclops.subscribe(function(value) {
 		if (value) {
-			$("input.temp_slider_dual").slider('disable');
-		} else  {
-			if (self.dual_extruder() && self.acceptsCommands()) {
+			if (self.acceptsCommands()) { 
+				$("#tool_select").bootstrapSwitch('disabled', false);
+			}
+		} else {
+			$("#tool_select").bootstrapSwitch('disabled', true);
+		}
+	});
+
+	self.dual_nozzle.subscribe(function(value) {
+		if (value) {
+			if (self.acceptsCommands()) {
 				$("input.temp_slider_dual").slider('enable');
 			} else {
 				$("input.temp_slider_dual").slider('disable');
 			}
+			$(".slider-row").css({"height": "15vh"});
+		} else  {
+			$("input.temp_slider_dual").slider('disable');
+			$(".slider-row").css({"height": "20vh"});
 		}
 	});
 	
@@ -607,6 +609,7 @@ function PrinterModel(){
 	self.printerConnect = function(){
 		sendConnectionCommand("connect");
 		switchPanel("status");
+		self.updateProfile();
 	}
 
 	self.printerDisconnect = function (){
@@ -619,6 +622,27 @@ function PrinterModel(){
 		  }
 		}});
 	}
+
+
+	self.getDefaultProfile = function() {
+		getExtruderCountFromProfile(function(data){		
+			current_profile_name = _.compact(_.map(data.profiles, function(obj) { if (obj.current) return obj.id; } ))[0];
+			self.current_profile = data.profiles[current_profile_name];
+			if (self.current_profile.extruder.count == 1){
+				self.dual_extruder(false);
+			} else {
+				self.dual_extruder(true);
+			}
+			
+		});
+	}
+
+	self.hotend_config = ko.computed(function(){
+		return self.nozzle_size() + "mm " + self.nozzle_name();
+	});
+
+	self.getDefaultProfile();
+
 }
 
 var printer;
@@ -640,3 +664,5 @@ function applyBindings(){
 	
 }
 
+
+	

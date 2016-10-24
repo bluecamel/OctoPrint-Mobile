@@ -24,8 +24,6 @@ function onReceivedData(data){
 }
 
 function onHistoryData(history){
-	//console.log(history);
-
 	updateFlasgs(history.state);	
 
 }
@@ -48,12 +46,10 @@ function onCurrentData(current){
 		printer.bed_target(current.temps[0].bed.target);
 		printer.extruder0_actual(current.temps[0].tool0.actual);
 		printer.extruder0_target(current.temps[0].tool0.target);
-		if ( current.temps[0].tool1.actual == null) {
-			printer.dual_extruder(false);
+		if ( current.temps[0].tool1 == undefined) {
 			printer.extruder1_actual(0);
 			printer.extruder1_target(0);
 		} else {
-			printer.dual_extruder(true);
 			printer.extruder1_actual(current.temps[0].tool1.actual);
 			printer.extruder1_target(current.temps[0].tool1.target);
 		}
@@ -143,27 +139,45 @@ function onPluginData(name, data){
 				if (data.zchange == "") {
 					printer.zchange("");
 				} else {
-					printer.zchange(data.zchange+"mm");
+					printer.zchange(data.zchange);
 				}
 			} 
 			if ( typeof(data.port) !== "undefined") { 
 				printer.port(data.port);
 			}
 			if ( typeof(data.tool) !== "undefined") { 
-				printer.active_extruder(data.tool);
+				printer.active_tool(data.tool);
 				if (data.tool == "0"){
 					$("#tool_select").bootstrapSwitch('state', true, true);
 				} else {
 					$("#tool_select").bootstrapSwitch('state', false, true);
 				}
 			}
-			if ( typeof(data.hotend) !== "undefined") { 
-				if (data.hotend == "single"){
-					printer.cyclops(true);
+			
+			if ( typeof(data.extruders) !== "undefined") { 
+				if (data.extruders == 1){
+					printer.dual_extruder(false);
 				} else {
-					printer.cyclops(false);
+					printer.dual_extruder(true);
 				}
 			}
+			
+			if ( typeof(data.nozzles) !== "undefined") { 
+				if (data.nozzles == 1){
+					printer.dual_nozzle(false);
+				} else {
+					printer.dual_nozzle(true);
+				}
+			}
+
+			if ( typeof(data.nozzle_size) !== "undefined") { 
+					printer.nozzle_size(data.nozzle_size);
+			}
+
+			if ( typeof(data.nozzle_name) !== "undefined") { 
+					printer.nozzle_name(data.nozzle_name);
+			}	
+
 			break;
 		case "status_line":
 			message(data.status_line);
