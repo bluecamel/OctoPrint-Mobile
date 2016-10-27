@@ -12,6 +12,10 @@ import re
 from flask import make_response, render_template, jsonify, url_for, request
 from . import pyrowl
 
+from jinja2 import Template
+from StringIO import StringIO
+import collections
+
 from struct import unpack
 from socket import AF_INET, inet_pton
 
@@ -175,28 +179,65 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		self._printer.unselect_file()
 		return "OK"
 	
+	@octoprint.plugin.BlueprintPlugin.route("/settings/", methods=["GET"])
 	@octoprint.plugin.BlueprintPlugin.route("/settings/<identifier>", methods=["GET"])
-	def get_ini_settings(self, identifier):
-		ini_settings = ConfigParser.ConfigParser()
+	def get_ini_settings(self, identifier = "preview"):
+		
 		inifile = os.path.join(self._basefolder, "default", "settings.ini")
 		if os.path.isfile(os.path.join(self.get_plugin_data_folder(), "settings.ini")):
 			inifile = os.path.join(self.get_plugin_data_folder(), "settings.ini")
+
+		with open(inifile) as foo:
+			ini_as_text = foo.read()
 		
-		ini_settings.read(inifile)
-		md5 = hashlib.md5(open(inifile, 'rb').read()).hexdigest()
+		md5 = hashlib.md5(ini_as_text).hexdigest()
+		
 		#self._logger.debug("gcode version: remote ["  +identifier +"] vs local ["+md5+"] ...")
 		if identifier == md5:
 			return jsonify(update=False)
+
 		else:
-			self._logger.info("new settings version: remote ["+identifier +"] vs local [" + md5 + "] ...")
-			retval = {'update':True, 'id':md5}
+			has_errors = False
+			retval = {}
+			
+			ini_settings = ConfigParser.ConfigParser()
+			ini_settings.readfp(StringIO(ini_as_text))
+		
+			try:
+				profile  = dict([a, int(x) if x.isdigit() else x] for a, x in ini_settings.items("profile"))
+			except:
+				self._logger.info("Unable to load [profile] section. Missing? Not needed?")
+				profile = dict()
+		
 			for section in ini_settings.sections():
 				view = ini_settings.items(section)
 				commands = {}
 				for key,value in view:
-					#remove all extra spaces
-					commands.update({key: ",".join(map(str.strip, re.sub( '\s+', ' ', value).split(',')) )})
-				retval.update({section: commands})
+					if section != "profile":
+						try:
+							#replace all the variables in the ini file
+							updated_value = Template(value).render(profile)
+							#compact the gcode
+							commands.update({key: ",".join(map(str.strip, re.sub( '\s+', ' ', str(updated_value)).split(',')) )})
+							
+						except Exception as e:
+							self._logger.error("Syntax error %s.%s: [%s]", section, key, e)
+							commands.update({key: "M117 Command configuration error."})
+							has_errors = True
+				retval.update({section: collections.OrderedDict(sorted(commands.items()))})
+
+			if identifier == "preview":
+				try:
+					del retval["profile"]
+				except:
+					pass
+			else:
+				self._logger.info("new settings version: remote ["+identifier +"] vs local [" + md5 + "] ...")
+				retval.update({'update':True, 'id':md5})
+
+			if has_errors and identifier != "preview":
+				self._printer.commands("M117 The settings file has errors. Please verify and fix before doing anything else.")
+
 			return jsonify(retval)
 	
 	##plugin hook
