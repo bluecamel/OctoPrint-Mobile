@@ -38,7 +38,7 @@ Some supplementary, non-core switch functions depend on a additional plugin whic
  - ver 1.3.5 (plugin) : allow editing "settings.ini" via the OctoPrint UI (under settings)
  - ver 1.4   (plugin) : single/dual nozzle/extruder based on OctoPrint profile. Now available in the plugin repository.
  - ver 1.4.1 (plugin) : settings.ini now supports variables and math operations
- 
+ - ver 1.4.2 (plugin) : fix missing profile data
 ##screenshots
 Setting page (under iOS Settings app)
 
