@@ -213,7 +213,9 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 				view = ini_settings.items(section)
 				commands = {}
 				for key,value in view:
-					if section != "profile":
+					if section == "profile":
+						commands.update({key: ",".join(map(str.strip, re.sub( '\s+', ' ', str(value)).split(',')) )})
+					else:
 						try:
 							#replace all the variables in the ini file
 							updated_value = Template(value).render(profile)
@@ -224,6 +226,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 							self._logger.error("Syntax error %s.%s: [%s]", section, key, e)
 							commands.update({key: "M117 Command configuration error."})
 							has_errors = True
+						
 				retval.update({section: collections.OrderedDict(sorted(commands.items()))})
 
 			if identifier == "preview":
