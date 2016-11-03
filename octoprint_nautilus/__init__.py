@@ -117,7 +117,8 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 	##octoprint.plugin.SettingsPlugin
 	def get_settings_defaults(self):
 		return dict(
-			prowl_key = None
+			prowl_key = None,
+			movie_link = "http://octopi.local/downloads/timelapse/"
 		)
 
 	def on_settings_load(self):
@@ -132,6 +133,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		
 		return dict(
 			prowl_key = self._settings.get(["prowl_key"]),
+			movie_link = self._settings.get(["movie_link"]),
 			gcodes = gcodes
 		)
 		
@@ -262,19 +264,19 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			self.read_profile()
 			self._plugin_manager.send_plugin_message(self._identifier, dict(zchange = self.zchange, port=self._printer.get_current_connection()[1], tool = self.tool, nozzles = self.nozzles, nozzle_size = self.nozzle_size, extruders = self.extruders, nozzle_name = self.nozzle_name))
 		elif event == Events.PRINT_DONE:
-			message="Printed '{0}' in {1}".format( os.path.basename(payload.get("file")), display_time(payload.get("time")) )
 			title = "Print Done"
-			self.send_prowl(title, message)
-	
-	
+			message="'{0}' printed in {1}. Timelapse will be available shortly.".format( os.path.basename(payload.get("file")), display_time(payload.get("time")) )
+			link =  "{0}/{1}.mpg".format(self._settings.get(["movie_link"]).strip("/"), os.path.basename(payload.get("file")))
+			self.send_prowl(title, message, link)
+			
 	## Prowl notification
-	def send_prowl(self, title, message):
+	def send_prowl(self, title, message, link = None):
 		prowl_key = self._settings.get(["prowl_key"])
-		self._logger.info("Sending message '{0}':'{1}'".format(title, message))
+		self._logger.info("Sending message '{0}':'{1}' [{2}]".format(title, message, link))
 		if prowl_key:
 			try:
 				service = pyrowl.Pyrowl(prowl_key)
-				res = service.push("Nautilus", title, message).get(prowl_key)
+				res = service.push("Nautilus", title, message, link).get(prowl_key)
 				if res.get('code') == '200':
 					self._logger.info( "Notification sent. %s remaining."%res.get('remaining') )
 				else:
