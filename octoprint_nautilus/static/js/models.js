@@ -211,7 +211,7 @@ function OffsetModel() {
 	}
 	
 	self.saveOffset = function(){
-		sendCommand( gcodes_offset.save_offset.replace("{z}", self.current_z()).split(","));
+		sendCommand( gcodes_offset.save_offset.replace("%z", self.current_z()).split(","));
 		self.prepared(false);
 	}
 
@@ -271,10 +271,10 @@ function OffsetModel() {
 	
 	self.sendOffsetAdjustment = function(z){
 		if (self.prepared()){
-			sendCommand( gcodes_offset.send_relative_z.replace("{z}", z).split(",") );
+			sendCommand( gcodes_offset.send_relative_z.replace("%z", z).split(",") );
 		} else {
-			sendCommand( gcodes_offset.save_offset.replace( "{z}", ( parseFloat(self.offset()) + parseFloat(z) ) ).split(",") 
-			.concat(  gcodes_offset.send_relative_z.replace("{z}", z).split(",")  )  );
+			sendCommand( gcodes_offset.save_offset.replace( "%z", ( parseFloat(self.offset()) + parseFloat(z) ) ).split(",") 
+			.concat(  gcodes_offset.send_relative_z.replace("%z", z).split(",")  )  );
 		}
 	}	
 }
