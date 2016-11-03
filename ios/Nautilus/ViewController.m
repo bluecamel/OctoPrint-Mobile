@@ -14,10 +14,6 @@ bool need_setup = NO;
 {
     [super viewDidLoad];
     
-    //register notifications for open/close
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onForeground:) name:@"onForeground" object: nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onBackground:) name:@"onBackground" object: nil];
-    
     self.webView.frame = [[UIScreen mainScreen] bounds];
     [self.webView setOpaque:NO];
 
@@ -27,13 +23,14 @@ bool need_setup = NO;
     UIGraphicsEndImageContext();
     
     self.webView.backgroundColor = [UIColor colorWithPatternImage:image ];
-    
-    [self loadWebApp];
+
+    //register notifications for open/close
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onForeground:) name:@"onForeground" object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onBackground:) name:@"onBackground" object: nil];
 }
 
 - (void) loadWebApp
 {
-
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *url = [defaults stringForKey:@"serverURL"];
     NSString *apikey = [defaults stringForKey:@"apikey"];
@@ -52,11 +49,17 @@ bool need_setup = NO;
             url = [NSString stringWithFormat: @"%@/", url];
         }
         
-        NSString *check_url = [NSString stringWithFormat: @"%@plugin/nautilus/static/img/appicon.png", url];
+        [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
 
-        NSURLSessionConfiguration *nocacheConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
-        nocacheConfiguration.requestCachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
         
+        [[NSURLCache sharedURLCache] removeAllCachedResponses];
+        
+        NSString *check_url = [NSString stringWithFormat: @"%@plugin/nautilus/static/img/appicon.png", url];
+        NSURLSessionConfiguration *nocacheConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        nocacheConfiguration.requestCachePolicy = NSURLRequestReloadRevalidatingCacheData;
+        nocacheConfiguration.timeoutIntervalForRequest = 15.0;
+        nocacheConfiguration.timeoutIntervalForResource = 60.0;
+
         NSURLSession *session = [NSURLSession sessionWithConfiguration:nocacheConfiguration];
         
         [[session dataTaskWithURL:[NSURL URLWithString:check_url]
@@ -67,12 +70,13 @@ bool need_setup = NO;
                     if (error) {
                         [self showMessage: error.localizedDescription];
                     } else if ([httpResponse statusCode] == 404) {
-                            [self showMessage: @"This application requires the plugin \"Nautilus\" to be installed on OctoPrint." ];
+                            [self showMessage: @"This application requires the plugin \"Nautilus\" installed on a running instance of OctoPrint." ];
                     } else if ([httpResponse statusCode] == 503 || [httpResponse statusCode] == 502) {
-                        [self showMessage: @"OctoPrint is currently not running. If you just started up your printer, please wait a couple of seconds, then shake to try again." ];
+                        [self showMessage: @"OctoPrint is currently not running. If you just started your printer, please wait a couple of seconds, then shake to retry." ];
                         } else {
                             load_webapp = YES;
-                            NSMutableURLRequest* request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:10.0];
+                            
+                            NSMutableURLRequest* request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:20];
                             [request addValue:apikey forHTTPHeaderField:@"API_KEY"];
                             [self.webView loadRequest:request];
                         }

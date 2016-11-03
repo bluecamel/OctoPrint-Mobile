@@ -93,12 +93,13 @@
 		BE526F181B6E991600005B15 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0720;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = net.hossu;
 				TargetAttributes = {
 					BE526F1F1B6E991600005B15 = {
 						CreatedOnToolsVersion = 6.4;
 						DevelopmentTeam = JZE7ZAS86N;
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
@@ -189,8 +190,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -206,7 +209,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -223,6 +226,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CURRENT_PROJECT_VERSION = 1.1;
 				DEPLOYMENT_LOCATION = NO;
+				DEVELOPMENT_TEAM = JZE7ZAS86N;
 				ENABLE_TESTABILITY = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/Nautilus/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -230,8 +234,9 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = mobile.octoprint;
 				PRODUCT_NAME = Nautilus;
-				PROVISIONING_PROFILE = "";
-				SDKROOT = iphoneos9.3;
+				PROVISIONING_PROFILE = "8014b681-6c86-4959-8b81-7ff3925c9411";
+				PROVISIONING_PROFILE_SPECIFIER = "Nautilus Appstore";
+				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};

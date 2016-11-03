@@ -1,36 +1,41 @@
 <html>
-    <head>
-        <style type="text/css">
-            * {
-                -webkit-touch-callout: none;
-                -webkit-user-select: none; /* Disable selection/copy in UIWebView */
-                -webkit-font-smoothing: antialiased;
-            }
-        
-        body {
-            background-color: #FFF;
-            line-height: 15vh;
-            font-size: 4vw;
-            color: #22527B;
-            margin: 30px;
-            font-family: Verdana;
-            background-image: url("background.png");
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            background-position: center;
-            background-size: contain;
-            display: flex;
-            align-items: center;
-        }
-        
-        #message {
-            width: 100%;
-            text-align: center;
-        }
-        </style>
-        
-    </head>
-    <body onload='document.getElementById("message").innerHTML = decodeURIComponent(window.location.search.substring(1));'>
-        <div id="message">Loading...</div>
-    </body>
+	<head>
+		<style type="text/css">
+			* {
+				-webkit-touch-callout: none;
+				-webkit-user-select: none; /* Disable selection/copy in UIWebView */
+				-webkit-font-smoothing: antialiased;
+			}
+		
+		body {
+			background-color: #FFF;
+			line-height: 15vh;
+			font-size: 4vw;
+			color: #22527B;
+			margin: 30px;
+			font-family: Verdana;
+			background-image: url("background.png");
+			background-repeat: no-repeat;
+			background-attachment: fixed;
+			background-position: center;
+			background-size: contain;
+			display: flex;
+			align-items: center;
+		}
+		
+		#message {
+			width: 100%;
+			text-align: center;
+		}
+		</style>
+	</head>
+	
+	<body onload='document.getElementById("message").innerHTML = decodeURIComponent(window.location.search.substring(1));'>
+		<div id="message">Loading...</div>
+		<script type="text/javascript">
+			document.ontouchmove = function(event){
+				return false;
+			};
+		</script>
+	</body>
 </html>
