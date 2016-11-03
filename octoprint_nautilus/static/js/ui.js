@@ -87,8 +87,7 @@ function touch_ui(touch) {
 		
 		$("#main_view").append($("#camera_panel").remove());
 		$("#wrapper").hide();
-
-		$("#webcam").css({"height": "100%", "width": SCREEN_WIDTH});
+		$("#webcam").css({"height": "auto", "width": SCREEN_WIDTH});
 		
 	} else {
 
