@@ -11,15 +11,7 @@ The iOS app is available on [Apple AppStore](https://itunes.apple.com/us/app/id1
 
 As long as octoprint is available over the internet, the UI changes to full screen webcam for pure monitoring. 
 
-For notifications via Prowl, change settings by manually editing `config.yaml` under "plugins"
-
-```
-plugins:
-  nautilus:
-    prowl_key: [your_prowl_key]
-```
-
-`pyprowl` included from https://github.com/babs/pyrowl/tree/master
+For notifications via Prowl, add the prowl key in settings.  `pyprowl` included from https://github.com/babs/pyrowl/tree/master
 
 `settings.ini` under the plugin folder or it's corresponding data folder (`.octoprint/data/nautilus`) provides the gcode sequences for most of the functions provided. Make sure they are configured properly for your machine.
 
@@ -39,6 +31,9 @@ Some supplementary, non-core switch functions depend on a additional plugin whic
  - ver 1.4   (plugin) : single/dual nozzle/extruder based on OctoPrint profile. Now available in the plugin repository.
  - ver 1.4.1 (plugin) : settings.ini now supports variables and math operations
  - ver 1.4.2 (plugin) : fix missing profile data
+ - ver 1.4.3 (plugin & ios) : caching & timeouts in the ios app, added link to timelapse in prowl notification, fix camera height, and most importantly, changed the keyword syntax for "current z" from "{z}" to "%s" **User must manually change this!!!**
+
+
 ##screenshots
 Setting page (under iOS Settings app)
 

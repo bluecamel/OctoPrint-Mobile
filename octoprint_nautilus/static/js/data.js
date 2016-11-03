@@ -93,7 +93,6 @@ function onMessageData(messages){
 			offset.offset(m[1]);
 		} 
 		if ((m = re114.exec(messages)) != null) {
-			//console.log(m);
 			if ( offset.prepared() ) {
 				offset.current_z(   (parseFloat(m[3]) + parseFloat(machine_profile.max_m851)).toFixed(2) );
 			} else {
