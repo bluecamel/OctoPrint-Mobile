@@ -266,7 +266,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		elif event == Events.PRINT_DONE:
 			title = "Print Done"
 			message="'{0}' printed in {1}. Timelapse will be available shortly.".format( os.path.basename(payload.get("file")), display_time(payload.get("time")) )
-			link =  "{0}/{1}.mpg".format(self._settings.get(["movie_link"]).strip("/"), os.path.basename(payload.get("file")))
+			link =  "{0}/{1}.mpg".format(self._settings.get(["movie_link"]).strip("/"), os.path.splitext(os.path.basename(payload.get("file")))[0])
 			self.send_prowl(title, message, link)
 			
 	## Prowl notification
