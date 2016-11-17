@@ -7,8 +7,10 @@
 
 @implementation ViewController
 
-bool load_webapp = NO;
+bool webapp_loaded = NO;
 bool need_setup = NO;
+int RETRY = 6;
+int RETRY_INTERVAL = 10; //seconds
 
 - (void)viewDidLoad
 {
@@ -27,21 +29,27 @@ bool need_setup = NO;
     //register notifications for open/close
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onForeground:) name:@"onForeground" object: nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onBackground:) name:@"onBackground" object: nil];
+
+    [self checkWebApp:RETRY];
 }
 
-- (void) loadWebApp
+- (void) checkWebApp:(int) retryCounter
 {
+    if (retryCounter == 0) {
+        return;
+    }
+    retryCounter--;
+
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *url = [defaults stringForKey:@"serverURL"];
     NSString *apikey = [defaults stringForKey:@"apikey"];
-    load_webapp = NO;
     need_setup = NO;
-    
+
     if ( [apikey length] == 0 || [url length] == 0 ) {
         
         need_setup = YES;
         
-        [self showMessage: @"Before you can use this app, the \"Nautilus\" plugin needs to be installed on OctoPrint and you need to setup the OctoPrint server URL and the API KEY in the settings of this app.<br/><br/>(shake to load the app settings)"];
+        [self showMessage: @"Before you can use this application, the \"Nautilus\" plugin needs to be installed on OctoPrint and you need to setup the OctoPrint server URL and the API KEY in the settings of this app.<br/><br/>(shake to load the app settings)"];
         
     } else {
         
@@ -49,17 +57,17 @@ bool need_setup = NO;
             url = [NSString stringWithFormat: @"%@/", url];
         }
         
-        [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
-
-        
         [[NSURLCache sharedURLCache] removeAllCachedResponses];
         
         NSString *check_url = [NSString stringWithFormat: @"%@plugin/nautilus/static/img/appicon.png", url];
-        NSURLSessionConfiguration *nocacheConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        
+        NSURLSessionConfiguration *nocacheConfiguration = [NSURLSessionConfiguration ephemeralSessionConfiguration];
         nocacheConfiguration.requestCachePolicy = NSURLRequestReloadRevalidatingCacheData;
         nocacheConfiguration.timeoutIntervalForRequest = 15.0;
-        nocacheConfiguration.timeoutIntervalForResource = 60.0;
+        nocacheConfiguration.timeoutIntervalForResource = 30.0;
 
+        __weak __typeof(self)weakSelf = self;
+        
         NSURLSession *session = [NSURLSession sessionWithConfiguration:nocacheConfiguration];
         
         [[session dataTaskWithURL:[NSURL URLWithString:check_url]
@@ -68,21 +76,49 @@ bool need_setup = NO;
                                     NSError *error) {
                     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
                     if (error) {
+                        webapp_loaded = NO;
                         [self showMessage: error.localizedDescription];
-                    } else if ([httpResponse statusCode] == 404) {
+                        [NSThread sleepForTimeInterval:RETRY_INTERVAL];
+                        [weakSelf checkWebApp: retryCounter];
+                    } else if ([httpResponse statusCode] == 404) { //file not found
+                            webapp_loaded = NO;
                             [self showMessage: @"This application requires the plugin \"Nautilus\" installed on a running instance of OctoPrint." ];
-                    } else if ([httpResponse statusCode] == 503 || [httpResponse statusCode] == 502) {
-                        [self showMessage: @"OctoPrint is currently not running. If you just started your printer, please wait a couple of seconds, then shake to retry." ];
+                    } else if ([httpResponse statusCode] == 503 || [httpResponse statusCode] == 502) { //service error
+                        webapp_loaded = NO;
+                        if (retryCounter == 0) {
+                            [self showMessage: @"I give up. OctoPrint is currently not running. You can wait a while longer, then shake to retry." ];
                         } else {
-                            load_webapp = YES;
-                            
-                            NSMutableURLRequest* request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:20];
-                            [request addValue:apikey forHTTPHeaderField:@"API_KEY"];
-                            [self.webView loadRequest:request];
+                            [self showMessage: @"OctoPrint is currently not running. Will retry in a few seconds." ];
+                        }
+                            [NSThread sleepForTimeInterval:RETRY_INTERVAL];
+                            [weakSelf checkWebApp: retryCounter];
+
+                        } else if ([httpResponse statusCode] == 200 ) {
+                            //call back to main thread
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                [self loadWebApp:url apikey:apikey];
+                            });
+                        } else { // huh ?
+                            webapp_loaded = NO;
+                            [NSThread sleepForTimeInterval:RETRY_INTERVAL];
+                            [weakSelf checkWebApp: retryCounter];
                         }
                 }] resume];
+            [session finishTasksAndInvalidate];
     }
 
+}
+
+-(void)loadWebApp:(NSString*)url apikey:(NSString*)apikey
+{
+    if (webapp_loaded) {
+        [self.webView reload];
+    } else {
+        NSMutableURLRequest* request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:20];
+        [request addValue:apikey forHTTPHeaderField:@"API_KEY"];
+        [self.webView loadRequest:request];
+        webapp_loaded = YES;
+    }
 }
 
 -(void)showMessage:(NSString*) message {
@@ -96,16 +132,14 @@ bool need_setup = NO;
 
 -(void)onForeground:(NSNotification*) notification
 {
-    if ( load_webapp ) {
+    if ( webapp_loaded ) {
         [self.webView stringByEvaluatingJavaScriptFromString:@"onForeground()"];
-    } else {
-        [self loadWebApp];
     }
 }
 
 -(void)onBackground:(NSNotification*) notification
 {
-    if ( load_webapp ) {
+    if ( webapp_loaded ) {
         [self.webView stringByEvaluatingJavaScriptFromString:@"onBackground();"];
         [self.webView.scrollView zoomToRect:[[UIScreen mainScreen] bounds] animated:YES];
         self.webView.scrollView.zoomScale = 1.0;
@@ -132,7 +166,7 @@ bool need_setup = NO;
         if (need_setup) {
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
         } else {
-            [self loadWebApp];
+            [self checkWebApp:RETRY];
             
             CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation"];
             [animation setToValue:[NSNumber numberWithFloat:-0.04f]];
