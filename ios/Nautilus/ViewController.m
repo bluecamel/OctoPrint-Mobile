@@ -42,7 +42,8 @@ int RETRY_INTERVAL = 10; //seconds
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *url = [defaults stringForKey:@"serverURL"];
-    NSString *apikey = [defaults stringForKey:@"apikey"];
+    NSString *apikey = [[defaults stringForKey:@"apikey"] stringByTrimmingCharactersInSet:
+                               [NSCharacterSet whitespaceCharacterSet]];
     need_setup = NO;
 
     if ( [apikey length] == 0 || [url length] == 0 ) {
@@ -64,7 +65,7 @@ int RETRY_INTERVAL = 10; //seconds
         NSURLSessionConfiguration *nocacheConfiguration = [NSURLSessionConfiguration ephemeralSessionConfiguration];
         nocacheConfiguration.requestCachePolicy = NSURLRequestReloadRevalidatingCacheData;
         nocacheConfiguration.timeoutIntervalForRequest = 15.0;
-        nocacheConfiguration.timeoutIntervalForResource = 30.0;
+        nocacheConfiguration.timeoutIntervalForResource = 60.0;
 
         __weak __typeof(self)weakSelf = self;
         
@@ -90,19 +91,19 @@ int RETRY_INTERVAL = 10; //seconds
                         } else {
                             [self showMessage: @"OctoPrint is currently not running. Will retry in a few seconds." ];
                         }
-                            [NSThread sleepForTimeInterval:RETRY_INTERVAL];
-                            [weakSelf checkWebApp: retryCounter];
+                        [NSThread sleepForTimeInterval:RETRY_INTERVAL];
+                        [weakSelf checkWebApp: retryCounter];
 
                         } else if ([httpResponse statusCode] == 200 ) {
                             //call back to main thread
                             dispatch_async(dispatch_get_main_queue(), ^{
                                 [self loadWebApp:url apikey:apikey];
                             });
-                        } else { // huh ?
-                            webapp_loaded = NO;
-                            [NSThread sleepForTimeInterval:RETRY_INTERVAL];
-                            [weakSelf checkWebApp: retryCounter];
-                        }
+                            } else { // huh ?
+                                webapp_loaded = NO;
+                                [NSThread sleepForTimeInterval:RETRY_INTERVAL];
+                                [weakSelf checkWebApp: retryCounter];
+                            }
                 }] resume];
             [session finishTasksAndInvalidate];
     }
