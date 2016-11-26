@@ -475,7 +475,7 @@ function PrinterModel(){
 			action.extruder0_slider_value(0);
 			action.extruder1_slider_value(0);
 			action.bed_slider_value(0);
-			//$("input.temp_slider").slider('disable');
+			$("input.temp_slider").slider('disable');
 			
 			self.zchange("");
 			$(".status_bar").css({"height": "100vh", "line-height": "100vh"});
@@ -530,7 +530,7 @@ function PrinterModel(){
 			action.extruder1_slider_value(0);
 			action.bed_slider_value(0);
 			
-			//$("input.temp_slider").slider('disable');
+			$("input.temp_slider").slider('disable');
 
 			if (currentPanel == 'movement' || currentPanel == 'offset') switchPanel("status");
 		}
