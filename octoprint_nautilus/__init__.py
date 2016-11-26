@@ -59,7 +59,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			octoprint.plugin.BlueprintPlugin,
 			octoprint.plugin.EventHandlerPlugin,
 			octoprint.plugin.SettingsPlugin):
-  
+
   ##octoprint.plugin.core.Plugin
 	def initialize(self):
 		#self._logger.setLevel(logging.DEBUG)
@@ -75,7 +75,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		self.extruders = self._printer_profile_manager.get_current_or_default().get('extruder').get('count')
 		#nozzle not yet supported by octoprint profile so assume if offset is 0 there's only one nozzle
 		offsets = self._printer_profile_manager.get_current_or_default().get('extruder').get('offsets')
-		if offsets == [(0.0, 0.0)]:
+		if offsets == [(0.0, 0.0)] or offsets == [(0.0, 0.0), (0.0, 0.0)]:
 			self.nozzles = 1
 		else:
 			self.nozzles = self.extruders
@@ -118,38 +118,99 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 	def get_settings_defaults(self):
 		return dict(
 			prowl_key = None,
-			movie_link = "http://octopi.local/downloads/timelapse/"
+			movie_link = "http://octopi.local/downloads/timelapse/",
+			_settings_version = None,
 		)
 
 	def on_settings_load(self):
 		octoprint.plugin.SettingsPlugin.on_settings_load(self)
 		
-		inifile = os.path.join(self._basefolder, "default", "settings.ini")
-		if os.path.isfile(os.path.join(self.get_plugin_data_folder(), "settings.ini")):
-			inifile = os.path.join(self.get_plugin_data_folder(), "settings.ini")
+		inifile = os.path.join(self.get_plugin_data_folder(), "settings.ini")
 
-		with open(inifile) as f:
+		gcodes = None
+		with open(inifile,'r') as f:
 			gcodes = f.read()
 		
 		return dict(
 			prowl_key = self._settings.get(["prowl_key"]),
 			movie_link = self._settings.get(["movie_link"]),
+			_settings_version = self._settings.get(["_settings_version"]),
 			gcodes = gcodes
 		)
-		
 		
 	def on_settings_save(self, data):
 		if 'gcodes' in data:
 			gcodes = data.pop('gcodes')
-			inifile = os.path.join(self.get_plugin_data_folder(), "settings.ini")
-			f = open(inifile, 'w')
-			f.write(gcodes)
-			f.close()
+			outfile = os.path.join(self.get_plugin_data_folder(), "settings.ini")
+			with open(outfile, 'w') as configfile:
+				configfile.write(gcodes)
+
 			self._plugin_manager.send_plugin_message(self._identifier, dict(action = "settings"))
 
 		octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
+			
+	def load_ini(self, config, inifile, force=True):
+		section = None
+		with open(inifile) as foo:
+			lines  = foo.readlines()
+			for line in lines:
+				line = line.strip()
+				if line.startswith("["):
+					section = line.translate(None, "[]")
+					try:
+						config.add_section(section)
+					except ConfigParser.DuplicateSectionError:
+						pass
+				elif ":" in line:
+					k, v = line.split(":")
+					k = k.strip()
+					v = v.strip()
+					if config.has_option(section, k):
+						if force :
+							config.set(section, k, v)
+					else:
+						config.set(section, k, v)
+						
+				elif "=" in line:
+					k, v = line.split("=")
+					k = k.strip()
+					v = v.strip()
+					if config.has_option(section, k):
+						if force :
+							config.set(section, k, v)
+					else:
+						config.set(section, k, v)
+				elif line.startswith("#") or line.startswith(";"):
+					if config.has_option(section, line):
+						if force :
+							config.set(section, line)
+					else:
+						config.set(section, line)
+						
+	def get_settings_version(self):
+		return 2
 
+	def on_settings_migrate(self, target, current):
+		#settings.ini version
+		current = self._settings.get(["_settings_version"])
+		if current is None or current < 2:
+			self._logger.info( "Migrate settings from %s to %s."%(current, target))
+			config = ConfigParser.ConfigParser(allow_no_value = True)
+		
+			inifile = os.path.join(self._basefolder, "default", "settings.ini")
+			self.load_ini(config, inifile)
 
+			if os.path.isfile(os.path.join(self.get_plugin_data_folder(), "settings.ini")):
+				inifile = os.path.join(self.get_plugin_data_folder(), "settings.ini")
+				self.load_ini(config, inifile, force=False)
+
+			outfile = os.path.join(self.get_plugin_data_folder(), "settings.ini")
+			with open(outfile, 'w') as configfile:
+				config.write(configfile)
+			
+			self._settings.set(["_settings_version"], self.get_settings_version())
+
+			
 	##octoprint.plugin.UiPlugin
 	def will_handle_ui(self, request):
 		return request.user_agent.string.startswith("Nautilus")
@@ -185,10 +246,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 	@octoprint.plugin.BlueprintPlugin.route("/settings/<identifier>", methods=["GET"])
 	def get_ini_settings(self, identifier = "preview"):
 		
-		inifile = os.path.join(self._basefolder, "default", "settings.ini")
-		if os.path.isfile(os.path.join(self.get_plugin_data_folder(), "settings.ini")):
-			inifile = os.path.join(self.get_plugin_data_folder(), "settings.ini")
-
+		inifile = os.path.join(self.get_plugin_data_folder(), "settings.ini")
 		with open(inifile) as foo:
 			ini_as_text = foo.read()
 		
