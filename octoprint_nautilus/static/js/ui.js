@@ -76,6 +76,39 @@ $("#tool_select").bootstrapSwitch({
 		}
 	});
 
+function generateSliderOptions(temp){
+	var step = parseInt(100/temp.length)
+	var ticks_positions = []
+	for (i=0; i <= 100-step; i += step){
+		ticks_positions.push(i);
+	}
+	ticks_positions.push(100);
+
+	return {
+		ticks: Array.apply(null, {length: temp.length+1}).map(Number.call, Number), 
+		ticks_labels: ['Off']. concat ( temp ), 
+		ticks_positions: ticks_positions,
+		min: 0, 
+		max: temp.length, 
+		step: 1,
+		tooltip: 'hide',
+		value: 0
+	}
+}
+
+function createHotendSliders(temp) {
+	options = generateSliderOptions(temp);
+	$("#hotend0_slider").slider(options).on('change', function(val){action.extruder0_slider_value(val.value.newValue);});	
+	$("#hotend1_slider").slider(options).on('change', function(val){action.extruder1_slider_value(val.value.newValue);});
+}
+
+var createBedSliders = function(temp) {
+	options = generateSliderOptions(temp);
+	$("#bed_slider").slider(options).on('change', function(val){action.bed_slider_value(val.value.newValue);});	
+}
+
+	
+
 var touch_start;	
 function touch_ui(touch) {
 	if (touch){

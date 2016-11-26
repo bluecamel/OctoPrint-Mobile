@@ -1,5 +1,9 @@
 $(document).ready(function() {
 	switchView("loading");
+	
+	//settings not loaded yet, but needed for display. 
+	machine_profile = {temperature_scale:"C", nozzle_temperatures:"", bed_temperatures:""};
+
 	applyBindings();
 	
 	checkHome(function(data){
@@ -14,22 +18,14 @@ function initialize() {
 		// no scrolling
 		touch_ui(false);
 		
+		
 		getConnectionStatus(function(data) {
 			printer.port(data.current.port);
 		 });
 
 		 connect();
 		 
-		//part of the hack to enable/disable sliders. must be called after biding 
-		// and will trigger the "subscribe" function. Only needs to happen once.
-		 var t = printer.power();
-		 printer.power(true);
-		 printer.power(false);
-		 printer.power(t);
-		 printer.acceptsCommands.extend({ notify: 'dirty' });
-		 printer.alwaysAcceptsCommands.extend({ notify: 'dirty' });
-		 
-		 
+		 //hack to fix camera size. not sure why this works :D
 		 printer.zoom(false);
 		 printer.zoom(true);
 		 printer.zoom(false);

@@ -195,8 +195,15 @@ function getSettings(){
 		if (data.update){
 			localStorage.setItem("mobile.settings.id", data.id);
 			machine_profile = data.profile;
+			if (machine_profile.temperature_scale == "C") {
+				machine_profile.temperature_scale = "ºC"
+			}
+			machine_profile.nozzle_temperatures = machine_profile.nozzle_temperatures.split(",")
+			machine_profile.bed_temperatures = machine_profile.bed_temperatures.split(",")
+
 			gcodes_offset = data.offset;
 			gcodes_action = data.action;
+			
 			localStorage.setItem("mobile.profile", JSON.stringify(data.profile));
 			localStorage.setItem("mobile.gcodes.offset", JSON.stringify(data.offset));
 			localStorage.setItem("mobile.gcodes.action", JSON.stringify(data.action));
@@ -208,7 +215,13 @@ function getSettings(){
 		offset.m1(gcodes_offset.macro_1);
 		offset.m2(gcodes_offset.macro_2);
 		offset.m3(gcodes_offset.macro_3);
-    offset.m4(gcodes_offset.macro_4);
+		offset.m4(gcodes_offset.macro_4);
+		
+		createHotendSliders( machine_profile.nozzle_temperatures );
+		createBedSliders( machine_profile.bed_temperatures );
+	 	if (! printer.power() ){
+			$("input.temp_slider").slider('disable');
+	 	}
 	});
 }
 

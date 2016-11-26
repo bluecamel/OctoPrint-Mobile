@@ -24,11 +24,6 @@ body {
   padding: 2.5vh 2.5vw !important;
 }
 
-.slider-tick-label {
-  font-size: 4vh;
-  line-height: 5vh;
-}
-
 .container-fluid, .container-fluid .row {
   padding: 0;
   margin: 0;
@@ -374,6 +369,8 @@ body {
 }
 
 .slider-tick-label {
+  font-size: 4vh;
+  line-height: 5vh;
 	width: 6vw !important;
 	margin-left: -3vw !important;
 }
