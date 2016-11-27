@@ -102,7 +102,7 @@ function createHotendSliders(temp) {
 	$("#hotend1_slider").slider(options).on('change', function(val){action.extruder1_slider_value(val.value.newValue);});
 }
 
-var createBedSliders = function(temp) {
+function createBedSliders(temp) {
 	options = generateSliderOptions(temp);
 	$("#bed_slider").slider(options).on('change', function(val){action.bed_slider_value(val.value.newValue);});	
 }
