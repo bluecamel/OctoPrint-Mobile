@@ -33,7 +33,7 @@ Some supplementary, non-core switch functions depend on a additional plugin whic
  - ver 1.4.2 (plugin) : fix missing profile data
  - ver 1.4.3 (plugin & ios) : caching & timeouts in the ios app, added link to timelapse in prowl notification, fix camera height, and most importantly, changed the keyword syntax for "current z" from "{z}" to "%z" **User must manually change this!!!**
  - ver 1.5   (plugin) : configurable temperature sliders (nozzles and bed) and support for `settings.ini` migration
-
+ - ver 1.5.1 (plugin) : minor bug fixes
 
 ##screenshots
 Setting page (under iOS Settings app)
