@@ -219,7 +219,7 @@ function getSettings(){
 		
 		createHotendSliders( machine_profile.nozzle_temperatures );
 		createBedSliders( machine_profile.bed_temperatures );
-	 	if (! printer.power() ){
+	 	if (! printer.acceptsCommands() ){
 			$("input.temp_slider").slider('disable');
 	 	}
 	});
