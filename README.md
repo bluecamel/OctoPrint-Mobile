@@ -1,4 +1,4 @@
-# Nautilus - mobile shell for OctoPrint
+#Nautilus - mobile shell for OctoPrint
 
 
 Octoprint simplified interface optimized for ios devices (only works on dev branch of Octoprint)
@@ -9,8 +9,9 @@ Bonus feature: shake to refresh.
 
 The iOS app is available on [Apple AppStore](https://itunes.apple.com/us/app/id1125992543)
 
+[more...](https://github.com/MoonshineSG/OctoPrint-Mobile/wiki)
 
-###Setup
+##Setup
 
 1. Install via Plugin Manager or manually using this URL: [https://github.com/MoonshineSG/Octoprint-Mobile/archive/master.zip](https://github.com/MoonshineSG/Octoprint-Mobile/archive/master.zip)
 
@@ -19,6 +20,11 @@ The iOS app is available on [Apple AppStore](https://itunes.apple.com/us/app/id1
 3. Edit the gcodes via OctoPrint settings. Optionally the prowl key.
 
 4. Configure the URL and OctoPrint APP KEY in your iPhone/iPad settings.
+
+
+##printing in progress
+
+![screenshot](screenshots/12.printing.gif)
 
 ##Updates
  
@@ -36,8 +42,5 @@ The iOS app is available on [Apple AppStore](https://itunes.apple.com/us/app/id1
  - ver 1.4.3 (plugin & ios) : caching & timeouts in the ios app, added link to timelapse in prowl notification, fix camera height, and most importantly, changed the keyword syntax for "current z" from "{z}" to "%z" **User must manually change this!!!**
  - ver 1.5   (plugin) : configurable temperature sliders (nozzles and bed) and support for `settings.ini` migration
  - ver 1.5.1 (plugin) : minor bug fixes
-
-
-##printing in progress
-
-![screenshot](screenshots/12.printing.gif)
+ 
+ 
