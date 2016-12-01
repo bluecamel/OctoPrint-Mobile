@@ -7,7 +7,7 @@ The iOS app will force landscape, maintain the API key and handle the server con
 
 Bonus feature: shake to refresh.
 
-The iOS app is available on [Apple AppStore](https://itunes.apple.com/us/app/id1125992543)
+The iOS app is available on [Apple AppStore](https://itunes.apple.com/us/app/id1125992543) 
 
 [more...](https://github.com/MoonshineSG/OctoPrint-Mobile/wiki)
 
@@ -22,7 +22,7 @@ The iOS app is available on [Apple AppStore](https://itunes.apple.com/us/app/id1
 4. Configure the URL and OctoPrint APP KEY in your iPhone/iPad settings.
 
 
-##printing in progress
+##Printing in progress
 
 ![screenshot](screenshots/12.printing.gif)
 
@@ -42,5 +42,5 @@ The iOS app is available on [Apple AppStore](https://itunes.apple.com/us/app/id1
  - ver 1.4.3 (plugin & ios) : caching & timeouts in the ios app, added link to timelapse in prowl notification, fix camera height, and most importantly, changed the keyword syntax for "current z" from "{z}" to "%z" **User must manually change this!!!**
  - ver 1.5   (plugin) : configurable temperature sliders (nozzles and bed) and support for `settings.ini` migration
  - ver 1.5.1 (plugin) : minor bug fixes
- 
+ - ver 1.5.2 (plugin) : removed default setting.ini, more configurable buttons (nozzle and bed temperature, fan speed, )
  
