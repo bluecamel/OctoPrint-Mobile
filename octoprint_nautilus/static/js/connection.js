@@ -1,7 +1,6 @@
 var socket;
 var retry_count = -1;
-var gcodes_offset;
-var gcodes_action;
+var settings = {printer: {temperature_scale:"C", nozzle_temperatures:"", bed_temperatures:""}};
 
 function connect(){
 	disconnect()
@@ -120,7 +119,7 @@ function sendJobCommand(command){
 }
 
 function sendCommandByName(name){
-	var gcode = gcodes_action[name];
+	var gcode = settings.action[name];
 	if (gcode != undefined) {
 		sendCommand( gcode.split(",") );
 	}
@@ -183,7 +182,7 @@ function checkHome(callback){
 
 function getSettings(){
 	$.ajax({
-		url:  MOBILE_URL+"/settings/"+localStorage.getItem("mobile.settings.id"),
+		url:  MOBILE_URL+"/settings/"+localStorage.getItem("mobile.settings.uid"),
 		headers: {"X-Api-Key": API_KEY},
 		method: "GET",
 		timeout: 10000,
@@ -193,32 +192,37 @@ function getSettings(){
 			data = JSON.parse(data);
 		}		
 		if (data.update){
-			localStorage.setItem("mobile.settings.id", data.id);
-			machine_profile = data.profile;
-			if (machine_profile.temperature_scale == "C") {
-				machine_profile.temperature_scale = "ºC"
+			localStorage.setItem("mobile.settings.uid", data.id);
+			
+			settings.profile = data.profile;
+			settings.printer = data.printer;
+			
+			if (settings.printer.temperature_scale == "C") {
+				settings.printer.temperature_scale = "ºC"
 			}
-			machine_profile.nozzle_temperatures = machine_profile.nozzle_temperatures.split(",")
-			machine_profile.bed_temperatures = machine_profile.bed_temperatures.split(",")
+			settings.printer.nozzle_temperatures = settings.printer.nozzle_temperatures.split(",")
+			settings.printer.bed_temperatures = settings.printer.bed_temperatures.split(",")
 
-			gcodes_offset = data.offset;
-			gcodes_action = data.action;
+			settings.offset = data.offset;
+			settings.action = data.action;
 			
 			localStorage.setItem("mobile.profile", JSON.stringify(data.profile));
-			localStorage.setItem("mobile.gcodes.offset", JSON.stringify(data.offset));
-			localStorage.setItem("mobile.gcodes.action", JSON.stringify(data.action));
+			localStorage.setItem("mobile.printer", JSON.stringify(data.printer));
+			localStorage.setItem("mobile.offset", JSON.stringify(data.offset));
+			localStorage.setItem("mobile.action", JSON.stringify(data.action));
 		} else {
-			machine_profile = JSON.parse(localStorage.getItem("mobile.profile"));
-			gcodes_offset = JSON.parse(localStorage.getItem("mobile.gcodes.offset"));
-			gcodes_action = JSON.parse(localStorage.getItem("mobile.gcodes.action"));
+			settings.profile = JSON.parse(localStorage.getItem("mobile.profile"));
+			settings.printer = JSON.parse(localStorage.getItem("mobile.printer"));
+			settings.offset = JSON.parse(localStorage.getItem("mobile.offset"));
+			settings.action = JSON.parse(localStorage.getItem("mobile.action"));
 		}
-		offset.m1(gcodes_offset.macro_1);
-		offset.m2(gcodes_offset.macro_2);
-		offset.m3(gcodes_offset.macro_3);
-		offset.m4(gcodes_offset.macro_4);
+		offset.m1(settings.offset.macro_1);
+		offset.m2(settings.offset.macro_2);
+		offset.m3(settings.offset.macro_3);
+		offset.m4(settings.offset.macro_4);
 		
-		createHotendSliders( machine_profile.nozzle_temperatures );
-		createBedSliders( machine_profile.bed_temperatures );
+		createHotendSliders( settings.printer.nozzle_temperatures );
+		createBedSliders( settings.printer.bed_temperatures );
 	 	if (! printer.acceptsCommands() ){
 			$("input.temp_slider").slider('disable');
 	 	}

@@ -1,8 +1,5 @@
 $(document).ready(function() {
 	switchView("loading");
-	
-	//settings not loaded yet, but needed for display. 
-	machine_profile = {temperature_scale:"C", nozzle_temperatures:"", bed_temperatures:""};
 
 	applyBindings();
 	

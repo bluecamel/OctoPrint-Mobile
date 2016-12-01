@@ -94,7 +94,7 @@ function onMessageData(messages){
 		} 
 		if ((m = re114.exec(messages)) != null) {
 			if ( offset.prepared() ) {
-				offset.current_z(   (parseFloat(m[3]) + parseFloat(machine_profile.max_m851)).toFixed(2) );
+				offset.current_z(   (parseFloat(m[3]) + parseFloat(settings.profile.max_m851)).toFixed(2) );
 			} else {
 				offset.current_z(m[3]);	
 			}

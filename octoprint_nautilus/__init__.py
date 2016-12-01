@@ -10,7 +10,9 @@ from octoprint.events import eventManager, Events
 import ConfigParser, hashlib, os
 import re
 from flask import make_response, render_template, jsonify, url_for, request
+
 from . import pyrowl
+from . import settings
 
 from jinja2 import Template
 from StringIO import StringIO
@@ -149,60 +151,21 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 
 		octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
 			
-	def load_ini(self, config, inifile, force=True):
-		section = None
-		with open(inifile) as foo:
-			lines  = foo.readlines()
-			for line in lines:
-				line = line.strip()
-				if line.startswith("["):
-					section = line.translate(None, "[]")
-					try:
-						config.add_section(section)
-					except ConfigParser.DuplicateSectionError:
-						pass
-				elif ":" in line:
-					k, v = line.split(":")
-					k = k.strip()
-					v = v.strip()
-					if config.has_option(section, k):
-						if force :
-							config.set(section, k, v)
-					else:
-						config.set(section, k, v)
-						
-				elif "=" in line:
-					k, v = line.split("=")
-					k = k.strip()
-					v = v.strip()
-					if config.has_option(section, k):
-						if force :
-							config.set(section, k, v)
-					else:
-						config.set(section, k, v)
-				elif line.startswith("#") or line.startswith(";"):
-					if config.has_option(section, line):
-						if force :
-							config.set(section, line)
-					else:
-						config.set(section, line)
-						
 	def get_settings_version(self):
-		return 2
+		return 3
 
 	def on_settings_migrate(self, target, current):
 		#settings.ini version
 		current = self._settings.get(["_settings_version"])
-		if current is None or current < 2:
+		if current is None or current < 3:
 			self._logger.info( "Migrate settings from %s to %s."%(current, target))
 			config = ConfigParser.ConfigParser(allow_no_value = True)
 		
-			inifile = os.path.join(self._basefolder, "default", "settings.ini")
-			self.load_ini(config, inifile)
+			settings.default(config)
 
 			if os.path.isfile(os.path.join(self.get_plugin_data_folder(), "settings.ini")):
 				inifile = os.path.join(self.get_plugin_data_folder(), "settings.ini")
-				self.load_ini(config, inifile, force=False)
+				settings.merge(config, inifile)
 
 			outfile = os.path.join(self.get_plugin_data_folder(), "settings.ini")
 			with open(outfile, 'w') as configfile:
@@ -244,7 +207,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 	
 	@octoprint.plugin.BlueprintPlugin.route("/settings/", methods=["GET"])
 	@octoprint.plugin.BlueprintPlugin.route("/settings/<identifier>", methods=["GET"])
-	def get_ini_settings(self, identifier = "preview"):
+	def get_config(self, identifier = "preview"):
 		
 		inifile = os.path.join(self.get_plugin_data_folder(), "settings.ini")
 		with open(inifile) as foo:
@@ -260,17 +223,17 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			has_errors = False
 			retval = {}
 			
-			ini_settings = ConfigParser.ConfigParser()
-			ini_settings.readfp(StringIO(ini_as_text))
+			config = ConfigParser.ConfigParser()
+			config.readfp(StringIO(ini_as_text))
 		
 			try:
-				profile  = dict([a, int(x) if x.isdigit() else x] for a, x in ini_settings.items("profile"))
+				profile  = dict([a, int(x) if x.isdigit() else x] for a, x in config.items("profile"))
 			except:
 				self._logger.info("Unable to load [profile] section. Missing? Not needed?")
 				profile = dict()
 		
-			for section in ini_settings.sections():
-				view = ini_settings.items(section)
+			for section in config.sections():
+				view = config.items(section)
 				commands = {}
 				for key,value in view:
 					if section == "profile":

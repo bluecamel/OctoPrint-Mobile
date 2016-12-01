@@ -10,21 +10,21 @@ function ActionModel(){
 		if (self.extruder0_slider_value() == 0) {
 			$("#hotend0_slider").slider('setValue', 0);
 		}
-		return  machine_profile.nozzle_temperatures[self.extruder0_slider_value() - 1];
+		return  settings.printer.nozzle_temperatures[self.extruder0_slider_value() - 1];
 	});
 
 	self.config_extruder1_temp = ko.computed(function(){
 		if (self.extruder1_slider_value() == 0) {
 			$("#hotend1_slider").slider('setValue', 0);
 		}
-		return  machine_profile.nozzle_temperatures[self.extruder1_slider_value() - 1];
+		return  settings.printer.nozzle_temperatures[self.extruder1_slider_value() - 1];
 	});
 
 	self.config_bed_temp = ko.computed(function(){
 		if (self.bed_slider_value() == 0) {
 			$("#bed_slider").slider('setValue', 0);
 		}
-		return  machine_profile.bed_temperatures[self.bed_slider_value() - 1];
+		return  settings.printer.bed_temperatures[self.bed_slider_value() - 1];
 	});
 
 	self.fan_slider_value = ko.observable(0);
@@ -47,12 +47,12 @@ function ActionModel(){
 
 	self.bed_temp = ko.computed(function(){
 		if (printer.bed_target() == 0) {
-			return sprintf(" %0.1f%s", printer.bed_actual(), machine_profile.temperature_scale);
+			return sprintf(" %0.1f%s", printer.bed_actual(), settings.printer.temperature_scale);
 		} else {
 			if (printer.bed_actual() > printer.bed_target()) {
-				return sprintf(" %0.1f%s &seArr; %s%s", printer.bed_actual(), machine_profile.temperature_scale, printer.bed_target(), machine_profile.temperature_scale);
+				return sprintf(" %0.1f%s &seArr; %s%s", printer.bed_actual(), settings.printer.temperature_scale, printer.bed_target(), settings.printer.temperature_scale);
 			} else {
-				return sprintf(" %0.1f%s &neArr; %s%s", printer.bed_actual(), machine_profile.temperature_scale,  printer.bed_target(), machine_profile.temperature_scale);
+				return sprintf(" %0.1f%s &neArr; %s%s", printer.bed_actual(), settings.printer.temperature_scale,  printer.bed_target(), settings.printer.temperature_scale);
 			}
 		}		
 	});
@@ -62,44 +62,44 @@ function ActionModel(){
 		if (printer.inProgress()) {
 				if (printer.extruder0_target() != 0) {
 					if (printer.extruder0_actual() > printer.extruder0_target()) {
-						temp += sprintf("%0.1f%s &seArr; %s%s", printer.extruder0_actual(), machine_profile.temperature_scale,  printer.extruder0_target(), machine_profile.temperature_scale);
+						temp += sprintf("%0.1f%s &seArr; %s%s", printer.extruder0_actual(), settings.printer.temperature_scale,  printer.extruder0_target(), settings.printer.temperature_scale);
 					}	else {
-						temp += sprintf("%0.1f%s &neArr; %s%s", printer.extruder0_actual(), machine_profile.temperature_scale,  printer.extruder0_target(), machine_profile.temperature_scale);
+						temp += sprintf("%0.1f%s &neArr; %s%s", printer.extruder0_actual(), settings.printer.temperature_scale,  printer.extruder0_target(), settings.printer.temperature_scale);
 					}
 				}
 				if (printer.extruder1_target() != 0) {
 					if (temp != " ") temp += " | ";
 					if (printer.extruder1_actual() > printer.extruder1_target()) {
-						temp += sprintf("%0.1f%s &seArr; %s%s", printer.extruder1_actual(), machine_profile.temperature_scale,  printer.extruder1_target(), machine_profile.temperature_scale);
+						temp += sprintf("%0.1f%s &seArr; %s%s", printer.extruder1_actual(), settings.printer.temperature_scale,  printer.extruder1_target(), settings.printer.temperature_scale);
 					}	else {
-						temp += sprintf("%0.1f%s &neArr; %s%s", printer.extruder1_actual(), machine_profile.temperature_scale,  printer.extruder1_target(), machine_profile.temperature_scale);
+						temp += sprintf("%0.1f%s &neArr; %s%s", printer.extruder1_actual(), settings.printer.temperature_scale,  printer.extruder1_target(), settings.printer.temperature_scale);
 					}
 				}
 				if (temp == " ") {
-					temp += sprintf("%0.1f%s", printer.extruder0_actual(), machine_profile.temperature_scale);
+					temp += sprintf("%0.1f%s", printer.extruder0_actual(), settings.printer.temperature_scale);
 					if ( printer.dual_nozzle() ) {
-						temp += sprintf(" | %0.1f%s", printer.extruder1_actual(), machine_profile.temperature_scale);	
+						temp += sprintf(" | %0.1f%s", printer.extruder1_actual(), settings.printer.temperature_scale);	
 					}
 				}
 		} else {
 			if (printer.extruder0_target() == 0) {
-				temp += sprintf("%0.1f%s", printer.extruder0_actual(), machine_profile.temperature_scale);
+				temp += sprintf("%0.1f%s", printer.extruder0_actual(), settings.printer.temperature_scale);
 			} else {
 				if (printer.extruder0_actual() > printer.extruder0_target()) {
-					temp += sprintf("%0.1f%s &seArr; %s%s", printer.extruder0_actual(), machine_profile.temperature_scale,  printer.extruder0_target(), machine_profile.temperature_scale);
+					temp += sprintf("%0.1f%s &seArr; %s%s", printer.extruder0_actual(), settings.printer.temperature_scale,  printer.extruder0_target(), settings.printer.temperature_scale);
 				}	else {
-					temp += sprintf("%0.1f%s &neArr; %s%s", printer.extruder0_actual(), machine_profile.temperature_scale,  printer.extruder0_target(), machine_profile.temperature_scale);
+					temp += sprintf("%0.1f%s &neArr; %s%s", printer.extruder0_actual(), settings.printer.temperature_scale,  printer.extruder0_target(), settings.printer.temperature_scale);
 				}
 			}
 			if ( printer.dual_nozzle() ) {
 				temp += " | ";
 				if (printer.extruder1_target() == 0) {
-					temp += sprintf("%0.1f%s", printer.extruder1_actual(), machine_profile.temperature_scale);
+					temp += sprintf("%0.1f%s", printer.extruder1_actual(), settings.printer.temperature_scale);
 				} else {
 					if (printer.extruder1_actual() > printer.extruder1_target()) {
-						temp += sprintf("%0.1f%s &seArr; %s%s", printer.extruder1_actual(), machine_profile.temperature_scale,  printer.extruder1_target(), machine_profile.temperature_scale);
+						temp += sprintf("%0.1f%s &seArr; %s%s", printer.extruder1_actual(), settings.printer.temperature_scale,  printer.extruder1_target(), settings.printer.temperature_scale);
 					}	else {
-						temp += sprintf("%0.1f%s &neArr; %s%s", printer.extruder1_actual(), machine_profile.temperature_scale,  printer.extruder1_target(), machine_profile.temperature_scale);
+						temp += sprintf("%0.1f%s &neArr; %s%s", printer.extruder1_actual(), settings.printer.temperature_scale,  printer.extruder1_target(), settings.printer.temperature_scale);
 					}
 				}
 			}
@@ -158,9 +158,9 @@ function ActionModel(){
 	
 	self.sendExtruder0Temperature = function(){
 		if (self.extruder0_slider_value() == 0) {
-			sendCommand(['M104 T0 S0', 'M300 @beep']);
+			sendCommand( settings.printer.nozzle_heater_off.replace("%tool", 0).split(",") );
 		} else {
-			sendCommand(['M104 T0 S'+self.config_extruder0_temp(), 'M300 @temperature_extruder']);
+			sendCommand( settings.printer.nozzle_heater_on.replace("%tool", 0).replace("%temp", self.config_extruder0_temp()).split(",") );
 			self.extruder0_slider_value(0);
 			switchPanel("status");
 		}
@@ -168,9 +168,9 @@ function ActionModel(){
 
 	self.sendExtruder1Temperature = function(){
 		if (self.extruder1_slider_value() == 0) {
-			sendCommand(['M104 T1 S0', 'M300 @beep']);
+			sendCommand( settings.printer.nozzle_heater_off.replace("%tool", 1).split(",") );
 		} else {
-			sendCommand(['M104 T1 S'+self.config_extruder1_temp(), 'M300 @temperature_extruder']);
+			sendCommand( settings.printer.nozzle_heater_on.replace("%tool", 1).replace("%temp", self.config_extruder1_temp()).split(",") );
 			self.extruder1_slider_value(0);
 			switchPanel("status");
 		}
@@ -178,9 +178,9 @@ function ActionModel(){
 
 	self.sendBedTemperature = function(){
 		if (self.bed_slider_value() == 0) {
-			sendCommand(['M140 S0', 'M300 @beep']);
+			sendCommand( settings.printer.bed_temperature_off.split(",") );
 		} else {
-			sendCommand(['M140 S'+self.config_bed_temp(), 'M300 @temperature_bed']);
+			sendCommand( settings.printer.bed_temperature_off.replace("%temp", self.config_bed_temp()).split(",") );
 			self.bed_slider_value(0);
 			switchPanel("status");
 		}
@@ -188,9 +188,9 @@ function ActionModel(){
 	
 	self.setFanSpeed = function(){
 		if (self.fan_slider_value() == 0) {
-			sendCommand('M106 S0');
+			sendCommand( settings.printer.fan_off.split(",") );
 		} else {
-			sendCommand('M106 S'+ Math.floor(255 * self.fan_slider_value()/100) );
+			sendCommand( settings.printer.fan_on.replace("%speed", Math.floor(255 * self.fan_slider_value()/100) ));
 			self.fan_slider_value(0);
 		}
 	}
@@ -227,75 +227,75 @@ function OffsetModel() {
 	}
 
 	self.prepareOffset = function(){
-		sendCommand( gcodes_offset.prepare_offset.split(",") );
+		sendCommand( settings.offset.prepare_offset.split(",") );
 		self.prepared(true);
 	}
 	
 	self.saveOffset = function(){
-		sendCommand( gcodes_offset.save_offset.replace("%z", self.current_z()).split(","));
+		sendCommand( settings.offset.save_offset.replace("%z", self.current_z()).split(","));
 		self.prepared(false);
 	}
 
 
 	self.showMacro = function (){
 		var message = "";
-		if (gcodes_offset.macro_1 != "") {
-			message += "M1 :<br/>&nbsp;&nbsp;&nbsp;" + gcodes_offset.macro_1.split(",").join("<br/>&nbsp;&nbsp;&nbsp;")+"<br/>";
+		if (settings.offset.macro_1 != "") {
+			message += "M1 :<br/>&nbsp;&nbsp;&nbsp;" + settings.offset.macro_1.split(",").join("<br/>&nbsp;&nbsp;&nbsp;")+"<br/>";
 		}
-		if (gcodes_offset.macro_2 != "") {
-			message += "M2 :<br/>&nbsp;&nbsp;&nbsp;" + gcodes_offset.macro_2.split(",").join("<br/>&nbsp;&nbsp;&nbsp;")+"<br/>";
+		if (settings.offset.macro_2 != "") {
+			message += "M2 :<br/>&nbsp;&nbsp;&nbsp;" + settings.offset.macro_2.split(",").join("<br/>&nbsp;&nbsp;&nbsp;")+"<br/>";
 		}
-		if (gcodes_offset.macro_3 != "") {
-			message += "M3 :<br/>&nbsp;&nbsp;&nbsp;" + gcodes_offset.macro_3.split(",").join("<br/>&nbsp;&nbsp;&nbsp;")+"<br/>";
+		if (settings.offset.macro_3 != "") {
+			message += "M3 :<br/>&nbsp;&nbsp;&nbsp;" + settings.offset.macro_3.split(",").join("<br/>&nbsp;&nbsp;&nbsp;")+"<br/>";
 		}
-		if (gcodes_offset.macro_4 != "") {
-			message += "M4 :<br/>&nbsp;&nbsp;&nbsp;" + gcodes_offset.macro_4.split(",").join("<br/>&nbsp;&nbsp;&nbsp;")+"<br/>";
+		if (settings.offset.macro_4 != "") {
+			message += "M4 :<br/>&nbsp;&nbsp;&nbsp;" + settings.offset.macro_4.split(",").join("<br/>&nbsp;&nbsp;&nbsp;")+"<br/>";
 		}
 		
 		info( message );
 	}
 	
 	self.macro1 = function(){
-		sendCommand( gcodes_offset.macro_1.split(","));
+		sendCommand( settings.offset.macro_1.split(","));
 	}
 	self.macro2 = function(){
-		sendCommand( gcodes_offset.macro_2.split(","));
+		sendCommand( settings.offset.macro_2.split(","));
 	}
 	self.macro3 = function(){
-		sendCommand( gcodes_offset.macro_3.split(","));
+		sendCommand( settings.offset.macro_3.split(","));
 	}
 
 	self.macro4 = function(){
-		sendCommand( gcodes_offset.macro_4.split(","));
+		sendCommand( settings.offset.macro_4.split(","));
 	}
 
 
 	self.offsetDone = function(){
-		sendCommand( gcodes_offset.offset_done.split(",") );
+		sendCommand( settings.offset.offset_done.split(",") );
 	}
 	
 	self.findZero = function(){
-		sendCommand( gcodes_offset.find_reference.split(",") );
+		sendCommand( settings.offset.find_reference.split(",") );
 	}
 
 	self.backLeft = function(){
-		sendCommand( gcodes_offset.back_left.split(",") );
+		sendCommand( settings.offset.back_left.split(",") );
 	}
 
 	self.frontMiddle = function(){
-		sendCommand( gcodes_offset.front_middle.split(",") );
+		sendCommand( settings.offset.front_middle.split(",") );
 	}
 
 	self.backRight = function(){
-		sendCommand( gcodes_offset.back_right.split(",") );
+		sendCommand( settings.offset.back_right.split(",") );
 	}
 	
 	self.sendOffsetAdjustment = function(z){
 		if (self.prepared()){
-			sendCommand( gcodes_offset.send_relative_z.replace("%z", z).split(",") );
+			sendCommand( settings.offset.send_relative_z.replace("%z", z).split(",") );
 		} else {
-			sendCommand( gcodes_offset.save_offset.replace( "%z", ( parseFloat(self.offset()) + parseFloat(z) ) ).split(",") 
-			.concat(  gcodes_offset.send_relative_z.replace("%z", z).split(",")  )  );
+			sendCommand( settings.offset.save_offset.replace( "%z", ( parseFloat(self.offset()) + parseFloat(z) ) ).split(",") 
+			.concat(  settings.offset.send_relative_z.replace("%z", z).split(",")  )  );
 		}
 	}	
 }
@@ -643,7 +643,7 @@ function PrinterModel(){
 		  if (result) {
 			  sendSwitch({"command":"power", "status":false}, function(){
 				sendSwitchCommand("status");
-				sendConnectionCommand("disconnect");		
+				sendConnectionCommand("disconnect");
 				});
 		  }
 		}});

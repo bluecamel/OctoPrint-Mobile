@@ -72,7 +72,7 @@
 									<input class="temp_slider" id="hotend0_slider" type="text"/>
 								</div>
 								<div class="col-xs-4">
-									<button type="button" class="btn btn-default" data-bind="enable: printer.acceptsCommands, click: sendExtruder0Temperature, style: { color: extruder0_slider_value() == 0  ? '#17b566' : '#ed2b36' }"><span data-bind="visible: printer.dual_nozzle()">left&nbsp;</span><span class="fa fa-lg fa-fire"></span><span data-bind="text: extruder0_slider_value() == 0  ? ' off': ' to ' + config_extruder0_temp()  + machine_profile.temperature_scale"></span></button>
+									<button type="button" class="btn btn-default" data-bind="enable: printer.acceptsCommands, click: sendExtruder0Temperature, style: { color: extruder0_slider_value() == 0  ? '#17b566' : '#ed2b36' }"><span data-bind="visible: printer.dual_nozzle()">left&nbsp;</span><span class="fa fa-lg fa-fire"></span><span data-bind="text: extruder0_slider_value() == 0  ? ' off': ' to ' + config_extruder0_temp()  + settings.printer.temperature_scale"></span></button>
 								</div>
 							</div>
 							<div class="row slider-row" data-bind="visible: printer.dual_nozzle()">
@@ -80,7 +80,7 @@
 									<input class="temp_slider temp_slider_dual" id="hotend1_slider" type="text"/>
 								</div>
 								<div class="col-xs-4">
-									<button type="button" class="btn btn-default" data-bind="enable: printer.dual_nozzle() && printer.acceptsCommands(), click: sendExtruder1Temperature, style: { color: extruder1_slider_value() == 0  ? '#17b566' : '#ed2b36' }"><span>right&nbsp;</span><span class="fa fa-lg fa-fire"></span><span data-bind="text: extruder1_slider_value() == 0  ? ' off': ' to ' + config_extruder1_temp()  + machine_profile.temperature_scale"></span></button>
+									<button type="button" class="btn btn-default" data-bind="enable: printer.dual_nozzle() && printer.acceptsCommands(), click: sendExtruder1Temperature, style: { color: extruder1_slider_value() == 0  ? '#17b566' : '#ed2b36' }"><span>right&nbsp;</span><span class="fa fa-lg fa-fire"></span><span data-bind="text: extruder1_slider_value() == 0  ? ' off': ' to ' + config_extruder1_temp()  + settings.printer.temperature_scale"></span></button>
 								</div>
 							</div>
 							<div class="row  slider-row">
@@ -88,7 +88,7 @@
 									<input class="temp_slider temp_bed_slider" id="bed_slider" type="text" />
 								</div>
 								<div class="col-xs-4">
-									<button type="button" class="btn btn-default" data-bind="enable: printer.acceptsCommands, click: sendBedTemperature, style: { color: bed_slider_value() == 0  ? '#17b566' : '#ed2b36' }""><span></span><span class="fa fa-lg fa-bed"></span><span data-bind="text: bed_slider_value() == 0  ? ' off': ' to ' + config_bed_temp() + machine_profile.temperature_scale""></span></button>
+									<button type="button" class="btn btn-default" data-bind="enable: printer.acceptsCommands, click: sendBedTemperature, style: { color: bed_slider_value() == 0  ? '#17b566' : '#ed2b36' }""><span></span><span class="fa fa-lg fa-bed"></span><span data-bind="text: bed_slider_value() == 0  ? ' off': ' to ' + config_bed_temp() + settings.printer.temperature_scale"></span></button>
 								</div>
 							</div>
 							<div class="row slider-row">
@@ -96,7 +96,7 @@
 									<input class="fan_slider" type="text" data-bind="sliderValue: {value: fan_slider_value, ticks: [0, 25, 50, 75, 100], ticks_positions: [0, 25, 50, 75, 100],  ticks_labels: ['Off', '1/4', 'Half', '3/4', 'Full'], step:25, tooltip: 'hide'}"/>
 								</div>
 								<div class="col-xs-4">
-									<button type="button" class="btn btn-default" data-bind="enable: printer.alwaysAcceptsCommands, click: setFanSpeed, style: { color: fan_slider_value() == 0  ? '#17b566' : '#337ab7' }""><span></span><span class="fa fa-lg fa-asterisk"></span><span data-bind="text: fan_slider_value() == 0  ? ' off': ' to ' + fan_slider_value() + '%' ""></span></button>
+									<button type="button" class="btn btn-default" data-bind="enable: printer.alwaysAcceptsCommands, click: setFanSpeed, style: { color: fan_slider_value() == 0  ? '#17b566' : '#337ab7' }"><span></span><span class="fa fa-lg fa-asterisk"></span><span data-bind="text: fan_slider_value() == 0  ? ' off': ' to ' + fan_slider_value() + '%'"></span></button>
 								</div>
 							</div>
 						</div>
@@ -168,7 +168,7 @@
 								<div class="btn-group-vertical">
 									<div class="btn-group">
 										<div class="btn-group"><button type="button" class="btn btn-lg btn-default disabled">X</button></div>
-										<div class="btn-group"><button type="button" class="btn btn-lg btn-danger" data-bind="click: sendAbsoluteG1.bind($data, 'X0 F10000')"><i class="fa fa-small fa-arrow-left"></i> </button></div>
+										<div class="btn-group"><button type="button" class="btn btn-lg btn-danger" data-bind="click: sendCommandByName.bind($data, 'goto_x_min')"><i class="fa fa-small fa-arrow-left"></i> </button></div>
 										<div class="btn-group"><button type="button" class="btn btn-lg btn-danger" data-bind="click: sendRelativeG1.bind($data, 'X-100 F6000')">100</button></div>
 										<div class="btn-group"><button type="button" class="btn btn-lg btn-danger" data-bind="click: sendRelativeG1.bind($data, 'X-10 F4000')">10</button></div>
 										<div class="btn-group"><button type="button" class="btn btn-lg btn-danger" data-bind="click: sendRelativeG1.bind($data, 'X-1 F1000')">1</button></div>
@@ -180,7 +180,7 @@
 									</div> 
 									<div class="btn-group">
 										<div class="btn-group"><button type="button" class="btn btn-lg btn-default disabled">Y</button></div>
-										<div class="btn-group"><button type="button" class="btn btn-lg btn-danger" data-bind="click: sendAbsoluteG1.bind($data, 'Y0 F10000')"><i class="fa fa-small fa-arrow-down fa-rotate-45"></i> </button></div>
+										<div class="btn-group"><button type="button" class="btn btn-lg btn-danger" data-bind="click: sendCommandByName.bind($data, 'goto_y_min')"><i class="fa fa-small fa-arrow-down fa-rotate-45"></i> </button></div>
 										<div class="btn-group"><button type="button" class="btn btn-lg btn-danger" data-bind="click: sendRelativeG1.bind($data, 'Y-100 F6000')">100</button></div>
 										<div class="btn-group"><button type="button" class="btn btn-lg btn-danger" data-bind="click: sendRelativeG1.bind($data, 'Y-10 F4000')">10</button></div>
 										<div class="btn-group"><button type="button" class="btn btn-lg btn-danger" data-bind="click: sendRelativeG1.bind($data, 'Y-1 F1000')">1</button></div>
@@ -192,7 +192,7 @@
 									</div>
 									<div class="btn-group">
 										<div class="btn-group"><button type="button" class="btn btn-lg btn-default disabled">Z</button></div>
-										<div class="btn-group"><button type="button" class="btn btn-lg btn-danger" data-bind="click: sendAbsoluteG1.bind($data, 'Z0 F3000')"><i class="fa fa-small fa-arrow-down"></i> </button></div>
+										<div class="btn-group"><button type="button" class="btn btn-lg btn-danger" data-bind="click: sendCommandByName.bind($data, 'goto_z_min')"><i class="fa fa-small fa-arrow-down"></i> </button></div>
 										<div class="btn-group"><button type="button" class="btn btn-lg btn-danger" data-bind="click: sendRelativeG1.bind($data, 'Z-100 F3000')">100</button></div>
 										<div class="btn-group"><button type="button" class="btn btn-lg btn-danger" data-bind="click: sendRelativeG1.bind($data, 'Z-10 F1000')">10</button></div>
 										<div class="btn-group"><button type="button" class="btn btn-lg btn-danger" data-bind="click: sendRelativeG1.bind($data, 'Z-1 F500')">1</button></div>
