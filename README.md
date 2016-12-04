@@ -43,4 +43,5 @@ The iOS app is available on [Apple AppStore](https://itunes.apple.com/us/app/id1
  - ver 1.5   (plugin) : configurable temperature sliders (nozzles and bed) and support for `settings.ini` migration
  - ver 1.5.1 (plugin) : minor bug fixes
  - ver 1.5.2 (plugin) : removed default setting.ini, more configurable buttons (nozzle and bed temperature, fan speed, )
+ - ver 1.5.3 (plugin) : hide switch buttons when plugin not present
  
