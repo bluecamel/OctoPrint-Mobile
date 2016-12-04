@@ -54,16 +54,16 @@
 
 					<div id="printer_panel" class="panel">
 						<div class="row printer_row_1">
-							<div class="btn-group">
-								<button type="button"  class="btn btn-default" data-bind="click: printer.toggleLights, disable: !has_switch() || printer.inProgress() "><span class="fa fa-lg fa-lightbulb-o" data-bind="style: { color: printer.lights()?'#17b566':'#b1adaa' }"></span></button>
-								<button type="button"  class="btn btn-default" data-bind="click: printer.toggleMute, enable: has_switch"><span class="fa fa-lg fa-bell-o" data-bind="style: { color: printer.mute()?'#b1adaa':'#17b566' }"></span></button>
-								<button type="button"  class="btn btn-default" data-bind="click: printer.toggleUnload, enable: has_switch"><span class="fa fa-lg fa-external-link" data-bind="style: { color: printer.unload()?'#3466ff':'#b1adaa' }"></span></button>
-								<button type="button"  class="btn btn-default" data-bind="click: printer.togglePowerOff, enable: has_switch "><span class="fa fa-lg fa-power-off" data-bind="style: { color: printer.poweroff()?'#3466ff':'#b1adaa' }"></span></button>
+							<div class="btn-group" data-bind="visible: has_switch()">
+								<button type="button"  class="btn btn-default" data-bind="click: printer.toggleLights, enable: !printer.inProgress() "><span class="fa fa-lg fa-lightbulb-o" data-bind="style: { color: printer.lights()?'#17b566':'#b1adaa' }"></span></button>
+								<button type="button"  class="btn btn-default" data-bind="click: printer.toggleMute"><span class="fa fa-lg fa-bell-o" data-bind="style: { color: printer.mute()?'#b1adaa':'#17b566' }"></span></button>
+								<button type="button"  class="btn btn-default" data-bind="click: printer.toggleUnload"><span class="fa fa-lg fa-external-link" data-bind="style: { color: printer.unload()?'#3466ff':'#b1adaa' }"></span></button>
+								<button type="button"  class="btn btn-default" data-bind="click: printer.togglePowerOff"><span class="fa fa-lg fa-power-off" data-bind="style: { color: printer.poweroff()?'#3466ff':'#b1adaa' }"></span></button>
 							</div>
-							<button type="button"  class="btn btn-danger" data-bind="click: printer.resetPrinter, enable: has_switch, visible: !printer.inProgress() "><span class="fa fa-repeat"></span> Reset <i class='fa fa-umbrella'></i></button>
-							<button type="button"  class="btn btn-default" data-bind="css: {'btn-default': !printer.ready(), 'btn-danger': printer.ready()}, visible: !printer.inProgress(), click: printer.ready()?printer.printerDisconnect:printer.printerConnect" ><span class="fa fa-usb"></span><span data-bind="html: (printer.ready() ? ' Disconnect  <i class=\'fa fa-sm fa-umbrella\'></i>' : ' Connect')"></span></button>
-							<button type="button"  class="btn btn-default" data-bind="click: printer.togglePower, enable: has_switch() && printer.ready(), visible: !printer.inProgress()"><span class="fa  fa-lg fa-power-off" data-bind="style: { color: printer.power()?'#17b566':'#ed2b36' }"></span> Power</button>							
-							<button type="button"  class="btn btn-emergency" data-bind="click: printer.emergencyStop, enable: has_switch, visible: printer.inProgress"><span class="fa fa-lg fa-life-ring" style="color: #ff002b;"></span>  Emergency STOP  <i class='fa fa-umbrella'></i></button>
+							<button type="button"  class="btn btn-danger" data-bind="click: printer.resetPrinter, enable: !printer.inProgress(), visible: (has_switch() && !printer.inProgress())"><span class="fa fa-repeat"></span> Reset <i class='fa fa-umbrella'></i></button>
+							<button type="button"  class="btn btn-default" id="reset_btn" data-bind="css: {'btn-default': !printer.ready(), 'btn-danger': printer.ready()}, enable: !printer.inProgress(), visible: (has_switch() && !printer.inProgress()) || !has_switch(), click: printer.ready()?printer.printerDisconnect:printer.printerConnect" ><span class="fa fa-usb"></span><span data-bind="html: (printer.ready() ? ' Disconnect  <i class=\'fa fa-sm fa-umbrella\'></i>' : ' Connect')"></span></button>
+							<button type="button"  class="btn btn-default" data-bind="click: printer.togglePower, enable: printer.ready, visible: has_switch() && !printer.inProgress()"><span class="fa  fa-lg fa-power-off" data-bind="style: { color: printer.power()?'#17b566':'#ed2b36' }"></span> Power</button>
+							<button type="button"  class="btn btn-emergency" data-bind="click: printer.emergencyStop, visible: has_switch() && printer.inProgress()"><span class="fa fa-lg fa-life-ring" style="color: #ff002b;"></span>  Emergency STOP  <i class='fa fa-umbrella'></i></button>
 							
 						</div>
 						<div class="row printer_row_2">
@@ -281,6 +281,11 @@
 	var has_switch = ko.observable({{ has_switch }});
 	var SCREEN_WIDTH = window.innerWidth + "px";
 	var SCREEN_HEIGHT = window.innerHeight + "px";
+	
+	if (! has_switch()) {
+		$("#reset_btn").css("float", "right");
+	}
+	
 	</script>
     
     {% include 'nautilus_javascripts.jinja2' %}
