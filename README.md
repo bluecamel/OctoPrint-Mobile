@@ -24,7 +24,7 @@ The iOS app is available on [Apple AppStore](https://itunes.apple.com/us/app/id1
 
 ##Printing in progress
 
-![screenshot](screenshots/12.printing.gif)
+![screenshot](https://moonshinesg.github.io/images/nautilus/printing.gif)
 
 ##Updates
  
