@@ -13,14 +13,8 @@ The iOS app is available on [Apple AppStore](https://itunes.apple.com/us/app/id1
 
 ##Setup
 
-1. Install via Plugin Manager or manually using this URL: [https://github.com/MoonshineSG/Octoprint-Mobile/archive/master.zip](https://github.com/MoonshineSG/Octoprint-Mobile/archive/master.zip)
 
-2. Get iOS application from [Apple AppStore](https://itunes.apple.com/us/app/id1125992543) (or compile, sign and install the ios app - developer license from Apple needed)
-
-3. Edit the gcodes via OctoPrint settings. Optionally the prowl key.
-
-4. Configure the URL and OctoPrint APP KEY in your iPhone/iPad settings.
-
+See the [installation guide](https://github.com/MoonshineSG/OctoPrint-Mobile/wiki/Install)
 
 ##Printing in progress
 
