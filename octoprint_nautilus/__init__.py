@@ -23,26 +23,6 @@ from socket import AF_INET, inet_pton
 
 home_folder = os.path.expanduser("~")
 
-intervals = (
-	('weeks', 604800),  # 60 * 60 * 24 * 7
-	('days', 86400),	# 60 * 60 * 24
-	('hours', 3600),	# 60 * 60
-	('minutes', 60),
-	('seconds', 1),
-	)
-
-def display_time(seconds, granularity=2):
-	result = []
-	
-	for name, count in intervals:
-		value = seconds // count
-		if value:
-			seconds -= value * count
-			if value == 1:
-				name = name.rstrip('s')
-			result.append("{} {}".format(int(value), name))
-	return ' and '.join(result[:granularity])
-
 def is_external(ip):
 	f = unpack('!I',inet_pton(AF_INET,ip))[0]
 	private = (
