@@ -119,7 +119,6 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 	##octoprint.plugin.SettingsPlugin
 	def get_settings_defaults(self):
 		return dict(
-			prowl_key = None,
 			movie_link = "http://octopi.local/downloads/timelapse/",
 			_settings_version = None,
 		)
@@ -134,7 +133,6 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			gcodes = f.read()
 		
 		return dict(
-			prowl_key = self._settings.get(["prowl_key"]),
 			movie_link = self._settings.get(["movie_link"]),
 			_settings_version = self._settings.get(["_settings_version"]),
 			gcodes = gcodes
@@ -284,28 +282,6 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		if event == Events.CLIENT_OPENED:
 			self.read_profile()
 			self._plugin_manager.send_plugin_message(self._identifier, dict(zchange = self.zchange, port=self._printer.get_current_connection()[1], tool = self.tool, nozzles = self.nozzles, nozzle_size = self.nozzle_size, extruders = self.extruders, nozzle_name = self.nozzle_name))
-		elif event == Events.PRINT_DONE:
-			title = "Print Done"
-			message="'{0}' printed in {1}. Timelapse will be available shortly.".format( os.path.basename(payload.get("file")), display_time(payload.get("time")) )
-			link =  "{0}/{1}.mpg".format(self._settings.get(["movie_link"]).strip("/"), os.path.splitext(os.path.basename(payload.get("file")))[0])
-			self.send_prowl(title, message, link)
-			
-	## Prowl notification
-	def send_prowl(self, title, message, link = None):
-		prowl_key = self._settings.get(["prowl_key"])
-		self._logger.info("Sending message '{0}':'{1}' [{2}]".format(title, message, link))
-		if prowl_key:
-			try:
-				service = pyrowl.Pyrowl(prowl_key)
-				res = service.push("Nautilus", title, message, link).get(prowl_key)
-				if res.get('code') == '200':
-					self._logger.info( "Notification sent. %s remaining."%res.get('remaining') )
-				else:
-					self._logger.error( res.get('message') )
-			except Exception as e:
-				self._logger.error("Prowl notification failed. [%s]"%e)
-		else:
-			self._logger.info("Prowl not yet setup. Add your prowl_key in the config file.")
 	
 	##plugin auto update
 	def get_version(self):
