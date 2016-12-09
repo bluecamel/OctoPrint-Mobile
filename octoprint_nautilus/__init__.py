@@ -11,7 +11,6 @@ import ConfigParser, hashlib, os
 import re
 from flask import make_response, render_template, jsonify, url_for, request
 
-from . import pyrowl
 from . import settings
 
 from jinja2 import Template
