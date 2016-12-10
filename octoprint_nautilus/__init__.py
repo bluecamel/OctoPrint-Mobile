@@ -20,8 +20,8 @@ import collections
 from struct import unpack
 from socket import AF_INET
 
-import platform
-if platform.system() == "Windows":
+import sys
+if sys.platform == "win32":
 	import win_inet_pton
 
 from socket import inet_pton
