@@ -278,7 +278,7 @@
 	var BASE_URL = location.protocol + '//' + location.host + "/";
 	var API_KEY = "{{ request.headers.get('API_KEY') }}";
 	var MOBILE_URL = BASE_URL+"{{ nautilus_url }}";
-	var has_switch = ko.observable({{ has_switch }});
+	var has_switch = ko.observable({{ has_switch  | lower}});
 	var SCREEN_WIDTH = window.innerWidth + "px";
 	var SCREEN_HEIGHT = window.innerHeight + "px";
 	

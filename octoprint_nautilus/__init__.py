@@ -11,14 +11,20 @@ import ConfigParser, hashlib, os
 import re
 from flask import make_response, render_template, jsonify, url_for, request
 
-from . import settings
+from nautilus import settings
 
 from jinja2 import Template
 from StringIO import StringIO
 import collections
 
 from struct import unpack
-from socket import AF_INET, inet_pton
+from socket import AF_INET
+
+import platform
+if platform.system() == "Windows":
+	import win_inet_pton
+
+from socket import inet_pton
 
 home_folder = os.path.expanduser("~")
 
@@ -159,9 +165,9 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		nautilus_url="plugin/%s"%self._identifier
 		
 		if self._plugin_manager.get_plugin("switch"):
-			has_switch="true"
+			has_switch = True
 		else:
-			has_switch="false"
+			has_switch = False
 		
 		return make_response(render_template("nautilus_index.jinja2", nautilus_url=nautilus_url, has_switch=has_switch) )
 	
