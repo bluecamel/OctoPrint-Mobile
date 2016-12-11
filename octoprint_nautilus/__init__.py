@@ -288,16 +288,15 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 				pip="https://github.com/MoonshineSG/OctoPrint-Mobile/archive/{target_version}.zip"
 			)
 		)
-
-__plugin_name__ = "Nautilus"
-__plugin_description__ = "Nautilus - OctoPrint mobile shell (simplified interface optimised for mobile devices)"
-
+		
 def __plugin_load__():
 	global __plugin_implementation__
 	__plugin_implementation__ = NautilusPlugin()
 	
 	global __plugin_hooks__
-	__plugin_hooks__ = {"octoprint.comm.protocol.action": __plugin_implementation__.custom_action_handler}
+	__plugin_hooks__ = {"octoprint.comm.protocol.action": __plugin_implementation__.custom_action_handler,
+		"octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
+	}
 
 
 
