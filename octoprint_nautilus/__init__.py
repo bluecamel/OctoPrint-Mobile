@@ -135,12 +135,12 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
 			
 	def get_settings_version(self):
-		return 3
+		return 4
 
 	def on_settings_migrate(self, target, current):
 		#settings.ini version
 		current = self._settings.get(["_settings_version"])
-		if current is None or current < 3:
+		if current is None or current < 4:
 			self._logger.info( "Migrate settings from %s to %s."%(current, target))
 			config = ConfigParser.ConfigParser(allow_no_value = True)
 		

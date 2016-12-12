@@ -1,4 +1,5 @@
 import ConfigParser
+import re
 
 def default(config):
 	config.add_section("profile")
@@ -102,12 +103,20 @@ def default(config):
 
 patch = ["; temperature sliders", "temperature_scale", "nozzle_temperatures", "bed_temperatures"]
 
+r_1 = (r"((?<!{){z}(?!}))", "%z")
+
 def merge(config, inifile):
 	section = None
 	with open(inifile) as foo:
 		lines  = foo.readlines()
 		for line in lines:
 			line = line.strip()
+			
+			#patch {z} to %z
+			result = re.sub(r_1[0], r_1[1], line)
+			if result:
+			    line = result
+			
 			if line.startswith("["):
 				section = line.translate(None, "[]")
 			elif ":" in line:
