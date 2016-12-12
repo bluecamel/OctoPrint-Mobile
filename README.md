@@ -41,3 +41,4 @@ See the [installation guide](https://github.com/MoonshineSG/OctoPrint-Mobile/wik
  - ver 1.5.4 (plugin) : fix bed temperature 
  - ver 1.5.5 (plugin) : fix windows dependency, remove prowl
  - ver 1.6   (plugin) : fix auto-update
+ - ver 1.6.1 (plugin) : regresive auto-patch settings.ini for update 1.4.3 (for auto-update)
