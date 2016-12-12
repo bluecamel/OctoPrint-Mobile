@@ -11,7 +11,7 @@ import ConfigParser, hashlib, os
 import re
 from flask import make_response, render_template, jsonify, url_for, request
 
-from nautilus import settings
+from octoprint_nautilus import settings
 
 from jinja2 import Template
 from StringIO import StringIO
