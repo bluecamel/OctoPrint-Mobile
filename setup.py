@@ -33,7 +33,10 @@ plugin_url = "https://github.com/MoonshineSG/OctoPrint-Mobile"
 plugin_license = "AGPLv3"
 
 # Any additional requirements besides OctoPrint should be listed here
+import sys
 plugin_requires = []
+if sys.platform == "win32":
+	plugin_requires = ["win-inet-pton"]
 
 ### --------------------------------------------------------------------------------------------------------------------
 ### More advanced options that you usually shouldn't have to touch follow after this point
