@@ -33,7 +33,7 @@ See the [installation guide](https://github.com/MoonshineSG/OctoPrint-Mobile/wik
  - ver 1.4   (plugin) : single/dual nozzle/extruder based on OctoPrint profile. Now available in the plugin repository.
  - ver 1.4.1 (plugin) : settings.ini now supports variables and math operations
  - ver 1.4.2 (plugin) : fix missing profile data
- - ver 1.4.3 (plugin & ios) : caching & timeouts in the ios app, added link to timelapse in prowl notification, fix camera height, and most importantly, changed the keyword syntax for "current z" from "{z}" to "%z" **User must manually change this!!!**
+ - ver 1.4.3 (plugin & ios) : caching & timeouts in the ios app, added link to timelapse in prowl notification, fix camera height, and most importantly, changed the keyword syntax for "current z" from "{z}" to "%z" 
  - ver 1.5   (plugin) : configurable temperature sliders (nozzles and bed) and support for `settings.ini` migration
  - ver 1.5.1 (plugin) : minor bug fixes
  - ver 1.5.2 (plugin) : removed default setting.ini, more configurable buttons (nozzle and bed temperature, fan speed, )
