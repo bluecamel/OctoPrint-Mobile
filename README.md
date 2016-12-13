@@ -1,15 +1,11 @@
 #Nautilus - mobile shell for OctoPrint
 
 
-Octoprint simplified interface optimized for ios devices (only works on dev branch of Octoprint)
+A simplified UI replacement for OctoPrint that has been optimised for iOS devices. 
 
-The iOS app will force landscape, maintain the API key and handle the server connection.
+The plugin requires at least ver 1.3 of OctoPrint and the companion Nautilus iOS app. The iOS app will force landscape, maintain the security API key and handle the server connection. It is available on [Apple AppStore](https://itunes.apple.com/us/app/id1125992543). 
 
-Bonus feature: shake to refresh.
-
-The iOS app is available on [Apple AppStore](https://itunes.apple.com/us/app/id1125992543) 
-
-[more...](https://github.com/MoonshineSG/OctoPrint-Mobile/wiki)
+[Read more...](https://github.com/MoonshineSG/OctoPrint-Mobile/wiki)
 
 ##Setup
 
