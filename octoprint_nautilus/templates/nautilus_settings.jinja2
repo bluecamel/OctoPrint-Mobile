@@ -5,4 +5,9 @@
             <textarea class="input-block-level" cols="40" rows="30" data-bind="value: settings.plugins.nautilus.gcodes"></textarea>
         </div>
     </div>
+        <label class="control-label">External access show only webcam</label>
+        <div class="controls">
+            <input type="radio" value="yes" data-bind="checked: settings.plugins.nautilus.external_access">Yes
+            <input type="radio" value="no" data-bind="checked: settings.plugins.nautilus.external_access">No
+        </div>
 </form>

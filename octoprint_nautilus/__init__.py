@@ -106,6 +106,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		return dict(
 			movie_link = "http://octopi.local/downloads/timelapse/",
 			_settings_version = None,
+			external_access = "yes"
 		)
 
 	def on_settings_load(self):
@@ -120,6 +121,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		return dict(
 			movie_link = self._settings.get(["movie_link"]),
 			_settings_version = self._settings.get(["_settings_version"]),
+			external_access = self._settings.get(["external_access"]),
 			gcodes = gcodes
 		)
 		
@@ -178,10 +180,14 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 	@octoprint.plugin.BlueprintPlugin.route("/home", methods=["GET"])
 	def check_home(self):
 		self._logger.info("X-Forwarded-For : [%s]"%request.headers.getlist("X-Forwarded-For")[0])
-		for remote in request.headers.getlist("X-Forwarded-For")[0].split(","): #always via haproxy ?
-			if is_external(remote):
-				return jsonify(home=False)
-		return jsonify(home=True)
+		if self._settings.get(["external_access"]) == "no":
+			self._logger.info("Forced 'home' access...")
+			return jsonify(home=True)
+		else:			
+			for remote in request.headers.getlist("X-Forwarded-For")[0].split(","): #always via haproxy ?
+				if is_external(remote):
+					return jsonify(home=False)
+			return jsonify(home=True)
 	
 	@octoprint.plugin.BlueprintPlugin.route("/unselect", methods=["GET"])
 	def unselect_file(self):
