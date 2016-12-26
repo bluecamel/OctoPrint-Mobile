@@ -178,8 +178,5 @@ function onPluginData(name, data){
 			}	
 
 			break;
-		case "status_line":
-			message(data.status_line);
-			break;
 	}
 }

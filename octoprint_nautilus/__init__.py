@@ -249,7 +249,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 
 			return jsonify(retval)
 	
-	##plugin hook
+	##plugin hooks
 	def custom_action_handler(self, comm, line, action, *args, **kwargs):
 		if action[:7] == "zchange":
 			self.zchange = action[8:]
@@ -258,6 +258,9 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			self.tool = action[5]
 			self._plugin_manager.send_plugin_message(self._identifier, dict(tool = self.tool))
 
+	def M117Message(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
+		if gcode and cmd.startswith("M117"):
+			self._plugin_manager.send_plugin_message(self._identifier, dict(message=cmd[4:].strip()))
 	
 	##octoprint.plugin.EventHandlerPlugin
 	def on_event(self, event, payload):
@@ -295,6 +298,7 @@ def __plugin_load__():
 	
 	global __plugin_hooks__
 	__plugin_hooks__ = {"octoprint.comm.protocol.action": __plugin_implementation__.custom_action_handler,
+		"octoprint.comm.protocol.gcode.queuing": __plugin_implementation__.M117Message,
 		"octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
 	}
 
