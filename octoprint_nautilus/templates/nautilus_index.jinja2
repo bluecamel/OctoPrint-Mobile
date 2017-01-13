@@ -276,7 +276,11 @@
 	<script type="text/javascript">
 	var home = false;
 	var BASE_URL = location.protocol + '//' + location.host + "/";
-	var API_KEY = "{{ request.headers.get('API_KEY') }}";
+	
+	var API_KEY_A = "{{ request.headers.get('API_KEY') }}";	
+	var API_KEY_X = "{{ request.headers.get('X-Api-Key') }}";	
+	var API_KEY = API_KEY_X ? API_KEY_X : API_KEY_A;
+
 	var MOBILE_URL = BASE_URL+"{{ nautilus_url }}";
 	var has_switch = ko.observable({{ has_switch  | lower}});
 	var SCREEN_WIDTH = window.innerWidth + "px";
