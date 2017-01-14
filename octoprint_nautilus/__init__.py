@@ -49,7 +49,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 
   ##octoprint.plugin.core.Plugin
 	def initialize(self):
-		#self._logger.setLevel(logging.DEBUG)
+		self._logger.setLevel(logging.DEBUG)
 		
 		#remember this values to send it when we reconnect
 		self.zchange = ""
@@ -161,9 +161,14 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			
 	##octoprint.plugin.UiPlugin
 	def will_handle_ui(self, request):
+		self._logger.debug( "will_handle_ui request headers:" )
+		self._logger.debug( request.headers )
 		return request.user_agent.string.startswith("Nautilus")
 	
 	def on_ui_render(self, now, request, render_kwargs):
+		self._logger.debug( "on_ui_render request headers:" )
+		self._logger.debug( request.headers )
+		
 		nautilus_url="plugin/%s"%self._identifier
 		
 		if self._plugin_manager.get_plugin("switch"):
