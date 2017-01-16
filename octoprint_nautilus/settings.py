@@ -26,10 +26,10 @@ def default(config):
 	config.set("printer", "bed_temperatures", "60, 70, 80, 90, 100, 110, 120")
 	
 	config.set("printer", "; %tool will be replaced with the tool id (0 or 1) and %temp with the slider value")
-	config.set("printer", "nozzle_temperature_on", "M104 T%tool S%temp, {{beep}}")
-	config.set("printer", "nozzle_temperature_off", "M104 T%tool S0, {{beep}}")
-	config.set("printer", "nozzle_heater_on", "M140 S%temp, {{beep}}")
-	config.set("printer", "nozzle_heater_off", "M140 S0, {{beep}}")
+	config.set("printer", "nozzle_heater_on", "M104 T%tool S%temp, {{beep}}")
+	config.set("printer", "nozzle_heater_off", "M104 T%tool S0, {{beep}}")
+	config.set("printer", "bed_heater_on", "M140 S%temp, {{beep}}")
+	config.set("printer", "bed_heater_off", "M140 S0, {{beep}}")
 	config.set("printer", "; %speed will be replaced with the slider value")
 	config.set("printer", "fan_on", "M106 S%speed")
 	config.set("printer", "fan_off", "M106 S0")
@@ -101,7 +101,10 @@ def default(config):
 	config.set("action", "; misc")
 	config.set("action", "motors_off", "M18")
 
-patch = ["; temperature sliders", "temperature_scale", "nozzle_temperatures", "bed_temperatures"]
+#move these to "printer" section
+patch_1 = ["; temperature sliders", "temperature_scale", "nozzle_temperatures", "bed_temperatures"]
+#remove these from "printer"
+patch_2 = ["nozzle_temperature_on", "nozzle_temperature_off", "bed_temperature_on", "bed_temperature_off"]
 
 r_1 = (r"((?<!{){z}(?!}))", "%z")
 
@@ -123,17 +126,19 @@ def merge(config, inifile):
 				k, v = line.split(":")
 				k = k.strip()
 				v = v.strip()
-				if k in patch:
+				if k in patch_1:					
 					config.set("printer", k, v)
 				else:
-					config.set(section, k, v)
+					if k not in patch_2:
+						config.set(section, k, v)
 					
 			elif "=" in line:
 				k, v = line.split("=")
 				k = k.strip()
 				v = v.strip()
-				if k in patch:
+				if k in patch_1:
 					config.set("printer", k, v)
 				else:
-					config.set(section, k, v)
+					if k not in patch_2:
+						config.set(section, k, v)
 

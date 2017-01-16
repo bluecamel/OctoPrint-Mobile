@@ -178,9 +178,9 @@ function ActionModel(){
 
 	self.sendBedTemperature = function(){
 		if (self.bed_slider_value() == 0) {
-			sendCommand( settings.printer.bed_temperature_off.split(",") );
+			sendCommand( settings.printer.bed_heater_off.split(",") );
 		} else {
-			sendCommand( settings.printer.bed_temperature_on.replace("%temp", self.config_bed_temp()).split(",") );
+			sendCommand( settings.printer.bed_heater_on.replace("%temp", self.config_bed_temp()).split(",") );
 			self.bed_slider_value(0);
 			switchPanel("status");
 		}
