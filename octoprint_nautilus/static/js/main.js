@@ -1,16 +1,19 @@
 $(document).ready(function() {
 	switchView("loading");
 
+});
+
+function initialize(apikey){
+API_KEY=apikey;
+	
 	applyBindings();
 	
 	checkHome(function(data){
 		home = data.home;
-		initialize();
+		load();
 	});
-	
-});
-
-function initialize() {
+}
+function load() {
 	if ( home ) {
 		// no scrolling
 		touch_ui(false);
