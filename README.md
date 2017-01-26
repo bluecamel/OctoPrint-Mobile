@@ -41,4 +41,5 @@ See the [installation guide](https://github.com/MoonshineSG/OctoPrint-Mobile/wik
  - ver 1.6.2 (plugin) : added support for M117 messages and settings to disable "webcam only" for external access
  - ver 1.6.3 (plugin) : fix nozzle & bed temperature settings
  - ver 1.6.4/1.6.5 (plugin) : quick fix for a error causing "Invalid Api Key" for some users  / fix version up 
+ - ver 1.7 (plugin) / ver 1.4 (ios) : X-Api-Key issues fix and iOS plugin version check
  
