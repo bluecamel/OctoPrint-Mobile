@@ -1,18 +1,7 @@
 $(document).ready(function() {
 	switchView("loading");
-
 });
 
-function initialize(apikey){
-API_KEY=apikey;
-	
-	applyBindings();
-	
-	checkHome(function(data){
-		home = data.home;
-		load();
-	});
-}
 function load() {
 	if ( home ) {
 		// no scrolling
@@ -89,6 +78,20 @@ function setCameraTimeout(){
 } 
 
 //called by ios app 
+function initialize(apikey){
+	$.ajaxSetup({
+		headers: { 'X-Api-Key': apikey },
+		timeout: 10000,
+		contentType: "application/json"
+	});
+	applyBindings();
+	
+	checkHome(function(data){
+		home = data.home;
+		load();
+	});
+}
+
 function onForeground(){
 	checkHome(function(data){
 		var new_home = data.home;

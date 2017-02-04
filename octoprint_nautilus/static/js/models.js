@@ -676,6 +676,10 @@ var action;
 var offset;
 
 function applyBindings(){
+	if (printer != undefined) {
+		return;
+	}
+	
 	printer = new PrinterModel();
 	offset = new OffsetModel();
 	action = new ActionModel();
