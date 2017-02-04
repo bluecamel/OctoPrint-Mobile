@@ -54,6 +54,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		self._logger.setLevel(logging.INFO)
 		self.zchange = ""
 		self.tool = 0
+		self.show_M117 = True
 		self._logger.info("Nautilus - OctoPrint mobile shell, started.")
 
 	def on_after_startup(self):	
@@ -63,7 +64,17 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		else:
 			self._logger.setLevel(logging.INFO)
 			self._logger.info( "Logging level is INFO.")
-			
+		
+		#user specficaly asked for messages to be ignored
+		if self._settings.get_boolean(["ignore_M117"]):
+			self.show_M117 = False
+			self._logger.info( "M117 message will be ignored (settings)...")
+		
+		#detailedprogress sends too many messages. ignore them
+		if self._plugin_manager.get_plugin("detailedprogress"):
+			self.show_M117 = False
+			self._logger.info( "M117 message will be ignored (Detailed Progress plugin)...")
+	
 	def read_profile(self):
 		#hotend info from profile
 		self.extruders = self._printer_profile_manager.get_current_or_default().get('extruder').get('count')
@@ -114,6 +125,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			movie_link = "http://octopi.local/downloads/timelapse/",
 			_settings_version = None,
 			external_only_webcam = True,
+			ignore_M117 = False,
 			debug = False
 		)
 
@@ -264,7 +276,12 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 				retval.update({'update':True, 'id':md5})
 
 			if has_errors and identifier != "preview":
-				self._printer.commands("M117 The settings file has errors. Please verify and fix before doing anything else.")
+				message = "The settings file has errors. Please verify and fix before doing anything else."
+				self._printer.commands("M117 %s"%message)
+				
+				#important message. make sure it's delivered!
+				if not self.show_M117:
+					self._plugin_manager.send_plugin_message(self._identifier, dict(message=message))
 
 			return jsonify(retval)
 	
@@ -278,8 +295,8 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			self._plugin_manager.send_plugin_message(self._identifier, dict(tool = self.tool))
 
 	def M117Message(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
-		if gcode and cmd.startswith("M117"):
-			self._plugin_manager.send_plugin_message(self._identifier, dict(message=cmd[4:].strip()))
+		if gcode and cmd.startswith("M117") and self.show_M117:
+				self._plugin_manager.send_plugin_message(self._identifier, dict(message=cmd[4:].strip()))
 					
 	##octoprint.plugin.EventHandlerPlugin
 	def on_event(self, event, payload):
