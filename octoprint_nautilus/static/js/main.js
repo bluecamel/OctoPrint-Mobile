@@ -1,18 +1,7 @@
 $(document).ready(function() {
 	switchView("loading");
-
 });
 
-function initialize(apikey){
-API_KEY=apikey;
-	
-	applyBindings();
-	
-	checkHome(function(data){
-		home = data.home;
-		load();
-	});
-}
 function load() {
 	if ( home ) {
 		// no scrolling
@@ -50,11 +39,11 @@ function start_camera(alone){
 	d = new Date();
 	if (alone) {
 		switchView("camera");
-		$("#webcam_alone").attr("src", BASE_URL+"webcam/?action=stream&"+d.getTime());
+		$("#webcam_alone").error(function(){$(this).attr("src", MOBILE_URL+"/static/img/no_camera.png");}).attr("src", BASE_URL+"webcam/?action=stream&"+d.getTime());
 	} else {
 		switchPanel("camera");
 		if (clearCameraTimeout()) {
-			$("#webcam").attr("src", BASE_URL+"webcam/?action=stream&"+d.getTime());	
+			$("#webcam").error(function(){$(this).attr("src", MOBILE_URL+"/static/img/no_camera.png");}).attr("src", BASE_URL+"webcam/?action=stream&"+d.getTime());	
 		} 
 	}
 }
@@ -89,6 +78,20 @@ function setCameraTimeout(){
 } 
 
 //called by ios app 
+function initialize(apikey){
+	$.ajaxSetup({
+		headers: { 'X-Api-Key': apikey },
+		timeout: 10000,
+		contentType: "application/json"
+	});
+	applyBindings();
+	
+	checkHome(function(data){
+		home = data.home;
+		load();
+	});
+}
+
 function onForeground(){
 	checkHome(function(data){
 		var new_home = data.home;

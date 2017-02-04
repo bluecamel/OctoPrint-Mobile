@@ -7,14 +7,21 @@
 
 @implementation ViewController
 
+
 bool webapp_loaded = NO;
 bool need_setup = NO;
 int RETRY = 6;
 int RETRY_INTERVAL = 10; //seconds
 
+NSString *apikey;
+
+NSString* requiredVersion = @"1.7";
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    self.webView.delegate = self;
     
     self.webView.frame = [[UIScreen mainScreen] bounds];
     [self.webView setOpaque:NO];
@@ -33,8 +40,14 @@ int RETRY_INTERVAL = 10; //seconds
     [self checkWebApp:RETRY];
 }
 
+- (void)webViewDidFinishLoad:(UIWebView *)webView {
+    [self.webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat: @"initialize(\"%@\");", apikey]];
+}
+
 - (void) checkWebApp:(int) retryCounter
 {
+    [[NSURLCache sharedURLCache] removeAllCachedResponses];
+    
     if (retryCounter == 0) {
         return;
     }
@@ -42,15 +55,15 @@ int RETRY_INTERVAL = 10; //seconds
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *url = [defaults stringForKey:@"serverURL"];
-    NSString *apikey = [[defaults stringForKey:@"apikey"] stringByTrimmingCharactersInSet:
+    apikey = [[defaults stringForKey:@"apikey"] stringByTrimmingCharactersInSet:
                                [NSCharacterSet whitespaceCharacterSet]];
     need_setup = NO;
-
+    
     if ( [apikey length] == 0 || [url length] == 0 ) {
         
         need_setup = YES;
         
-        [self showMessage: @"Before you can use this application, the \"Nautilus\" plugin needs to be installed on OctoPrint and you need to setup the OctoPrint server URL and the API KEY in the settings of this app.<br/><br/>(shake to load the app settings)"];
+        [self showMessage: @"Before using this application, the \"Nautilus\" plugin needs to be installed on OctoPrint and the OctoPrint server URL and the API KEY need to be setup.<br/>(shake to load the settings page)"];
         
     } else {
         
@@ -63,10 +76,10 @@ int RETRY_INTERVAL = 10; //seconds
         NSString *check_url = [NSString stringWithFormat: @"%@plugin/nautilus/static/img/appicon.png", url];
         
         NSURLSessionConfiguration *nocacheConfiguration = [NSURLSessionConfiguration ephemeralSessionConfiguration];
-        nocacheConfiguration.requestCachePolicy = NSURLRequestReloadRevalidatingCacheData;
+        nocacheConfiguration.requestCachePolicy = NSURLRequestReloadIgnoringCacheData;
         nocacheConfiguration.timeoutIntervalForRequest = 15.0;
         nocacheConfiguration.timeoutIntervalForResource = 60.0;
-
+        
         __weak __typeof(self)weakSelf = self;
         
         NSURLSession *session = [NSURLSession sessionWithConfiguration:nocacheConfiguration];
@@ -94,31 +107,80 @@ int RETRY_INTERVAL = 10; //seconds
                         [NSThread sleepForTimeInterval:RETRY_INTERVAL];
                         [weakSelf checkWebApp: retryCounter];
 
-                        } else if ([httpResponse statusCode] == 200 ) {
+                    } else if ([httpResponse statusCode] == 200 ) {
+                        //check plugin version
+                        if ( [self checkPluginVersion:url] ) {
                             //call back to main thread
                             dispatch_async(dispatch_get_main_queue(), ^{
-                                [self loadWebApp:url apikey:apikey];
+                                [self loadWebApp:url];
                             });
-                            } else { // huh ?
-                                webapp_loaded = NO;
-                                [NSThread sleepForTimeInterval:RETRY_INTERVAL];
-                                [weakSelf checkWebApp: retryCounter];
-                            }
+                        } else {
+                            webapp_loaded = NO;
+                        }
+                    } else { // huh ?
+                        webapp_loaded = NO;
+                        [NSThread sleepForTimeInterval:RETRY_INTERVAL];
+                        [weakSelf checkWebApp: retryCounter];
+                    }
                 }] resume];
             [session finishTasksAndInvalidate];
     }
 
 }
 
--(void)loadWebApp:(NSString*)url apikey:(NSString*)apikey
+-(bool) checkPluginVersion: (NSString*)url
+
+{
+    NSString *check_url = [NSString stringWithFormat: @"%@plugin/nautilus/static/js/version.js", url];
+    
+    NSString* actualVersion;
+    @try {
+        NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:check_url] options:NSDataReadingUncached error:nil];
+        actualVersion = [NSString stringWithUTF8String:[data bytes]];
+    }
+    @catch ( NSException *e ) {
+        //old plugins have no version, so force it to 0
+        actualVersion = @"0.0";
+    }
+    
+    if ([requiredVersion compare:actualVersion options:NSNumericSearch] == NSOrderedDescending) {
+        if ([actualVersion isEqual: @"0.0"]){ //is a very old plugin
+            [self showMessage: @"You have a very old version of the Nautilus plugin. remove it and install it again using the OctoPrint plugin manager. This will also enable auto-update for the plugin and keep you updated with the latest features and fixes."];
+        } else {
+            [self showMessage: [NSString stringWithFormat: @"Please update your Nautilus plugin to version %@ or higher. You have version %@.", requiredVersion, actualVersion]];
+        }
+        return false;
+    } else {
+        return true;
+    }
+}
+
+-(void)loadWebApp:(NSString*)url
 {
     if (webapp_loaded) {
         [self.webView reload];
     } else {
-        NSMutableURLRequest* request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:20];
-        [request addValue:apikey forHTTPHeaderField:@"API_KEY"];
+        
+        NSMutableURLRequest* request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:20];
+
+        [request setValue:@"no-cache" forHTTPHeaderField:@"Cache-Control"];
+        [request setValue:@"no-cache" forHTTPHeaderField:@"Pragma"];
+
         [self.webView loadRequest:request];
         webapp_loaded = YES;
+
+        /*
+        NSString *title = [NSString stringWithFormat: @"Loaded '%@'", url];
+        NSString *message = [NSString stringWithFormat: @"with headers: %@", request.allHTTPHeaderFields];
+        
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:^(UIAlertAction * action){
+                [self dismissViewControllerAnimated:YES completion:nil];
+            }];
+        [alert addAction:okAction];
+        [self presentViewController:alert animated:YES completion:nil];
+         */
+
     }
 }
 
@@ -167,6 +229,8 @@ int RETRY_INTERVAL = 10; //seconds
         if (need_setup) {
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
         } else {
+            
+            
             [self checkWebApp:RETRY];
             
             CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation"];

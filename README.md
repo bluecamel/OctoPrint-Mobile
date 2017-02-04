@@ -42,4 +42,4 @@ See the [installation guide](https://github.com/MoonshineSG/OctoPrint-Mobile/wik
  - ver 1.6.3 (plugin) : fix nozzle & bed temperature settings
  - ver 1.6.4/1.6.5 (plugin) : quick fix for a error causing "Invalid Api Key" for some users  / fix version up 
  - ver 1.7 (plugin) / ver 1.4 (ios) : X-Api-Key issues fix and iOS plugin version check
- 
+ - ver 1.7.1 (plugin) : cleanup new API Key implementation, fix "Detailed Progress" plugin conflict, error message when camera not available, added optional debug logs

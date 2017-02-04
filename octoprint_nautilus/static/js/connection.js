@@ -45,10 +45,7 @@ function disconnect(){
 function sendConnectionCommand(command){
 		$.ajax({
 			url:  BASE_URL+"api/connection",
-			headers: {"X-Api-Key": API_KEY},
 			method: "POST",
-			timeout: 10000,
-			contentType: "application/json",
 			data: JSON.stringify({"command": command})
 		});
 }
@@ -56,20 +53,14 @@ function sendConnectionCommand(command){
 function getConnectionStatus(callback){
 		$.ajax({
 			url:  BASE_URL+"api/connection",
-			headers: {"X-Api-Key": API_KEY},
 			method: "GET",
-			timeout: 10000,
-			contentType: "application/json"
 		}).done(function(data){if (typeof callback === "function") callback(data);});
 }
 
 function getExtruderCountFromProfile(callback){
 		$.ajax({
 			url:  BASE_URL+"api/printerprofiles",
-			headers: {"X-Api-Key": API_KEY},
 			method: "GET",
-			timeout: 10000,
-			contentType: "application/json"
 		}).done(function(data){if (typeof callback === "function") callback(data);});
 }
 
@@ -77,10 +68,7 @@ function getExtruderCountFromProfile(callback){
 function sendLoadFile(filename){
 		$.ajax({
 			url:  BASE_URL+"api/files/local/"+filename,
-			headers: {"X-Api-Key": API_KEY},
 			method: "POST",
-			timeout: 10000,
-			contentType: "application/json",
 			data: JSON.stringify({"command": "select"})
 		});
 }
@@ -88,10 +76,7 @@ function sendLoadFile(filename){
 function getFileInfo(filename){
 	$.ajax({
 		url:  BASE_URL+"api/files/local/"+filename,
-		headers: {"X-Api-Key": API_KEY},
 		method: "GET",
-		timeout: 10000,
-		contentType: "application/json",
 	}).done(function(data){ if (data.userdata != "undefined") printer.fileInfo(data.userdata);});
 }
 
@@ -99,10 +84,7 @@ function getFileInfo(filename){
 function getGcodeFiles(callback){
 		$.ajax({
 			url:  BASE_URL+"api/files",
-			headers: {"X-Api-Key": API_KEY},
 			method: "GET",
-			timeout: 10000,
-			contentType: "application/json",
 		}).done(function(data){if (typeof callback === "function") callback(data);});
 }
 
@@ -110,10 +92,7 @@ function getGcodeFiles(callback){
 function sendJobCommand(command){
 		$.ajax({
 			url:  BASE_URL+"api/job",
-			headers: {"X-Api-Key": API_KEY},
 			method: "POST",
-			timeout: 10000,
-			contentType: "application/json",
 			data: JSON.stringify({"command": command})
 		});
 }
@@ -134,10 +113,7 @@ function sendCommand(data){
 	}
 	$.ajax({
 		url:  BASE_URL+"api/printer/command",
-		headers: {"X-Api-Key": API_KEY},
 		method: "POST",
-		timeout: 10000,
-		contentType: "application/json",
 		data: JSON.stringify(command)
 	});
 }
@@ -147,10 +123,7 @@ function sendSwitch(data, callback){
 	if (has_switch()) {
 		$.ajax({
 			url:  BASE_URL+"api/plugin/switch",
-			headers: {"X-Api-Key": API_KEY},
 			method: "POST",
-			timeout: 10000,
-			contentType: "application/json",
 			data: JSON.stringify(data),
 			
 		}).done(function(){if (typeof callback === "function") callback();});
@@ -171,10 +144,7 @@ function sendSwitchCommand(command, status){
 function checkHome(callback){
 	$.ajax({
 		url:  MOBILE_URL+"/home",
-		headers: {"X-Api-Key": API_KEY},
 		method: "GET",
-		timeout: 10000,
-		contentType: "application/json",
 		error: protocol_error
 	}).done(function(data){if (typeof callback === "function") callback(data);});
 }
@@ -183,10 +153,7 @@ function checkHome(callback){
 function getSettings(){
 	$.ajax({
 		url:  MOBILE_URL+"/settings/"+localStorage.getItem("mobile.settings.uid"),
-		headers: {"X-Api-Key": API_KEY},
 		method: "GET",
-		timeout: 10000,
-		contentType: "application/json"
 	}).done( function(data){
 		if (typeof(data) === "string") {
 			data = JSON.parse(data);
@@ -232,10 +199,7 @@ function getSettings(){
 function unselect(){
 	$.ajax({
 		url:  MOBILE_URL+"/unselect",
-		headers: {"X-Api-Key": API_KEY},
-		method: "GET",
-		timeout: 10000,
-		contentType: "application/json"
+		method: "GET"
 	});
 }
 

@@ -45,17 +45,35 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			octoprint.plugin.TemplatePlugin,
 			octoprint.plugin.BlueprintPlugin,
 			octoprint.plugin.EventHandlerPlugin,
-			octoprint.plugin.SettingsPlugin):
+			octoprint.plugin.SettingsPlugin,
+			octoprint.plugin.StartupPlugin):
 
   ##octoprint.plugin.core.Plugin
 	def initialize(self):
-		self._logger.setLevel(logging.DEBUG)
-		
 		#remember this values to send it when we reconnect
+		self._logger.setLevel(logging.INFO)
 		self.zchange = ""
 		self.tool = 0
+		self.show_M117 = True
 		self._logger.info("Nautilus - OctoPrint mobile shell, started.")
 
+	def on_after_startup(self):	
+		if self._settings.get_boolean(["debug"]):
+			self._logger.setLevel(logging.DEBUG)
+			self._logger.debug( "Logging level is DEBUG...")
+		else:
+			self._logger.setLevel(logging.INFO)
+			self._logger.info( "Logging level is INFO.")
+		
+		#user specficaly asked for messages to be ignored
+		if self._settings.get_boolean(["ignore_M117"]):
+			self.show_M117 = False
+			self._logger.info( "M117 message will be ignored (settings)...")
+		
+		#detailedprogress sends too many messages. ignore them
+		if self._plugin_manager.get_plugin("detailedprogress"):
+			self.show_M117 = False
+			self._logger.info( "M117 message will be ignored (Detailed Progress plugin)...")
 	
 	def read_profile(self):
 		#hotend info from profile
@@ -93,7 +111,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			except:
 				self._logger.error( "Hotend config file contains invalid data [%s]. Should be 'extruders|nozzles|nozzle_size|name'."%first_line )
 		else:
-			self._logger.info( "Can't read the hotend config file. Default values used.")
+			self._logger.debug( "Can't read the hotend config file. Default values used.")
 		
 	##octoprint.plugin.TemplatePlugin
 	def get_template_configs(self):
@@ -106,11 +124,13 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		return dict(
 			movie_link = "http://octopi.local/downloads/timelapse/",
 			_settings_version = None,
-			external_only_webcam = True
+			external_only_webcam = True,
+			ignore_M117 = False,
+			debug = False
 		)
 
 	def on_settings_load(self):
-		octoprint.plugin.SettingsPlugin.on_settings_load(self)
+		_settings = octoprint.plugin.SettingsPlugin.on_settings_load(self)
 		
 		inifile = os.path.join(self.get_plugin_data_folder(), "settings.ini")
 
@@ -118,12 +138,9 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		with open(inifile,'r') as f:
 			gcodes = f.read()
 		
-		return dict(
-			movie_link = self._settings.get(["movie_link"]),
-			_settings_version = self._settings.get(["_settings_version"]),
-			external_only_webcam = self._settings.get(["external_only_webcam"]),
-			gcodes = gcodes
-		)
+		_settings.update({"gcodes":gcodes})
+		
+		return _settings
 		
 	def on_settings_save(self, data):
 		if 'gcodes' in data:
@@ -135,6 +152,9 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			self._plugin_manager.send_plugin_message(self._identifier, dict(action = "settings"))
 
 		octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
+
+		#check settings again
+		self.on_after_startup()
 			
 	def get_settings_version(self):
 		return 5
@@ -184,14 +204,14 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 	
 	@octoprint.plugin.BlueprintPlugin.route("/home", methods=["GET"])
 	def check_home(self):
-		self._logger.info("X-Forwarded-For : [%s]"%request.headers.getlist("X-Forwarded-For")[0])
+		self._logger.debug("X-Forwarded-For : [%s]"%request.headers.getlist("X-Forwarded-For")[0])
 		if self._settings.get(["external_only_webcam"]):
 			for remote in request.headers.getlist("X-Forwarded-For")[0].split(","): #always via haproxy ?
 				if is_external(remote):
 					return jsonify(home=False)
 			return jsonify(home=True)
 		else:			
-			self._logger.info("Forced 'home' access...")
+			self._logger.debug("Forced 'home' access...")
 			return jsonify(home=True)
 	
 	@octoprint.plugin.BlueprintPlugin.route("/unselect", methods=["GET"])
@@ -223,7 +243,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			try:
 				profile  = dict([a, int(x) if x.isdigit() else x] for a, x in config.items("profile"))
 			except:
-				self._logger.info("Unable to load [profile] section. Missing? Not needed?")
+				self._logger.error("Unable to load [profile] section.")
 				profile = dict()
 		
 			for section in config.sections():
@@ -252,11 +272,16 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 				except:
 					pass
 			else:
-				self._logger.info("new settings version: remote ["+identifier +"] vs local [" + md5 + "] ...")
+				self._logger.debug("new settings version: remote ["+identifier +"] vs local [" + md5 + "] ...")
 				retval.update({'update':True, 'id':md5})
 
 			if has_errors and identifier != "preview":
-				self._printer.commands("M117 The settings file has errors. Please verify and fix before doing anything else.")
+				message = "The settings file has errors. Please verify and fix before doing anything else."
+				self._printer.commands("M117 %s"%message)
+				
+				#important message. make sure it's delivered!
+				if not self.show_M117:
+					self._plugin_manager.send_plugin_message(self._identifier, dict(message=message))
 
 			return jsonify(retval)
 	
@@ -270,9 +295,9 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			self._plugin_manager.send_plugin_message(self._identifier, dict(tool = self.tool))
 
 	def M117Message(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
-		if gcode and cmd.startswith("M117"):
-			self._plugin_manager.send_plugin_message(self._identifier, dict(message=cmd[4:].strip()))
-	
+		if gcode and cmd.startswith("M117") and self.show_M117:
+				self._plugin_manager.send_plugin_message(self._identifier, dict(message=cmd[4:].strip()))
+					
 	##octoprint.plugin.EventHandlerPlugin
 	def on_event(self, event, payload):
 		if event == Events.CONNECTED:
