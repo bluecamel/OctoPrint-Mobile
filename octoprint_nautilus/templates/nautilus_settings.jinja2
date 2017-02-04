@@ -1,12 +1,15 @@
 <form class="form-horizontal">
+      <div class="control-group">
+          <textarea class="input-block-level" cols="60" rows="30" data-bind="value: settings.plugins.nautilus.gcodes"></textarea>
+      </div>
     <div class="control-group">
-        <label class="control-label">Settings</label>
-        <div class="controls">
-            <textarea class="input-block-level" cols="40" rows="30" data-bind="value: settings.plugins.nautilus.gcodes"></textarea>
-        </div>
-    </div>
-        <label class="control-label"></label>
         <label class="checkbox">
             <input type="checkbox" data-bind="checked: settings.plugins.nautilus.external_only_webcam">External access show only webcam
         </label>
+    </div>        
+    <div class="control-group">
+        <label class="checkbox">
+            <input type="checkbox" data-bind="checked: settings.plugins.nautilus.debug">Debug
+        </label>
+    </div>
 </form>
