@@ -39,11 +39,11 @@ function start_camera(alone){
 	d = new Date();
 	if (alone) {
 		switchView("camera");
-		$("#webcam_alone").attr("src", BASE_URL+"webcam/?action=stream&"+d.getTime());
+		$("#webcam_alone").error(function(){$(this).attr("src", MOBILE_URL+"/static/img/no_camera.png");}).attr("src", BASE_URL+"webcam/?action=stream&"+d.getTime());
 	} else {
 		switchPanel("camera");
 		if (clearCameraTimeout()) {
-			$("#webcam").attr("src", BASE_URL+"webcam/?action=stream&"+d.getTime());	
+			$("#webcam").error(function(){$(this).attr("src", MOBILE_URL+"/static/img/no_camera.png");}).attr("src", BASE_URL+"webcam/?action=stream&"+d.getTime());	
 		} 
 	}
 }
