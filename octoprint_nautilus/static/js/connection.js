@@ -198,26 +198,18 @@ function unselect(){
 	});
 }
 
-function getCustom(data, callback){	
+function sendPowerOnButton(){	
 		$.ajax({
-			url:  BASE_URL+"api/system/commands/custom",
-			method: "GET"
+			url:  BASE_URL+"api/system/commands/custom/power_on_printer",
+			method: "POST"
 		});
 }
 
-
-function sendPowerOnButton(data, callback){	
-		$.ajax({
-			url:  BASE_URL+"api/system/commands/custom/power_on_printer",
-			method: "POST",
-		}).done(function(resp){if (typeof callback === "function") callback(resp);});
-}
-
-function sendPowerOffButton(data, callback){	
+function sendPowerOffButton(){	
 		$.ajax({
 			url:  BASE_URL+"api/system/commands/custom/shutdown_printer",
-			method: "POST",
-		}).done(function(resp){if (typeof callback === "function") callback(resp);});
+			method: "POST"
+		})
 }
 
 
