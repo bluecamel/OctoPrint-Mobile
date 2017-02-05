@@ -115,14 +115,14 @@ function onEventData(type, payload) {
 
 function onPluginData(name, data){
 	//console.log("Plugin '"+ name + "': ", data);
-	switch (name) {
+	switch (name) {	
 		 case "switch":
-			printer.power(JSON.parse(data.power)); //convert to boolean
-			printer.lights(JSON.parse(data.lights));
-			printer.mute(JSON.parse(data.mute));
-			printer.unload(JSON.parse(data.unload));
-			printer.poweroff(JSON.parse(data.poweroff));
-			break;
+				printer.power(JSON.parse(data.power)); //convert to boolean
+				buttons.lights(JSON.parse(data.lights));
+				buttons.mute(JSON.parse(data.mute));
+				buttons.unload(JSON.parse(data.unload));
+				buttons.poweroff(JSON.parse(data.poweroff));
+				break;
 		case "nautilus":
 			if ( typeof(data.message) !== "undefined") {
 				message(data.message);

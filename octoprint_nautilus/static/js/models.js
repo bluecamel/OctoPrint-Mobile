@@ -308,6 +308,8 @@ function PrinterModel(){
 	self.version = ko.observable("");
 	self.status =  ko.observable("Offline");
 	
+	self.power = ko.observable(true);
+	
 	self.status.subscribe(function(value) {
 		if (self.error() || self.closedOrError() && value != "Offline"){
 			$(".status_bar").css({"line-height": "20vh"});
@@ -382,12 +384,6 @@ function PrinterModel(){
           }
       }
   });
-	
-	self.power = ko.observable(true);
-	self.lights = ko.observable(false);
-	self.mute = ko.observable(true);
-	self.unload = ko.observable(false);
-	self.poweroff = ko.observable(false);
 	
 	//whether the printer is currently connected and responding
 	self.operational = ko.observable(null);
@@ -575,7 +571,7 @@ function PrinterModel(){
 		if ( printer.printing() ) {
 			self.zoom( !self.zoom() );
 		} else {
-			self.toggleLights();
+			if ( has_switch_plugin() ) buttons.toggleLights();
 		}
 	}
 	
@@ -589,13 +585,86 @@ function PrinterModel(){
 		}
 	});
 	
-	//switches ====================
+  // generic connect / disconnect (check for dif button types)
+	self.printerConnect = function(){
+		sendConnectionCommand("connect");
+		switchPanel("status");
+		self.getDefaultProfile();
+	}
+
+	self.printerDisconnect = function (){
+		bootbox.confirm({closeButton: false, message: "Disconnect?", callback: function(result) {
+		  if (result) {
+				if (has_switch_plugin()) {
+			  	sendSwitch({"command":"power", "status":false}, 
+					function(){
+							sendSwitchCommand("status");
+							sendConnectionCommand("disconnect");
+						}
+					);
+				} else {
+					sendConnectionCommand("disconnect");
+				}
+		 }
+		}});
+	}
+
+	self.getDefaultProfile = function() {
+		getExtruderCountFromProfile(function(data){		
+			current_profile_name = _.compact(_.map(data.profiles, function(obj) { if (obj.current) return obj.id; } ))[0];
+			self.current_profile = data.profiles[current_profile_name];
+			if (self.current_profile.extruder.count == 1){
+				self.dual_extruder(false);
+			} else {
+				self.dual_extruder(true);
+			}
+			
+		});
+	}
+
+	self.hotend_config = ko.computed(function(){
+		return self.nozzle_size() + "mm " + self.nozzle_name();
+	});
+
+	self.getDefaultProfile();
+	
+}
+function PowerButonsModel(){
+	var self = this;
+
+	self.powerOn = function(){
+		bootbox.confirm({closeButton: false, message: confirm_on, callback: function(result) {
+		  if (result) {
+ 			 sendPowerOnButton();
+		  }
+		}});
+	}
+
+	self.powerOff = function(){
+		bootbox.confirm({closeButton: false, message: confirm_off, callback: function(result) {
+		  if (result) {
+			 sendPowerOffButton();
+		  }
+		}});
+	}
+
+}
+
+function SwitchPluginModel(){
+	
+	var self = this;
+	
+	self.lights = ko.observable(false);
+	self.mute = ko.observable(true);
+	self.unload = ko.observable(false);
+	self.poweroff = ko.observable(false);
+	
 	self.toggleLights = function(){
 		sendSwitchCommand("lights",!self.lights());
 	}
 
 	self.togglePower = function(){
-		sendSwitchCommand("power",!self.power());
+		sendSwitchCommand("power",!printer.power());
 	}
 
 	self.toggleUnload = function(){
@@ -632,48 +701,12 @@ function PrinterModel(){
 		sendSwitchCommand("mute",!self.mute());
 	}
 	
-	self.printerConnect = function(){
-		sendConnectionCommand("connect");
-		switchPanel("status");
-		self.getDefaultProfile();
-	}
-
-	self.printerDisconnect = function (){
-		bootbox.confirm({closeButton: false, message: "Disconnect?", callback: function(result) {
-		  if (result) {
-			  sendSwitch({"command":"power", "status":false}, function(){
-				sendSwitchCommand("status");
-				sendConnectionCommand("disconnect");
-				});
-		  }
-		}});
-	}
-
-
-	self.getDefaultProfile = function() {
-		getExtruderCountFromProfile(function(data){		
-			current_profile_name = _.compact(_.map(data.profiles, function(obj) { if (obj.current) return obj.id; } ))[0];
-			self.current_profile = data.profiles[current_profile_name];
-			if (self.current_profile.extruder.count == 1){
-				self.dual_extruder(false);
-			} else {
-				self.dual_extruder(true);
-			}
-			
-		});
-	}
-
-	self.hotend_config = ko.computed(function(){
-		return self.nozzle_size() + "mm " + self.nozzle_name();
-	});
-
-	self.getDefaultProfile();
-	
 }
 
 var printer;
 var action;
 var offset;
+var buttons;
 
 function applyBindings(){
 	if (printer != undefined) {
@@ -683,7 +716,12 @@ function applyBindings(){
 	printer = new PrinterModel();
 	offset = new OffsetModel();
 	action = new ActionModel();
-
+	
+	
+	if ( has_switch_plugin() ) buttons = new SwitchPluginModel();
+	
+	if ( has_power_buttons() ) buttons = new PowerButonsModel()
+	
 	ko.applyBindings(action, document.getElementById("status_panel"));
 	ko.applyBindings(action, document.getElementById("printer_panel"));
 	ko.applyBindings(action, document.getElementById("movement_panel"));

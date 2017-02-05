@@ -13,8 +13,8 @@ function connect(){
 	socket.onopen = function() {
 		getSettings();
 		switchView("main");
-		sendSwitchCommand("status");
 		retry_count = -1;
+		if ( has_switch_plugin() ) sendSwitchCommand("status");
 	};
 	
 	socket.onmessage = function(e) {
@@ -119,17 +119,12 @@ function sendCommand(data){
 }
 
 //switch plugin
-function sendSwitch(data, callback){
-	if (has_switch()) {
+function sendSwitch(data, callback){	
 		$.ajax({
 			url:  BASE_URL+"api/plugin/switch",
 			method: "POST",
 			data: JSON.stringify(data),
-			
 		}).done(function(){if (typeof callback === "function") callback();});
-	} else {
-		if (typeof callback === "function") callback();
-	}
 }
 
 function sendSwitchCommand(command, status){
@@ -201,6 +196,28 @@ function unselect(){
 		url:  MOBILE_URL+"/unselect",
 		method: "GET"
 	});
+}
+
+function getCustom(data, callback){	
+		$.ajax({
+			url:  BASE_URL+"api/system/commands/custom",
+			method: "GET"
+		});
+}
+
+
+function sendPowerOnButton(data, callback){	
+		$.ajax({
+			url:  BASE_URL+"api/system/commands/custom/power_on_printer",
+			method: "POST",
+		}).done(function(resp){if (typeof callback === "function") callback(resp);});
+}
+
+function sendPowerOffButton(data, callback){	
+		$.ajax({
+			url:  BASE_URL+"api/system/commands/custom/shutdown_printer",
+			method: "POST",
+		}).done(function(resp){if (typeof callback === "function") callback(resp);});
 }
 
 
