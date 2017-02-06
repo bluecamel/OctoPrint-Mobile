@@ -185,8 +185,9 @@ function getSettings(){
 		
 		createHotendSliders( settings.printer.nozzle_temperatures );
 		createBedSliders( settings.printer.bed_temperatures );
-	 	if (! printer.acceptsCommands() ){
+	 	if (! printer.acceptsCommands() ){			
 			$("input.temp_slider").slider('disable');
+			$("input.fan_slider").slider('disable');
 	 	}
 	});
 }
