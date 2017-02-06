@@ -629,26 +629,6 @@ function PrinterModel(){
 	self.getDefaultProfile();
 	
 }
-function PowerButonsModel(){
-	var self = this;
-
-	self.powerOn = function(){
-		bootbox.confirm({closeButton: false, message: confirm_on, callback: function(result) {
-		  if (result) {
- 			 sendPowerOnButton();
-		  }
-		}});
-	}
-
-	self.powerOff = function(){
-		bootbox.confirm({closeButton: false, message: confirm_off, callback: function(result) {
-		  if (result) {
-			 sendPowerOffButton();
-		  }
-		}});
-	}
-
-}
 
 function SwitchPluginModel(){
 	
@@ -703,6 +683,27 @@ function SwitchPluginModel(){
 	
 }
 
+function PowerButtonsModel(){
+	var self = this;
+
+	self.powerOn = function(){
+		bootbox.confirm({closeButton: false, message: confirm_on, callback: function(result) {
+		  if (result) {
+ 			 sendPowerOnButton();
+		  }
+		}});
+	}
+
+	self.powerOff = function(){
+		bootbox.confirm({closeButton: false, message: confirm_off, callback: function(result) {
+		  if (result) {
+			 sendPowerOffButton();
+		  }
+		}});
+	}
+
+}
+
 var printer;
 var action;
 var offset;
@@ -717,10 +718,8 @@ function applyBindings(){
 	offset = new OffsetModel();
 	action = new ActionModel();
 	
-	
-	if ( has_switch_plugin() ) buttons = new SwitchPluginModel();
-	
-	if ( has_power_buttons() ) buttons = new PowerButonsModel()
+	if ( has_switch_plugin() ) buttons = new SwitchPluginModel();	
+	if ( has_power_buttons() ) buttons = new PowerButtonsModel();
 	
 	ko.applyBindings(action, document.getElementById("status_panel"));
 	ko.applyBindings(action, document.getElementById("printer_panel"));
