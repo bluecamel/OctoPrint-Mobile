@@ -105,7 +105,8 @@ function sendCommandByName(name){
 }
 
 //G or M codes
-function sendCommand(data, invert = false){
+function sendCommand(data, invert){
+	invert = typeof invert !== 'undefined' ? invert : false;
 	if (typeof data  === "string") {
 		if (invert) {
 			data = invertAxes(data);
