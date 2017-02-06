@@ -196,7 +196,16 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		else:
 			has_switch = False
 		
-		return make_response(render_template("nautilus_index.jinja2", nautilus_url=nautilus_url, has_switch=has_switch) )
+		profile = self._printer_profile_manager.get_current_or_default()
+		invert = [profile.get('axes').get("x").get('inverted'),
+		profile.get('axes').get("y").get('inverted'),
+		profile.get('axes').get("z").get('inverted')]
+
+		speed = [profile.get('axes').get("x").get('speed'),
+		profile.get('axes').get("y").get('speed'),
+		profile.get('axes').get("z").get('speed')]
+		
+		return make_response(render_template("nautilus_index.jinja2", nautilus_url=nautilus_url, has_switch=has_switch, invert=invert, speed=speed) )
 	
 	##octoprint.plugin.BlueprintPlugin
 	def is_blueprint_protected(self):
