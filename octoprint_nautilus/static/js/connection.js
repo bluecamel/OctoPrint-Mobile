@@ -221,10 +221,7 @@ function protocol_error(reason) {
 		case 401:  //UNAUTHORIZED
 			$("#disconnected_message").html(reason.responseText);
 			$("#reconnect").click(function(){
-				checkHome(function(data){
-					home = data.home;
-					initialize();
-				});
+				window.location.reload();
 			});
 			break;
 		case 503:  //Service Unavailable

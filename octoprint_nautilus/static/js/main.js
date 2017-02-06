@@ -94,16 +94,14 @@ function initialize(apikey){
 
 function onForeground(){
 	checkHome(function(data){
-		var new_home = data.home;
-		if ( new_home == home) { //didn't change location
-			if ( ! new_home ) { //we're away 
-				start_camera(true);
-			} else {
+		if ( home = data.home) { //didn't change location
+			if ( home ) {
 				connect();
+			} else {
+				start_camera(true); //camera in full screen mode
 			}
-		} else { //we moved in or out the house, run setup for new environment
-			home = new_home;
-			initialize();
+		} else { //we moved in or out the house, reload
+			window.location.reload();
 		}
 	});
 }
