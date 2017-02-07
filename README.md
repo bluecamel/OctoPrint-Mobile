@@ -43,3 +43,25 @@ See the [installation guide](https://github.com/MoonshineSG/OctoPrint-Mobile/wik
  - ver 1.6.4/1.6.5 (plugin) : quick fix for a error causing "Invalid Api Key" for some users  / fix version up 
  - ver 1.7 (plugin) / ver 1.4 (ios) : X-Api-Key issues fix and iOS plugin version check
  - ver 1.7.1 (plugin) : cleanup new API Key implementation, fix "Detailed Progress" plugin conflict, error message when camera not available, added optional debug logs
+ - ver 1.8 (plugin) : 
+- support for inverted axes (see https://github.com/MoonshineSG/OctoPrint-Mobile/issues/29)
+> no configurations needed. Nautilus follows the printer profile set in OctoPrint
+- support for custom power buttons (see https://github.com/MoonshineSG/OctoPrint-Mobile/issues/23#issuecomment-277459712)
+> no configurations needed. If `Switch` plugin is not installed and Nautilus finds `power_on_printer` `shutdown_printer` actions in the system menu, it will add 2 buttons on the printer pannel. 
+>```
+> system:
+>   actions:
+>     - name: Power On Printer
+>       action: power_on_printer
+>       command: sudo /home/pi/power_on_command
+>       confirm: You are about to power on the 3D Printer.
+>     - name: Shutdown Printer
+>       action: shutdown_printer
+>       command: sudo /home/pi/shudown_command
+>       confirm: You are about to shutdown the 3D Printer.
+>```
+
+- application reload after a server reboot when config or plugins change
+- better handling reconnections
+- fix fan slider disable condition
+
