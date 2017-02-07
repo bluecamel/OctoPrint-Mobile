@@ -13,8 +13,8 @@ function connect(){
 	socket.onopen = function() {
 		getSettings();
 		switchView("main");
-		sendSwitchCommand("status");
 		retry_count = -1;
+		if ( has_switch_plugin() ) sendSwitchCommand("status");
 	};
 	
 	socket.onmessage = function(e) {
@@ -105,10 +105,17 @@ function sendCommandByName(name){
 }
 
 //G or M codes
-function sendCommand(data){
+function sendCommand(data, invert){
+	invert = typeof invert !== 'undefined' ? invert : false;
 	if (typeof data  === "string") {
+		if (invert) {
+			data = invertAxes(data);
+		}
 		command = {"command": data};
 	} else {
+		if (invert) {
+			data = _.map(data, invertAxes)
+		}
 		command = {"commands": data};
 	}
 	$.ajax({
@@ -119,17 +126,12 @@ function sendCommand(data){
 }
 
 //switch plugin
-function sendSwitch(data, callback){
-	if (has_switch()) {
+function sendSwitch(data, callback){	
 		$.ajax({
 			url:  BASE_URL+"api/plugin/switch",
 			method: "POST",
 			data: JSON.stringify(data),
-			
 		}).done(function(){if (typeof callback === "function") callback();});
-	} else {
-		if (typeof callback === "function") callback();
-	}
 }
 
 function sendSwitchCommand(command, status){
@@ -190,8 +192,9 @@ function getSettings(){
 		
 		createHotendSliders( settings.printer.nozzle_temperatures );
 		createBedSliders( settings.printer.bed_temperatures );
-	 	if (! printer.acceptsCommands() ){
+	 	if (! printer.acceptsCommands() ){			
 			$("input.temp_slider").slider('disable');
+			$("input.fan_slider").slider('disable');
 	 	}
 	});
 }
@@ -203,6 +206,20 @@ function unselect(){
 	});
 }
 
+function sendPowerOnButton(){	
+		$.ajax({
+			url:  BASE_URL+"api/system/commands/custom/power_on_printer",
+			method: "POST"
+		});
+}
+
+function sendPowerOffButton(){	
+		$.ajax({
+			url:  BASE_URL+"api/system/commands/custom/shutdown_printer",
+			method: "POST"
+		})
+}
+
 
 //error handling
 function protocol_error(reason) {
@@ -212,10 +229,7 @@ function protocol_error(reason) {
 		case 401:  //UNAUTHORIZED
 			$("#disconnected_message").html(reason.responseText);
 			$("#reconnect").click(function(){
-				checkHome(function(data){
-					home = data.home;
-					initialize();
-				});
+				window.location.reload();
 			});
 			break;
 		case 503:  //Service Unavailable

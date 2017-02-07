@@ -191,13 +191,41 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		
 		nautilus_url="plugin/%s"%self._identifier
 		
-		if self._plugin_manager.get_plugin("switch"):
-			has_switch = True
-		else:
-			has_switch = False
+		buttons = None
+		custom_power, confirm = self.has_custom_power()
+		if self._plugin_manager.get_plugin("switch", require_enabled=True):
+			buttons = "switch_plugin"
+
+		elif custom_power:
+			buttons = "custom_power"
 		
-		return make_response(render_template("nautilus_index.jinja2", nautilus_url=nautilus_url, has_switch=has_switch) )
+		axes = self._printer_profile_manager.get_current_or_default().get('axes')
+		
+		invert = [axes.get("x").get('inverted'), axes.get("y").get('inverted'), axes.get("z").get('inverted')]
+		speed = [axes.get("x").get('speed'), axes.get("y").get('speed'), axes.get("z").get('speed')]
+		
+		return make_response(render_template("nautilus_index.jinja2", nautilus_url=nautilus_url, buttons=buttons, confirm=confirm, invert=invert, speed=speed) )
+
 	
+	def has_custom_power(self):
+		on = False
+		off = False
+		confirm = ["",""]
+		for action in self._settings.global_get(["system", "actions"]):
+			if  action.get("action")  == "power_on_printer":
+				self._logger.debug("power_on_printer '%s'"% action.get("command"))
+				if action.get("confirm"):
+					confirm[0] = action.get("confirm")
+				on = True
+			if  action.get("action")  == "shutdown_printer":
+				self._logger.debug("shutdown_printer '%s'"% action.get("command"))
+				if action.get("confirm"):
+					confirm[1] = action.get("confirm")
+				off = True
+		self._logger.debug( "has_custom_power ? %s"%(on and off) )
+		return (on and off), confirm
+		
+		
 	##octoprint.plugin.BlueprintPlugin
 	def is_blueprint_protected(self):
 		return True

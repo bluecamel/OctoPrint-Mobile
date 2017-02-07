@@ -4,6 +4,34 @@ function formatSeconds(s){
     return date.toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");
 }
 
+const reInvertX = /(G1.*)(X)\s?(-?)(\d*)/g;
+const reInvertY = /(G1.*)(Y)\s?(-?)(\d*)/g;
+const reInvertZ = /(G1.*)(Z)\s?(-?)(\d*)/g;
+const reMinus = '\$1\$2-\$4';
+const rePlus = '\$1\$2\$4';
+
+function invertAxes(gcode){
+	//console.log('GCODE before invert: ', gcode);
+	if (invertedX) gcode = invertXYZ(reInvertX, gcode)	
+	if (invertedY) gcode = invertXYZ(reInvertY, gcode)
+	if (invertedZ) gcode = invertXYZ(reInvertZ, gcode)
+	//console.log('GCODE after invert: ', gcode);
+	return gcode;
+}
+
+function invertXYZ(regex, gcode){
+	const f = regex.exec(gcode);
+	if (f !== null) {
+		if (_.trim(f[3]) == "-") {
+			return gcode.replace(regex, rePlus);	
+		} else {
+			return gcode.replace(regex, reMinus);
+		}
+	} else {
+		return gcode;
+	}
+}
+
 // from OctoPrint's "helpers.js"
 function formatFuzzyPrintTime(totalSeconds) {
     /**

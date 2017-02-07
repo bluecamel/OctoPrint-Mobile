@@ -1,10 +1,16 @@
 var re114 = /X:([+-]?[0-9.]+) Y:([+-]?[0-9.]+) Z:([+-]?[0-9.]+) E:([+-]?[0-9.]+)/;
 var re851 = /echo:Z Offset : ([-.\d]*)/;
 
+var app_hash;
+
 function onReceivedData(data){
 	if (typeof(data) === "string") {
 		data = JSON.parse(data);
 	}
+
+	if(typeof(data.connected) !== "undefined"){
+		onConnectedData(data.connected);
+	} 
   
 	if(typeof(data.current) !== "undefined"){
 		onCurrentData(data.current);
@@ -21,6 +27,16 @@ function onReceivedData(data){
 	if(typeof(data.plugin) !== "undefined"){
 		onPluginData(data.plugin.plugin, data.plugin.data);
 	}	
+}
+
+function onConnectedData(data){	
+	if ( app_hash != undefined ) {
+		if ( app_hash != data.config_hash +"-"+ data.plugin_hash) {
+			window.location.reload();
+		}
+	} else {
+		app_hash = data.config_hash +"-"+ data.plugin_hash;
+	}
 }
 
 function onHistoryData(history){
@@ -115,14 +131,14 @@ function onEventData(type, payload) {
 
 function onPluginData(name, data){
 	//console.log("Plugin '"+ name + "': ", data);
-	switch (name) {
+	switch (name) {	
 		 case "switch":
-			printer.power(JSON.parse(data.power)); //convert to boolean
-			printer.lights(JSON.parse(data.lights));
-			printer.mute(JSON.parse(data.mute));
-			printer.unload(JSON.parse(data.unload));
-			printer.poweroff(JSON.parse(data.poweroff));
-			break;
+				printer.power(JSON.parse(data.power)); //convert to boolean
+				buttons.lights(JSON.parse(data.lights));
+				buttons.mute(JSON.parse(data.mute));
+				buttons.unload(JSON.parse(data.unload));
+				buttons.poweroff(JSON.parse(data.poweroff));
+				break;
 		case "nautilus":
 			if ( typeof(data.message) !== "undefined") {
 				message(data.message);
