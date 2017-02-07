@@ -11,11 +11,11 @@ const reMinus = '\$1\$2-\$4';
 const rePlus = '\$1\$2\$4';
 
 function invertAxes(gcode){
-	console.log('GCODE before invert: ', gcode);
+	//console.log('GCODE before invert: ', gcode);
 	if (invertedX) gcode = invertXYZ(reInvertX, gcode)	
 	if (invertedY) gcode = invertXYZ(reInvertY, gcode)
 	if (invertedZ) gcode = invertXYZ(reInvertZ, gcode)
-	console.log('GCODE after invert: ', gcode);
+	//console.log('GCODE after invert: ', gcode);
 	return gcode;
 }
 
