@@ -105,10 +105,17 @@ function sendCommandByName(name){
 }
 
 //G or M codes
-function sendCommand(data){
+function sendCommand(data, invert){
+	invert = typeof invert !== 'undefined' ? invert : false;
 	if (typeof data  === "string") {
+		if (invert) {
+			data = invertAxes(data);
+		}
 		command = {"command": data};
 	} else {
+		if (invert) {
+			data = _.map(data, invertAxes)
+		}
 		command = {"commands": data};
 	}
 	$.ajax({

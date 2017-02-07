@@ -149,7 +149,7 @@ function ActionModel(){
 	}
 	
 	self.sendRelativeG1 = function(data){
-		sendCommand(["G91", "G1 "+data, "G90"]);
+		sendCommand(["G91", "G1 " + data, "G90"],  true);
 	}
 
 	self.sendAbsoluteG1 = function(data){
@@ -292,10 +292,10 @@ function OffsetModel() {
 	
 	self.sendOffsetAdjustment = function(z){
 		if (self.prepared()){
-			sendCommand( settings.offset.send_relative_z.replace("%z", z).split(",") );
+			sendCommand( settings.offset.send_relative_z.replace("%z", z).split(","), true );
 		} else {
 			sendCommand( settings.offset.save_offset.replace( "%z", ( parseFloat(self.offset()) + parseFloat(z) ) ).split(",") 
-			.concat(  settings.offset.send_relative_z.replace("%z", z).split(",")  )  );
+			.concat(  settings.offset.send_relative_z.replace("%z", z).split(",")  ), true  );
 		}
 	}	
 }
