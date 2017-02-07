@@ -1,0 +1,10 @@
+<button type="button"  class="btn btn-default" data-bind="click: buttons.powerOn, enable: !printer.inProgress()"><span class="fa  fa-lg fa-power-off" style = "color: #17b566" ></span> Power On {%if confirm[0]%} <i class='fa fa-sm fa-umbrella'></i>{%endif%}</button>
+<button type="button"  class="btn btn-default" data-bind="click: buttons.powerOff, enable: !printer.inProgress()"><span class="fa  fa-lg fa-power-off" style = "color: #ed2b36"></span> Power Off {%if confirm[1]%} <i class='fa fa-sm fa-umbrella'></i>{%endif%}</button>
+
+<button type="button"  class="btn btn-default" id="reset_btn" data-bind="css: {'btn-default': !printer.ready(), 'btn-danger': printer.ready()}, visible: !printer.inProgress(), click: printer.ready()?printer.printerDisconnect:printer.printerConnect" ><span class="fa fa-usb"></span><span data-bind="html: (printer.ready() ? ' Disconnect  <i class=\'fa fa-sm fa-umbrella\'></i>' : ' Connect')"></span></button>
+
+
+<script type="text/javascript">
+	var confirm_on = "{{confirm[0]}}";
+	var confirm_off = "{{confirm[1]}}";
+</script>
