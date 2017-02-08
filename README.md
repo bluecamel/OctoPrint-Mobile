@@ -43,7 +43,7 @@ See the [installation guide](https://github.com/MoonshineSG/OctoPrint-Mobile/wik
  - ver 1.6.4/1.6.5 (plugin) : quick fix for a error causing "Invalid Api Key" for some users  / fix version up 
  - ver 1.7 (plugin) / ver 1.4 (ios) : X-Api-Key issues fix and iOS plugin version check
  - ver 1.7.1 (plugin) : cleanup new API Key implementation, fix "Detailed Progress" plugin conflict, error message when camera not available, added optional debug logs
- - ver 1.8 (plugin) : 
+ - ver 1.8 (plugin) / ver 1.4.1 (ios): 
 	- support for inverted axes (see https://github.com/MoonshineSG/OctoPrint-Mobile/issues/18#issuecomment-272616681 and https://github.com/MoonshineSG/OctoPrint-Mobile/issues/29)
 	
 		> no configuration needed. Nautilus follows the printer profile set in OctoPrint
@@ -55,4 +55,4 @@ See the [installation guide](https://github.com/MoonshineSG/OctoPrint-Mobile/wik
 	- application reload after a server reboot when config or plugins change
 	- better handling reconnections
 	- fix fan slider disable condition
-
+	- fix reconnect when OctoPrint is not available
