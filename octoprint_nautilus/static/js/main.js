@@ -94,7 +94,7 @@ function initialize(apikey){
 
 function onForeground(){
 	checkHome(function(data){
-		if ( home = data.home) { //didn't change location
+		if ( home == data.home) { //didn't change location
 			if ( home ) {
 				connect();
 			} else {

@@ -10,8 +10,10 @@
 
 bool webapp_loaded = NO;
 bool need_setup = NO;
-int RETRY = 6;
-int RETRY_INTERVAL = 10; //seconds
+const int RETRY = 6;
+const int RETRY_INTERVAL = 10; //seconds
+
+int retryCounter = RETRY;
 
 NSString *apikey;
 
@@ -37,21 +39,18 @@ NSString* requiredVersion = @"1.7";
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onForeground:) name:@"onForeground" object: nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onBackground:) name:@"onBackground" object: nil];
 
-    [self checkWebApp:RETRY];
+    [self checkWebApp];
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
     [self.webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat: @"initialize(\"%@\");", apikey]];
 }
 
-- (void) checkWebApp:(int) retryCounter
+- (void) checkWebApp
 {
-    [[NSURLCache sharedURLCache] removeAllCachedResponses];
-    
-    if (retryCounter == 0) {
-        return;
-    }
     retryCounter--;
+    
+    [[NSURLCache sharedURLCache] removeAllCachedResponses];
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *url = [defaults stringForKey:@"serverURL"];
@@ -93,7 +92,7 @@ NSString* requiredVersion = @"1.7";
                         webapp_loaded = NO;
                         [self showMessage: error.localizedDescription];
                         [NSThread sleepForTimeInterval:RETRY_INTERVAL];
-                        [weakSelf checkWebApp: retryCounter];
+                        [weakSelf checkWebApp];
                     } else if ([httpResponse statusCode] == 404) { //file not found
                             webapp_loaded = NO;
                             [self showMessage: @"This application requires the plugin \"Nautilus\" installed on a running instance of OctoPrint." ];
@@ -102,11 +101,10 @@ NSString* requiredVersion = @"1.7";
                         if (retryCounter == 0) {
                             [self showMessage: @"I give up. OctoPrint is currently not running. You can wait a while longer, then shake to retry." ];
                         } else {
-                            [self showMessage: @"OctoPrint is currently not running. Will retry in a few seconds." ];
+                            [self showMessage:  [NSString stringWithFormat: @"OctoPrint is currently not running. Will retry in a few seconds. [%i]", retryCounter ]];
+                            [NSThread sleepForTimeInterval:RETRY_INTERVAL];
+                            [weakSelf checkWebApp];
                         }
-                        [NSThread sleepForTimeInterval:RETRY_INTERVAL];
-                        [weakSelf checkWebApp: retryCounter];
-
                     } else if ([httpResponse statusCode] == 200 ) {
                         //check plugin version
                         if ( [self checkPluginVersion:url] ) {
@@ -120,7 +118,7 @@ NSString* requiredVersion = @"1.7";
                     } else { // huh ?
                         webapp_loaded = NO;
                         [NSThread sleepForTimeInterval:RETRY_INTERVAL];
-                        [weakSelf checkWebApp: retryCounter];
+                        [weakSelf checkWebApp];
                     }
                 }] resume];
             [session finishTasksAndInvalidate];
@@ -157,31 +155,15 @@ NSString* requiredVersion = @"1.7";
 
 -(void)loadWebApp:(NSString*)url
 {
-    if (webapp_loaded) {
-        [self.webView reload];
-    } else {
-        
-        NSMutableURLRequest* request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:20];
+    NSMutableURLRequest* request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:20];
 
-        [request setValue:@"no-cache" forHTTPHeaderField:@"Cache-Control"];
-        [request setValue:@"no-cache" forHTTPHeaderField:@"Pragma"];
+    [request setValue:@"no-cache" forHTTPHeaderField:@"Cache-Control"];
+    [request setValue:@"no-cache" forHTTPHeaderField:@"Pragma"];
 
-        [self.webView loadRequest:request];
-        webapp_loaded = YES;
+    webapp_loaded = YES;
+    retryCounter = 0;
 
-        /*
-        NSString *title = [NSString stringWithFormat: @"Loaded '%@'", url];
-        NSString *message = [NSString stringWithFormat: @"with headers: %@", request.allHTTPHeaderFields];
-        
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-        UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:^(UIAlertAction * action){
-                [self dismissViewControllerAnimated:YES completion:nil];
-            }];
-        [alert addAction:okAction];
-        [self presentViewController:alert animated:YES completion:nil];
-         */
-
-    }
+    [self.webView loadRequest:request];
 }
 
 -(void)showMessage:(NSString*) message {
@@ -230,8 +212,10 @@ NSString* requiredVersion = @"1.7";
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
         } else {
             
-            
-            [self checkWebApp:RETRY];
+            if (retryCounter == 0) {
+                retryCounter = RETRY;
+                [self checkWebApp];
+            }
             
             CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation"];
             [animation setToValue:[NSNumber numberWithFloat:-0.04f]];
