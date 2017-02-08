@@ -205,17 +205,21 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		speed = [axes.get("x").get('speed'), axes.get("y").get('speed'), axes.get("z").get('speed')]
 		home = self._printer_profile_manager.get_current_or_default().get('volume').get('origin')
 		mark = ' style="color:#17b566"'
+			#  0     3
+			#     2
+			#  1     4
+		origin = ["", "", "", "", ""]
 		if home == 'center':
-			origin = ["", "", mark, "", ""]
+			origin[2] = mark
 		else:
-			if invert[0] and invert[1]:
-				origin = ["", "", "", mark, ""]
-			elif invert[0]:
-				origin = ["", "", "", "", mark]
-			elif invert[1]:
-				origin = [mark, "", "", "", ""]
+			if invert[0] and invert[1]: # X & Y inverted
+				origin[3] = mark
+			elif invert[0]:       # X inverted
+				origin[4] = mark
+			elif invert[1]:       # Y inverted
+				origin[0] = mark
 			else:
-				origin = ["", mark, "", "", ""]	
+				origin[1] = mark
 
 		return make_response(render_template("nautilus_index.jinja2", nautilus_url=nautilus_url, buttons=buttons, confirm=confirm, invert=invert, speed=speed, origin=origin) )
 
