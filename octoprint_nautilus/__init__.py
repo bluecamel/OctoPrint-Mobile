@@ -203,8 +203,21 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		
 		invert = [axes.get("x").get('inverted'), axes.get("y").get('inverted'), axes.get("z").get('inverted')]
 		speed = [axes.get("x").get('speed'), axes.get("y").get('speed'), axes.get("z").get('speed')]
-		
-		return make_response(render_template("nautilus_index.jinja2", nautilus_url=nautilus_url, buttons=buttons, confirm=confirm, invert=invert, speed=speed) )
+		home = self._printer_profile_manager.get_current_or_default().get('volume').get('origin')
+		mark = ' style="color:#17b566"'
+		if home == 'center':
+			origin = ["", "", mark, "", ""]
+		else:
+			if invert[0] and invert[1]:
+				origin = ["", "", "", mark, ""]
+			elif invert[0]:
+				origin = ["", "", "", "", mark]
+			elif invert[1]:
+				origin = [mark, "", "", "", ""]
+			else:
+				origin = ["", mark, "", "", ""]	
+
+		return make_response(render_template("nautilus_index.jinja2", nautilus_url=nautilus_url, buttons=buttons, confirm=confirm, invert=invert, speed=speed, origin=origin) )
 
 	
 	def has_custom_power(self):
