@@ -56,4 +56,4 @@ See the [installation guide](https://github.com/MoonshineSG/OctoPrint-Mobile/wik
 	- better handling reconnections
 	- fix fan slider disable condition
 	- fix reconnect when OctoPrint is not available
- - ver 1.9 (plugin) : added "home" marker on the navigation page, added optional quick peek terminal, added camara rotation (follows OctoPrint settings)
+ - ver 1.9 (plugin) : added "home" marker on the navigation page, added optional quick peek terminal, added camera rotation (follows OctoPrint settings)
