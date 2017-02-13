@@ -110,7 +110,6 @@
 							</div>
 						</div>
 					</div>
-
 					<div id="movement_panel" class="panel">
 						<div class="row movement-row-1">
 							<div class="col-xs-6 no-padding">
@@ -268,6 +267,7 @@
 							<img class="{{"flipH" if webcam[0]}} {{"flipV" if webcam[1]}}" id="webcam"/>
 						{{ "</div>" if webcam[2] }}
 					</div>
+					{{ "<div id=\"terminal\"><textarea readonly rows=\"20\" cols=\"250\" id=\"logs\"></textarea></div>" if terminal }}
 				</div>
 			</div>
 		</div>
@@ -286,6 +286,7 @@
     {% include 'nautilus_javascript_lib.jinja2' %}
     
 	<script type="text/javascript">
+	//"{{webcam}}"
 	var home = false;
 	var BASE_URL = location.protocol + '//' + location.host + "/";
 	var MOBILE_URL = BASE_URL+"{{ nautilus_url }}";
@@ -297,12 +298,13 @@
 	
 	const WEBCAM_URL = {{"location.protocol + '//' + location.host + " if webcam[3][0] == "/"}}"{{webcam[3]}}";
 	
+	const TERMINAL = {{ terminal | lower }};
+	
 	const invertedX = {{ invert[0]  | lower}};
 	const invertedY = {{ invert[1]  | lower}};
 	const invertedZ = {{ invert[2]  | lower}};
 	</script>
     
     {% include 'nautilus_javascripts.jinja2' %}
-
 </body>
 </html>

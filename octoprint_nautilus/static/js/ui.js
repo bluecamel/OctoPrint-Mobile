@@ -1,6 +1,9 @@
 var currentView;
 var currentPanel;
 
+var pressTimer;
+var show_terminal = false;
+
 function switchView(view) {
 	if ( currentView != view ){
 		if (view == "main") {
@@ -29,9 +32,34 @@ function switchPanel(panel){
 }
 
 // tab menu buttons
-$("#status_btn").click(function() {
-	switchPanel("status");
-});
+if (TERMINAL) {
+
+	document.getElementById("status_btn").ontouchend = function(){
+	  clearTimeout(pressTimer);
+		$("#terminal").hide();
+		if (!show_terminal){
+			switchPanel("status");
+		}
+		show_terminal = false;	  
+	  return false;
+	}
+	
+	document.getElementById("status_btn").ontouchstart = function(){
+	  pressTimer = window.setTimeout(function() {
+			//since we don't update when hidden
+			_logs.value = latest_log.join("\n");
+
+			$("#terminal").show();
+			show_terminal = true;
+		},800);
+	  return false; 
+	}
+	
+} else {
+	$("#status_btn").click(function() {
+		switchPanel("status");
+	});
+}
 
 $("#printer_btn").click(function() {
 	switchPanel("printer");
@@ -123,7 +151,7 @@ function touch_ui(touch) {
 		$("#webcam").css({"height": "auto", "width": SCREEN_WIDTH});
 		
 	} else {
-
+		
 		document.ontouchstart = function(event) {
 			if ( $(event.target).hasClass("bootbox-body") ) {
 				touch_start = event.touches[0].clientY;

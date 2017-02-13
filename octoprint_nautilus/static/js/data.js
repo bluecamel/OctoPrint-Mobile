@@ -3,6 +3,9 @@ var re851 = /echo:Z Offset : ([-.\d]*)/;
 
 var app_hash;
 
+var latest_log = [];
+var _logs  = document.getElementById("logs");
+
 function onReceivedData(data){
 	if (typeof(data) === "string") {
 		data = JSON.parse(data);
@@ -41,13 +44,27 @@ function onConnectedData(data){
 
 function onHistoryData(history){
 	updateFlasgs(history.state);	
+	if (TERMINAL) onLogs(history.logs);
+}
 
+function onLogs(logs){
+	var filtered = [];
+	
+	_.each(logs, function(o) { if ( o == "Send: M105" || o.startsWith("Recv: ok T") || o.startsWith("Recv: echo:busy") || o == "Recv: wait" ) { filtered.push("[...]"); } else { filtered.push(o); } });
+	latest_log = _.concat(latest_log, filtered);
+	latest_log = _.reject(latest_log, function (o, i) { if (o === "[...]") {return i > 0 && latest_log[i - 1] === o;} });
+	latest_log = _.takeRight(latest_log, 20);
+
+	//only update if visible. improved performance ?
+	if (show_terminal) {
+		_logs.value = latest_log.join("\n");
+	}
 }
 
 function onCurrentData(current){
-	// uppdate printer status
-	//console.log(current);
+	// uppdate printer status	
 	updateFlasgs(current.state);
+	if (TERMINAL) onLogs(current.logs);
   
   if ( printer.error() || printer.closedOrError() ) {
 	  printer.fileToPrint(null);
