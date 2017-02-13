@@ -446,3 +446,18 @@ body {
 .alert {
   width: 90vw;
 }
+.flipH { 
+  -webkit-transform:scaleX(-1);
+}
+
+.flipV{
+  -webkit-transform:scaleY(-1);  
+}
+
+.flipH.flipV{
+  -webkit-transform:scaleX(-1) scaleY(-1);  
+}
+
+.rotate90{
+  -webkit-transform:rotate(-90deg);
+}

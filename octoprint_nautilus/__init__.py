@@ -220,8 +220,14 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 				origin[0] = mark
 			else:
 				origin[1] = mark
+				
+		webcam = [self._settings.global_get_boolean(["webcam", "flipH"]), \
+			self._settings.global_get_boolean(["webcam", "flipV"]), \
+			self._settings.global_get_boolean(["webcam", "rotate90"]) ,\
+			self._settings.global_get(["webcam", "stream"]) ]
+		
 
-		return make_response(render_template("nautilus_index.jinja2", nautilus_url=nautilus_url, buttons=buttons, confirm=confirm, invert=invert, speed=speed, origin=origin) )
+		return make_response(render_template("nautilus_index.jinja2", nautilus_url=nautilus_url, buttons=buttons, confirm=confirm, invert=invert, speed=speed, origin=origin, webcam=webcam) )
 
 	
 	def has_custom_power(self):
