@@ -126,7 +126,8 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			_settings_version = None,
 			external_only_webcam = True,
 			ignore_M117 = False,
-			debug = False
+			debug = False,
+			terminal = False
 		)
 
 	def on_settings_load(self):
@@ -203,8 +204,30 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		
 		invert = [axes.get("x").get('inverted'), axes.get("y").get('inverted'), axes.get("z").get('inverted')]
 		speed = [axes.get("x").get('speed'), axes.get("y").get('speed'), axes.get("z").get('speed')]
+		home = self._printer_profile_manager.get_current_or_default().get('volume').get('origin')
+		mark = ' style="color:#17b566"'
+			#  0     3
+			#     2
+			#  1     4
+		origin = ["", "", "", "", ""]
+		if home == 'center':
+			origin[2] = mark
+		else:
+			if invert[0] and invert[1]: # X & Y inverted
+				origin[3] = mark
+			elif invert[0]:       # X inverted
+				origin[4] = mark
+			elif invert[1]:       # Y inverted
+				origin[0] = mark
+			else:
+				origin[1] = mark
+				
+		webcam = [self._settings.global_get_boolean(["webcam", "flipH"]), \
+			self._settings.global_get_boolean(["webcam", "flipV"]), \
+			self._settings.global_get_boolean(["webcam", "rotate90"]) ,\
+			self._settings.global_get(["webcam", "stream"]) ]
 		
-		return make_response(render_template("nautilus_index.jinja2", nautilus_url=nautilus_url, buttons=buttons, confirm=confirm, invert=invert, speed=speed) )
+		return make_response(render_template("nautilus_index.jinja2", nautilus_url=nautilus_url, buttons=buttons, confirm=confirm, invert=invert, speed=speed, origin=origin, webcam=webcam, terminal=self._settings.get_boolean(["terminal"])) )
 
 	
 	def has_custom_power(self):

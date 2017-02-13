@@ -446,3 +446,44 @@ body {
 .alert {
   width: 90vw;
 }
+
+#terminal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 300vw;
+  height: 100vh;
+  margin-left: 12vw;
+  padding: 0;
+  display: none;
+  border-radius: 0 !important;
+}
+
+#logs {
+  background: black;
+  border: 0;
+  color: #0aef0a;  
+  width: 300vw;
+  height: 100vh;
+  padding-top: 5px;
+  padding-left: 10px;
+  font-size: 4.5vh;
+  line-height: 5vh;
+  border-radius: 0 !important;
+}
+
+.flipH { 
+  -webkit-transform:scaleX(-1);
+}
+
+.flipV{
+  -webkit-transform:scaleY(-1);  
+}
+
+.flipH.flipV{
+  -webkit-transform:scaleX(-1) scaleY(-1);  
+}
+
+.rotate90{
+  -webkit-transform:rotate(-90deg);
+}
