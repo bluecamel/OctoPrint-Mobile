@@ -43,7 +43,10 @@ function onConnectedData(data){
 
 function onHistoryData(history){
 	updateFlasgs(history.state);	
-	if (TERMINAL) onLogs(history.logs);
+	if (TERMINAL) { 
+		latest_log = [];
+		onLogs(history.logs);
+	}
 }
 
 function terminal_filter(o) {
@@ -125,7 +128,6 @@ function onMessageData(messages){
 	if (currentPanel == "offset") {
 		var m;
 		if ((m = re851.exec(messages)) !== null) {
-			//console.log(m);
 			offset.offset(m[1]);
 		} 
 	}
@@ -139,7 +141,6 @@ function onEventData(type, payload) {
 			bootbox.hideAll();
 			break;
 		case "PositionUpdate":
-			console.log(payload);
 			if ( offset.prepared() ) {
 				offset.current_z(   (parseFloat(payload.z) + parseFloat(settings.profile.max_m851)).toFixed(2) );
 			} else {
