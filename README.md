@@ -9,12 +9,18 @@ The plugin requires at least ver 1.3 of OctoPrint and the companion Nautilus iOS
 
 ##Setup
 
-
 See the [installation guide](https://github.com/MoonshineSG/OctoPrint-Mobile/wiki/Install)
+
+##Issues
+
+If you have problems with the plugin, don't write it in the Appstore as a review. That, is a one way communication, and since I don't know who you are, I can't contact you. Most often than not, more information is needed to solve a problem. 
+
+So please, open a [Github issue](https://github.com/MoonshineSG/OctoPrint-Mobile/issues/new).
 
 ##Printing in progress
 
 ![screenshot](https://moonshinesg.github.io/images/nautilus/printing.gif)
+
 
 ##Updates
  
