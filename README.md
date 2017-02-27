@@ -57,3 +57,4 @@ See the [installation guide](https://github.com/MoonshineSG/OctoPrint-Mobile/wik
 	- fix fan slider disable condition
 	- fix reconnect when OctoPrint is not available
  - ver 1.9 (plugin) : added "home" marked on the navigation page, added optional "peep" terminal, added camara rotation (follows OctoPrint settings)
+ - ver 1.9.1 (plugin) : fix camera freeze on app switch, fix history log update
