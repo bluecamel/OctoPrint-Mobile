@@ -42,8 +42,9 @@ function start_camera(alone){
 		$("#webcam_alone").error(function(){$(this).attr("src", MOBILE_URL+"/static/img/no_camera.png");}).attr("src", WEBCAM_URL+"&"+d.getTime());
 	} else {
 		switchPanel("camera");
-		clearCameraTimeout()
-		$("#webcam").error(function(){$(this).attr("src", MOBILE_URL+"/static/img/no_camera.png");}).attr("src", WEBCAM_URL+"&"+d.getTime());	
+		if (clearCameraTimeout()) {
+			$("#webcam").error(function(){$(this).attr("src", MOBILE_URL+"/static/img/no_camera.png");}).attr("src", WEBCAM_URL+"&"+d.getTime());	
+		} 
 	}
 }
 
@@ -60,10 +61,11 @@ var camera_timeout;
 
 function clearCameraTimeout(){
 	//console.log(camera_timeout);
-	if (camera_timeout == undefined) return;
+	if (camera_timeout == undefined) return true;
 	clearTimeout(camera_timeout);
 	camera_timeout = undefined;
 	//console.log("cleared");
+	return false;
 }
 
 function setCameraTimeout(){
