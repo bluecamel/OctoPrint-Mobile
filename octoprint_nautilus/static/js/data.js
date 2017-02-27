@@ -1,4 +1,3 @@
-var re114 = /X:([+-]?[0-9.]+) Y:([+-]?[0-9.]+) Z:([+-]?[0-9.]+) E:([+-]?[0-9.]+)/;
 var re851 = /echo:Z Offset : ([-.\d]*)/;
 
 var app_hash;
@@ -44,7 +43,10 @@ function onConnectedData(data){
 
 function onHistoryData(history){
 	updateFlasgs(history.state);	
-	if (TERMINAL) onLogs(history.logs);
+	if (TERMINAL) { 
+		latest_log = [];
+		onLogs(history.logs);
+	}
 }
 
 function terminal_filter(o) {
@@ -126,16 +128,8 @@ function onMessageData(messages){
 	if (currentPanel == "offset") {
 		var m;
 		if ((m = re851.exec(messages)) !== null) {
-			//console.log(m);
 			offset.offset(m[1]);
 		} 
-		if ((m = re114.exec(messages)) != null) {
-			if ( offset.prepared() ) {
-				offset.current_z(   (parseFloat(m[3]) + parseFloat(settings.profile.max_m851)).toFixed(2) );
-			} else {
-				offset.current_z(m[3]);	
-			}
-		}
 	}
 }
 
@@ -145,6 +139,13 @@ function onEventData(type, payload) {
 		case "Connected":
 			printer.port(payload.port);
 			bootbox.hideAll();
+			break;
+		case "PositionUpdate":
+			if ( offset.prepared() ) {
+				offset.current_z(   (parseFloat(payload.z) + parseFloat(settings.profile.max_m851)).toFixed(2) );
+			} else {
+				offset.current_z(payload.z);	
+			}
 			break;
 	}
 }
