@@ -42,9 +42,8 @@ function start_camera(alone){
 		$("#webcam_alone").error(function(){$(this).attr("src", MOBILE_URL+"/static/img/no_camera.png");}).attr("src", WEBCAM_URL+"&"+d.getTime());
 	} else {
 		switchPanel("camera");
-		if (clearCameraTimeout()) {
-			$("#webcam").error(function(){$(this).attr("src", MOBILE_URL+"/static/img/no_camera.png");}).attr("src", WEBCAM_URL+"&"+d.getTime());	
-		} 
+		clearCameraTimeout()
+		$("#webcam").error(function(){$(this).attr("src", MOBILE_URL+"/static/img/no_camera.png");}).attr("src", WEBCAM_URL+"&"+d.getTime());	
 	}
 }
 
@@ -61,11 +60,10 @@ var camera_timeout;
 
 function clearCameraTimeout(){
 	//console.log(camera_timeout);
-	if (camera_timeout == undefined) return true;
+	if (camera_timeout == undefined) return;
 	clearTimeout(camera_timeout);
 	camera_timeout = undefined;
 	//console.log("cleared");
-	return false;
 }
 
 function setCameraTimeout(){
@@ -109,9 +107,9 @@ function onForeground(){
 //called by ios app 
 function onBackground(){
 	if (home) {
+		clearCameraTimeout()
 		touch_ui(false);
 		bootbox.hideAll();
-		clearCameraTimeout()
 		disconnect();
 	} else {
 		stop_camera(true); //stop camera immediately
