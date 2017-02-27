@@ -42,7 +42,7 @@ function start_camera(alone){
 		$("#webcam_alone").error(function(){$(this).attr("src", MOBILE_URL+"/static/img/no_camera.png");}).attr("src", WEBCAM_URL+"&"+d.getTime());
 	} else {
 		switchPanel("camera");
-		if (clearCameraTimeout()) {
+		if ( clearCameraTimeout() ) {
 			$("#webcam").error(function(){$(this).attr("src", MOBILE_URL+"/static/img/no_camera.png");}).attr("src", WEBCAM_URL+"&"+d.getTime());	
 		} 
 	}
@@ -60,7 +60,6 @@ function stop_camera(imediate){
 var camera_timeout;
 
 function clearCameraTimeout(){
-	//console.log(camera_timeout);
 	if (camera_timeout == undefined) return true;
 	clearTimeout(camera_timeout);
 	camera_timeout = undefined;
@@ -95,6 +94,8 @@ function initialize(apikey){
 function onForeground(){
 	checkHome(function(data){
 		if ( home == data.home) { //didn't change location
+			clearCameraTimeout()
+			currentPanel = undefined; 
 			if ( home ) {
 				connect();
 			} else {

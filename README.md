@@ -9,12 +9,18 @@ The plugin requires at least ver 1.3 of OctoPrint and the companion Nautilus iOS
 
 ##Setup
 
-
 See the [installation guide](https://github.com/MoonshineSG/OctoPrint-Mobile/wiki/Install)
+
+##Issues
+
+If you have problems with the plugin, don't write it in the Apple Appstore as a review. That, is a one way communication, and since I don't know who you are, I can't contact you. More often than not, information provided is not enough to solve the problem. 
+
+So please, open a [Github issue](https://github.com/MoonshineSG/OctoPrint-Mobile/issues/new).
 
 ##Printing in progress
 
 ![screenshot](https://moonshinesg.github.io/images/nautilus/printing.gif)
+
 
 ##Updates
  
@@ -56,5 +62,5 @@ See the [installation guide](https://github.com/MoonshineSG/OctoPrint-Mobile/wik
 	- better handling reconnections
 	- fix fan slider disable condition
 	- fix reconnect when OctoPrint is not available
- - ver 1.9 (plugin) : added "home" marked on the navigation page, added optional "peep" terminal, added camara rotation (follows OctoPrint settings)
+ - ver 1.9 (plugin) : added "home" marker on the navigation page, added optional quick peek terminal, added camera rotation (follows OctoPrint settings)
  - ver 1.9.1 (plugin) : fix camera freeze on app switch, fix history log update
