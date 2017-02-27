@@ -79,7 +79,9 @@ $("#offset_btn").click(function() {
 });
 
 $("#camera_btn").click(function() {
-	start_camera();
+	if (currentPanel != "camera") {
+		start_camera();
+	}
 });
 
 
