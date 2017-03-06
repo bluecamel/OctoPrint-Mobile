@@ -225,7 +225,7 @@ function ActionModel(){
 		if (self.fan_slider_value() == 0) {
 			sendCommand( settings.printer.fan_off.split(",") );
 		} else {
-			sendCommand( settings.printer.fan_on.replace("%speed", Math.floor(255 * self.fan_slider_value()/100) ));
+			sendCommand( settings.printer.fan_on.replace("%speed", Math.floor(255 * self.fan_slider_value()/100) ).split(","));
 			self.fan_slider_value(0);
 		}
 	}
