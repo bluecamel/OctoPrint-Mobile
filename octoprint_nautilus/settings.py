@@ -28,9 +28,10 @@ def default(config):
 	config.set("printer", "; flow and feed sliders up and down adjustemnt limit %")
 	config.set("printer", "flow_adjustment_percentage", "10")
 	config.set("printer", "feed_adjustment_percentage", "25")
+	
 	config.set("printer", "; %tool will be replaced with the tool id (0 or 1) and %flow with the slider value")
 	config.set("printer", "flow_adjustment", "M221 T%tool S%flow, {{beep}}")
-	config.set("printer", "; %feed with the slider value")
+	config.set("printer", "; %feed will be replaced with the slider value")
 	config.set("printer", "feed_adjustment", "M220 S%feed, {{beep}}")
 	
 	config.set("printer", "; %tool will be replaced with the tool id (0 or 1) and %temp with the slider value")
