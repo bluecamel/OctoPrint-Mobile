@@ -378,6 +378,19 @@ body {
 	margin-left: -3vw !important;
 }
 
+#FR .slider-selection {
+	background: transparent;
+}
+
+#FR .slider-tick {
+	background: #f9f9f9;
+}
+
+.btn-block {
+  margin-left: 1.5vw;
+  padding: 1.8vh 1vw !important;
+}
+  
 .port, .nozzle, .zchange, .hotend, .desktop, .print_time_origin {
   text-align: right;
   font-size: 4vh;

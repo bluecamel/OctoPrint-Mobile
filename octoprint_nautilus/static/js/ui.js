@@ -27,6 +27,12 @@ function switchPanel(panel){
 		if (currentPanel == "camera") {
 			stop_camera(false); //stop streaming, but not imediate
 		} 
+
+		if (panel == "printer") {
+			if ( printer.printing() ) {
+				action.show_flow(true);
+			}
+		} 
 		currentPanel = panel;
 	}
 }
@@ -62,8 +68,22 @@ if (TERMINAL) {
 }
 
 $("#printer_btn").click(function() {
-	switchPanel("printer");
+	if ( currentPanel == "printer" ){
+		//reset all sliders to default values
+		action.extruder0_slider_value(0);
+		action.extruder1_slider_value(0);
+		action.bed_slider_value(0);
+
+		action.extruder0_flow_value(100);
+		action.extruder1_flow_value(100);
+		action.feed_rate_value(100);
+		
+		action.show_flow(!action.show_flow());
+	} else {
+		switchPanel("printer");
+	}
 });
+
 
 $("#movement_btn").click(function() {
 	if (printer.acceptsCommands()){
@@ -137,7 +157,31 @@ function createBedSliders(temp) {
 	$("#bed_slider").slider(options).on('change', function(val){action.bed_slider_value(val.value.newValue);});	
 }
 
+function generateFlowOptions(adjustment_percentage){
+	const min = 100 - adjustment_percentage;
+	const max = 100 + adjustment_percentage;
+	return {
+		id: "FR",
+		ticks: [min, 100, max], 
+		ticks_labels: [min, 100, max], 
+		ticks_positions: [0, 50, 100], 
+		min: min, 
+		max: max, 
+		step: 1,
+		tooltip: 'hide',
+		value: 100
+	}
+}
+
+function createFlowSliders(adjustment_percentage) {	
 	
+	$("#hotend0_flow").slider( generateFlowOptions(adjustment_percentage) ).on('change', function(val){action.extruder0_flow_value(val.value.newValue);});
+	$("#hotend1_flow").slider( generateFlowOptions(adjustment_percentage) ).on('change', function(val){action.extruder1_flow_value(val.value.newValue);});		
+}
+
+function createFeedSliders(adjustment_percentage) {	
+	$("#feed_slider").slider( generateFlowOptions(adjustment_percentage) ).on('change', function(val){action.feed_rate_value(val.value.newValue);});	
+}
 
 var touch_start;	
 function touch_ui(touch) {

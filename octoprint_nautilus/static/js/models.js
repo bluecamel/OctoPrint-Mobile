@@ -6,25 +6,60 @@ function ActionModel(){
 	self.extruder1_slider_value = ko.observable(0);
 	self.bed_slider_value = ko.observable(0);
 
+	self.show_flow = ko.observable(false);
+	
+	self.show_flow.subscribe(function(value){
+		if ( value ) {	
+			if ( printer.dual_extruder() ) {
+				$(".slider-row").css({"height": "15vh"});
+			} else {
+				$(".slider-row").css({"height": "20vh"});
+			}
+		} else {
+			if ( printer.dual_nozzle() ) {
+				$(".slider-row").css({"height": "15vh"});
+			} else {
+				$(".slider-row").css({"height": "20vh"});
+			}
+		}
+	});
+	
+		
+	self.extruder0_flow_value = ko.observable(100);
+	self.extruder1_flow_value = ko.observable(100);
+	self.feed_rate_value = ko.observable(100);
+	
 	self.config_extruder0_temp = ko.computed(function(){
 		if (self.extruder0_slider_value() == 0) {
 			$("#hotend0_slider").slider('setValue', 0);
 		}
-		return  settings.printer.nozzle_temperatures[self.extruder0_slider_value() - 1];
+		return settings.printer.nozzle_temperatures[self.extruder0_slider_value() - 1];
 	});
 
 	self.config_extruder1_temp = ko.computed(function(){
 		if (self.extruder1_slider_value() == 0) {
 			$("#hotend1_slider").slider('setValue', 0);
 		}
-		return  settings.printer.nozzle_temperatures[self.extruder1_slider_value() - 1];
+		return settings.printer.nozzle_temperatures[self.extruder1_slider_value() - 1];
 	});
 
 	self.config_bed_temp = ko.computed(function(){
 		if (self.bed_slider_value() == 0) {
 			$("#bed_slider").slider('setValue', 0);
 		}
-		return  settings.printer.bed_temperatures[self.bed_slider_value() - 1];
+		return settings.printer.bed_temperatures[self.bed_slider_value() - 1];
+	});
+
+	self.extruder0_flow_value.subscribe(function(value) {
+		$("#hotend0_flow").slider('setValue', value);
+	});
+	
+	self.extruder1_flow_value.subscribe(function(value) {
+		$("#hotend1_flow").slider('setValue', value);
+	});
+	
+	self.feed_rate_value.subscribe(function(value) {
+		$("#feed_slider").slider('setValue', value);
 	});
 
 	self.fan_slider_value = ko.observable(0);
@@ -193,6 +228,21 @@ function ActionModel(){
 			sendCommand( settings.printer.fan_on.replace("%speed", Math.floor(255 * self.fan_slider_value()/100) ));
 			self.fan_slider_value(0);
 		}
+	}
+	
+	self.sendFlow0 = function(){
+			sendCommand( settings.printer.flow_adjustment.replace("%tool", 0).replace("%flow", self.extruder0_flow_value()).split(",") );
+			self.extruder0_flow_value(100);
+	}
+
+	self.sendFlow1 = function(){
+			sendCommand( settings.printer.flow_adjustment.replace("%tool", 1).replace("%flow", self.extruder1_flow_value()).split(",") );
+			self.extruder1_flow_value(100);
+	}
+	
+	self.sendFeed = function(){
+			sendCommand( settings.printer.feed_adjustment.replace("%feed", self.feed_rate_value()).split(",") );
+			self.feed_rate_value(100);
 	}
 	
 	self.load_filament = function(){
@@ -471,7 +521,10 @@ function PrinterModel(){
 			action.extruder0_slider_value(0);
 			action.extruder1_slider_value(0);
 			action.bed_slider_value(0);
-			$("input.temp_slider").slider('disable');
+			
+			action.extruder0_flow_value(100);
+			action.extruder1_flow_value(100);
+			action.feed_rate_value(100);
 			
 			self.zchange("");
 			$(".status_bar").css({"height": "100vh", "line-height": "100vh"});
@@ -506,16 +559,21 @@ function PrinterModel(){
 		if (value) {
 			
 			$("input.temp_slider").slider('enable');
+			
 			if (! self.dual_nozzle() ) {
 				$("input.temp_slider_dual").slider('disable');
-				$(".slider-row").css({"height": "20vh"});
+				if ( ! action.show_flow() ) {
+					$(".slider-row").css({"height": "20vh"});
+				}
 			} else {
 				if (self.dual_nozzle()){
 					$("input.temp_slider_dual").slider('enable');
 				} else  {
 					$("input.temp_slider_dual").slider('disable');
 				}
-				$(".slider-row").css({"height": "15vh"});
+				if ( ! action.show_flow() ) {
+					$(".slider-row").css({"height": "15vh"});	
+				}				
 			}
 			$("#tool_select").bootstrapSwitch('disabled', false );
 
@@ -525,7 +583,7 @@ function PrinterModel(){
 			action.extruder0_slider_value(0);
 			action.extruder1_slider_value(0);
 			action.bed_slider_value(0);
-			
+						
 			$("input.temp_slider").slider('disable');
 
 			if (currentPanel == 'movement' || currentPanel == 'offset') switchPanel("status");
@@ -536,9 +594,19 @@ function PrinterModel(){
 		if (value) {
 			if (self.acceptsCommands()) { 
 				$("#tool_select").bootstrapSwitch('disabled', false);
+				$("input.flow_slider_dual").slider('enable');
+			} else {
+				$("input.flow_slider_dual").slider('disable');
 			}
+			if ( action.show_flow() ) {
+				$(".slider-row").css({"height": "15vh"});	
+			}			
 		} else {
 			$("#tool_select").bootstrapSwitch('disabled', true);
+			$("input.flow_slider_dual").slider('disable');
+			if ( action.show_flow() ) {
+				$(".slider-row").css({"height": "20vh"});
+			}
 		}
 	});
 
@@ -549,19 +617,28 @@ function PrinterModel(){
 			} else {
 				$("input.temp_slider_dual").slider('disable');
 			}
-			$(".slider-row").css({"height": "15vh"});
+			if ( ! action.show_flow() ) {
+				$(".slider-row").css({"height": "15vh"});
+			}
 		} else  {
 			$("input.temp_slider_dual").slider('disable');
-			$(".slider-row").css({"height": "20vh"});
+			if ( ! action.show_flow() ) {
+				$(".slider-row").css({"height": "20vh"});
+			}
 		}
 	});
 	
 	self.alwaysAcceptsCommands.subscribe(function(value) {
 		if (value) {
 			$("input.fan_slider").slider('enable');
+			$("input.flow_slider").slider('enable');
 		} else {
 			$("input.fan_slider").slider('disable');
+			$("input.flow_slider").slider('disable');
 			action.fan_slider_value(0);
+			action.extruder0_flow_value(100);
+			action.extruder1_flow_value(100);
+			action.feed_rate_value(100);
 		}
 	});
 	

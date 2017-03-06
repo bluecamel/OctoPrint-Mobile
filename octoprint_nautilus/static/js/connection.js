@@ -192,6 +192,10 @@ function getSettings(){
 		
 		createHotendSliders( settings.printer.nozzle_temperatures );
 		createBedSliders( settings.printer.bed_temperatures );
+		
+		createFlowSliders(parseInt(settings.printer.flow_adjustment_percentage));
+		createFeedSliders(parseInt(settings.printer.feed_adjustment_percentage));
+		
 	 	if (! printer.acceptsCommands() ){			
 			$("input.temp_slider").slider('disable');
 	 	}

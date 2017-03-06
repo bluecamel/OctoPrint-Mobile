@@ -112,7 +112,6 @@ function onBackground(){
 	if (home) {
 		touch_ui(false);
 		bootbox.hideAll();
-		clearCameraTimeout()
 		disconnect();
 	} else {
 		stop_camera(true); //stop camera immediately
