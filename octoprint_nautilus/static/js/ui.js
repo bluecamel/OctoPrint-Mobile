@@ -27,12 +27,6 @@ function switchPanel(panel){
 		if (currentPanel == "camera") {
 			stop_camera(false); //stop streaming, but not imediate
 		} 
-
-		if (panel == "printer") {
-			if ( printer.printing() ) {
-				action.show_flow(true);
-			}
-		} 
 		currentPanel = panel;
 	}
 }
