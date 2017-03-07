@@ -464,12 +464,14 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  width: 300vw;
+  width: 88vw;
   height: 100vh;
   margin-left: 12vw;
   padding: 0;
   display: none;
   border-radius: 0 !important;
+  overflow-y: hidden; 
+  overflow-x: hidden; 
 }
 
 #logs {
