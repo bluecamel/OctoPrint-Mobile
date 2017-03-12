@@ -63,28 +63,56 @@
 							{% endif %}
 						</div>
 						<div class="row printer_row_2">
-							<div class="row slider-row">
-								<div class="col-xs-8">
-									<input class="temp_slider" id="hotend0_slider" type="text"/>
+							<div  data-bind="visible: ! action.show_flow()">
+								<div class="row slider-row">
+									<div class="col-xs-8">
+										<input class="temp_slider" id="hotend0_slider" type="text"/>
+									</div>
+									<div class="col-xs-4">
+										<button type="button" class="btn btn-default btn-block" data-bind="enable: printer.acceptsCommands, click: sendExtruder0Temperature, style: { color: extruder0_slider_value() == 0  ? '#17b566' : '#ed2b36' }"><span data-bind="visible: printer.dual_nozzle()">left&nbsp;</span><span class="fa fa-lg fa-fire"></span><span data-bind="text: extruder0_slider_value() == 0  ? ' off': ' to ' + config_extruder0_temp()  + settings.printer.temperature_scale"></span></button>
+									</div>
 								</div>
-								<div class="col-xs-4">
-									<button type="button" class="btn btn-default" data-bind="enable: printer.acceptsCommands, click: sendExtruder0Temperature, style: { color: extruder0_slider_value() == 0  ? '#17b566' : '#ed2b36' }"><span data-bind="visible: printer.dual_nozzle()">left&nbsp;</span><span class="fa fa-lg fa-fire"></span><span data-bind="text: extruder0_slider_value() == 0  ? ' off': ' to ' + config_extruder0_temp()  + settings.printer.temperature_scale"></span></button>
+								<div class="row slider-row" data-bind="visible: printer.dual_nozzle()">
+									<div class="col-xs-8">
+										<input class="temp_slider temp_slider_dual" id="hotend1_slider" type="text"/>
+									</div>
+									<div class="col-xs-4">
+										<button type="button" class="btn btn-default btn-block" data-bind="enable: printer.acceptsCommands, click: sendExtruder1Temperature, style: { color: extruder1_slider_value() == 0  ? '#17b566' : '#ed2b36' }"><span>right&nbsp;</span><span class="fa fa-lg fa-fire"></span><span data-bind="text: extruder1_slider_value() == 0  ? ' off': ' to ' + config_extruder1_temp()  + settings.printer.temperature_scale"></span></button>
+									</div>
+								</div>
+								<div class="row  slider-row">
+									<div class="col-xs-8">
+										<input class="temp_slider temp_bed_slider" id="bed_slider" type="text" />
+									</div>
+									<div class="col-xs-4">
+										<button type="button" class="btn btn-default btn-block" data-bind="enable: printer.acceptsCommands, click: sendBedTemperature, style: { color: bed_slider_value() == 0  ? '#17b566' : '#ed2b36' }"><span></span><span class="fa fa-lg fa-bed"></span><span data-bind="text: bed_slider_value() == 0  ? ' off': ' to ' + config_bed_temp() + settings.printer.temperature_scale"></span></button>
+									</div>
 								</div>
 							</div>
-							<div class="row slider-row" data-bind="visible: printer.dual_nozzle()">
-								<div class="col-xs-8">
-									<input class="temp_slider temp_slider_dual" id="hotend1_slider" type="text"/>
+							<div  data-bind="visible: action.show_flow()">
+								<div class="row slider-row">
+									<div class="col-xs-8">
+										<input class="flow_slider" id="hotend0_flow" type="text"/>
+									</div>
+									<div class="col-xs-4">
+										<button type="button" class="btn btn-default btn-block" data-bind="enable: printer.alwaysAcceptsCommands, click:sendFlow0, style: { color: extruder0_flow_value() == 100  ? '#17b566' : extruder0_flow_value() > 100  ? '#ed2b36'  : '#337ab7' }"><span data-bind="visible: printer.dual_extruder()">left&nbsp;</span><span data-bind="text: 'flow rate ' + extruder0_flow_value() + '%'"></span><span data-bind="visible: printer.dual_nozzle()"></span></button>
+									</div>
 								</div>
-								<div class="col-xs-4">
-									<button type="button" class="btn btn-default" data-bind="enable: printer.dual_nozzle() && printer.acceptsCommands(), click: sendExtruder1Temperature, style: { color: extruder1_slider_value() == 0  ? '#17b566' : '#ed2b36' }"><span>right&nbsp;</span><span class="fa fa-lg fa-fire"></span><span data-bind="text: extruder1_slider_value() == 0  ? ' off': ' to ' + config_extruder1_temp()  + settings.printer.temperature_scale"></span></button>
+								<div class="row slider-row" data-bind="visible: printer.dual_extruder()">
+									<div class="col-xs-8">
+										<input class="flow_slider flow_slider_dual" id="hotend1_flow" type="text"/>
+									</div>
+									<div class="col-xs-4">
+										<button type="button" class="btn btn-default btn-block" data-bind="enable: printer.alwaysAcceptsCommands, click: sendFlow1, style: { color: extruder1_flow_value() == 100  ? '#17b566' : extruder1_flow_value() > 100  ? '#ed2b36'  : '#337ab7' }"><span>right flow rate&nbsp;</span><span data-bind="text: extruder1_flow_value() + '%'"></span></button>
+									</div>
 								</div>
-							</div>
-							<div class="row  slider-row">
-								<div class="col-xs-8">
-									<input class="temp_slider temp_bed_slider" id="bed_slider" type="text" />
-								</div>
-								<div class="col-xs-4">
-									<button type="button" class="btn btn-default" data-bind="enable: printer.acceptsCommands, click: sendBedTemperature, style: { color: bed_slider_value() == 0  ? '#17b566' : '#ed2b36' }"><span></span><span class="fa fa-lg fa-bed"></span><span data-bind="text: bed_slider_value() == 0  ? ' off': ' to ' + config_bed_temp() + settings.printer.temperature_scale"></span></button>
+								<div class="row  slider-row">
+									<div class="col-xs-8">
+										<input class="flow_slider" id="feed_slider" type="text" />
+									</div>
+									<div class="col-xs-4">
+										<button type="button" class="btn btn-default btn-block" data-bind="enable: printer.alwaysAcceptsCommands, click:sendFeed, style: { color: feed_rate_value() == 100  ? '#17b566' : feed_rate_value() > 100  ? '#ed2b36'  : '#337ab7' }"><span></span><span data-bind="text: 'feed rate ' + feed_rate_value()  + '%'"></span></button>
+									</div>
 								</div>
 							</div>
 							<div class="row slider-row">
@@ -92,7 +120,7 @@
 									<input class="fan_slider" type="text" data-bind="sliderValue: {value: fan_slider_value, ticks: [0, 25, 50, 75, 100], ticks_positions: [0, 25, 50, 75, 100],  ticks_labels: ['Off', '1/4', 'Half', '3/4', 'Full'], step:25, tooltip: 'hide'}"/>
 								</div>
 								<div class="col-xs-4">
-									<button type="button" class="btn btn-default" data-bind="enable: printer.alwaysAcceptsCommands, click: setFanSpeed, style: { color: fan_slider_value() == 0  ? '#17b566' : '#337ab7' }"><span></span><span class="fa fa-lg fa-asterisk"></span><span data-bind="text: fan_slider_value() == 0  ? ' off': ' to ' + fan_slider_value() + '%'"></span></button>
+									<button type="button" class="btn btn-default btn-block" data-bind="enable: printer.alwaysAcceptsCommands, click: setFanSpeed, style: { color: fan_slider_value() == 0  ? '#17b566' : '#337ab7' }"><span></span><span class="fa fa-lg fa-snowflake-o"></span><span data-bind="text: fan_slider_value() == 0  ? ' off': ' to ' + fan_slider_value() + '%'"></span></button>
 								</div>
 							</div>
 						</div>
