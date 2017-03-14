@@ -107,17 +107,14 @@ function sendCommandByName(name){
 //G or M codes
 function sendCommand(data, invert){
 	invert = typeof invert !== 'undefined' ? invert : false;
-	if (typeof data  === "string") {
-		if (invert) {
-			data = invertAxes(data);
+	if (invert) {
+		if (typeof data  === "string") {
+				data = invertAxes(data);
+		} else {
+			data = _.map(data, invertAxes);
 		}
-		command = {"command": data};
-	} else {
-		if (invert) {
-			data = _.map(data, invertAxes)
-		}
-		command = {"commands": data};
 	}
+	command = {"command": data};
 	$.ajax({
 		url:  BASE_URL+"api/printer/command",
 		method: "POST",
