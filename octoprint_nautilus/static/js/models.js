@@ -654,10 +654,10 @@ function PrinterModel(){
 	
 	self.zoom.subscribe(function(value){
 		if (value) {
-			touch_ui(true);
+			camera_setup(true);
 		} else {
 			if (document.documentElement.clientWidth == window.innerWidth || document.documentElement.scrollWidth == window.innerWidth) { //no "pinch zoom"
-				touch_ui(false);
+				camera_setup(false);
 			}
 		}
 	});

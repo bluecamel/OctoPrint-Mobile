@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta charset="utf-8">
-	<title>Nautilus</title>
+	<title>nautilus</title>
     
 	<link rel="shortcut icon" href="/{{nautilus_url}}/static/img/appicon.png">
     <link rel="apple-touch-icon" sizes="114x114" href="/{{ nautilus_url }}/static/img/apple-touch-icon-114x114.png">
@@ -320,6 +320,7 @@
 	var MOBILE_URL = BASE_URL+"{{ nautilus_url }}";
 	var SCREEN_WIDTH = window.innerWidth + "px";
 	var SCREEN_HEIGHT = window.innerHeight + "px";
+	var v1 = {{request.user_agent.string.startswith('Nautilus/1') | lower }};
 
 	var has_switch_plugin = ko.observable({{ (buttons == "switch_plugin") | lower}});
 	var has_power_buttons = ko.observable({{ (buttons == "custom_power") | lower}});
