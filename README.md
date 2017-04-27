@@ -65,3 +65,5 @@ So please, open a [Github issue](https://github.com/MoonshineSG/OctoPrint-Mobile
  - ver 1.9 (plugin) : added "home" marker on the navigation page, added optional quick peek terminal, added camera rotation (follows OctoPrint settings)
  - ver 1.9.1 (plugin) : fix camera freeze on app switch, fix history log update
  - ver 1.10 (plugin) : feed rate and flow rate adjustments 
+ - ver 1.11 (plugin) : prepare for iOS release 2
+ 
