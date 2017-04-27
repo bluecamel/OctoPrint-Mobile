@@ -1,4 +1,4 @@
-#Nautilus - mobile shell for OctoPrint
+# Nautilus - mobile shell for OctoPrint
 
 
 A simplified UI replacement for OctoPrint that has been optimised for iOS devices. 
@@ -7,22 +7,22 @@ The plugin requires at least ver 1.3 of OctoPrint and the companion Nautilus iOS
 
 [Read more...](https://github.com/MoonshineSG/OctoPrint-Mobile/wiki)
 
-##Setup
+## Setup
 
 See the [installation guide](https://github.com/MoonshineSG/OctoPrint-Mobile/wiki/Install)
 
-##Issues
+## Issues
 
 If you have problems with the plugin, don't write it in the Apple Appstore as a review. That, is a one way communication, and since I don't know who you are, I can't contact you. More often than not, information provided is not enough to solve the problem. 
 
 So please, open a [Github issue](https://github.com/MoonshineSG/OctoPrint-Mobile/issues/new).
 
-##Printing in progress
+## Printing in progress
 
 ![screenshot](https://moonshinesg.github.io/images/nautilus/printing.gif)
 
 
-##Updates
+## Updates
  
  - ver 1.2  (plugin & ios) : For security reasons (API_KEY sent in clear), access is only allowed via the iOS app
  - ver 1.2.1 (plugin) : OctoPrint improved estimations, so own estimations based on marlin firmware have been removed
