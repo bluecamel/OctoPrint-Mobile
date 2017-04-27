@@ -644,12 +644,6 @@ function PrinterModel(){
 	
 	self.cameraAction = function(){
 		self.zoom( !self.zoom() );
-		return;
-		if ( printer.printing() ) {
-			self.zoom( !self.zoom() );
-		} else {
-			if ( has_switch_plugin() ) buttons.toggleLights();
-		}
 	}
 	
 	self.zoom.subscribe(function(value){

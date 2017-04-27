@@ -316,14 +316,15 @@
 	<script type="text/javascript">
 	//"{{webcam}}"
 	var home = false;
-	var BASE_URL = location.protocol + '//' + location.host + "/";
-	var MOBILE_URL = BASE_URL+"{{ nautilus_url }}";
-	var SCREEN_WIDTH = window.innerWidth + "px";
-	var SCREEN_HEIGHT = window.innerHeight + "px";
-	var v1 = {{request.user_agent.string.startswith('Nautilus/1') | lower }};
+	const BASE_URL = location.protocol + '//' + location.host + "/";
+	const MOBILE_URL = BASE_URL+"{{ nautilus_url }}";
+	const SCREEN_WIDTH = window.innerWidth + "px";
+	const SCREEN_HEIGHT = window.innerHeight + "px";
+	const v1 = {{request.user_agent.string.startswith('Nautilus/1') | lower }};
+	const v2 = {{request.user_agent.string.startswith('Nautilus/2') | lower }};
 
-	var has_switch_plugin = ko.observable({{ (buttons == "switch_plugin") | lower}});
-	var has_power_buttons = ko.observable({{ (buttons == "custom_power") | lower}});
+	const has_switch_plugin = ko.observable({{ (buttons == "switch_plugin") | lower}});
+	const has_power_buttons = ko.observable({{ (buttons == "custom_power") | lower}});
 	
 	const WEBCAM_URL = {{"location.protocol + '//' + location.host + " if webcam[3][0] == "/"}}"{{webcam[3]}}";
 	

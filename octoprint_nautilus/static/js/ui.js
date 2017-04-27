@@ -237,6 +237,6 @@ function setup_camera_click() {
     // Re-add event handler for all matching elements
     $("#webcam").on("click", function() {
         printer.cameraAction();
-		return false;
+				return false;
     });
 }
