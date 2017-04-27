@@ -4,9 +4,7 @@ $(document).ready(function() {
 
 function load() {
 	if ( home ) {
-		// no scrolling
-		touch_ui(false);
-		
+		camera_setup(false);
 		
 		getConnectionStatus(function(data) {
 			printer.port(data.current.port);
@@ -20,10 +18,12 @@ function load() {
 		 printer.zoom(false);
 		 
 	} else {
-		// allow scrolling
-		document.ontouchmove = function(event){
-			return true;
-		};
+		if (v1) {
+			// allow scrolling
+			document.ontouchmove = function(event){
+				return true;
+			};
+		}
 		var vp = document.getElementById('vp');
 		vp.content = "width=device-width, maximum-scale=10,user-scalable=yes";
 		
@@ -110,7 +110,7 @@ function onForeground(){
 //called by ios app 
 function onBackground(){
 	if (home) {
-		touch_ui(false);
+		camera_setup(false);
 		bootbox.hideAll();
 		disconnect();
 	} else {

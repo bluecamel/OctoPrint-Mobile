@@ -177,49 +177,49 @@ function createFeedSliders(adjustment_percentage) {
 	$("#feed_slider").slider( generateFlowOptions(adjustment_percentage) ).on('change', function(val){action.feed_rate_value(val.value.newValue);});	
 }
 
-var touch_start;	
-function touch_ui(touch) {
-	if (touch){
-		document.ontouchmove = function(event){
-			return true;
-		};
+var touch_start;
+function camera_setup(fullscreen) {
+	if (fullscreen){
+		if (v1) {	
+				document.ontouchmove = function(event){
+					return true;
+				};
+		}	
 		var vp = document.getElementById('vp');
 		vp.content = "width=device-width, initial-scale=1, maximum-scale=3, user-scalable=yes";
 		
 		$("#main_view").append($("#camera_panel").remove());
 		$("#wrapper").hide();
 		$("#webcam").css({"height": "auto", "width": SCREEN_WIDTH});
-		
 	} else {
-		
-		document.ontouchstart = function(event) {
-			if ( $(event.target).hasClass("bootbox-body") ) {
-				touch_start = event.touches[0].clientY;
-			}
-		}
-
-		document.ontouchmove = function(event){
-			if ( $(event.target).hasClass("bootbox-body") ) {
-				var t = $(event.target);
-				if (touch_start > event.changedTouches[0].clientY) {
-					//scrool down
-					return t.scrollTop() < t.get(0).scrollHeight - t.get(0).offsetHeight;
-				} else {
-					//scrool up
-					if ( t.scrollTop() == 0 ) {
-						return false;
-					} else {
-						return true;
+		if (v1) {
+			document.ontouchstart = function(event) {
+					if ( $(event.target).hasClass("bootbox-body") ) {
+						touch_start = event.touches[0].clientY;
 					}
 				}
-			} else {
-				return false;
-			}
-		};
 
+			document.ontouchmove = function(event){
+				if ( $(event.target).hasClass("bootbox-body") ) {
+					var t = $(event.target);
+					if (touch_start > event.changedTouches[0].clientY) {
+						//scrool down
+						return t.scrollTop() < t.get(0).scrollHeight - t.get(0).offsetHeight;
+					} else {
+						//scrool up
+						if ( t.scrollTop() == 0 ) {
+							return false;
+						} else {
+							return true;
+						}
+					}
+				} else {
+					return false;
+				}
+			};
+		} //end v1
 		var vp = document.getElementById('vp');
 		vp.content = "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no";
-	
 		$("#webcam").css({"height": SCREEN_HEIGHT, "width": "100%"});
 		$("#main").append($("#camera_panel").remove());
 		$("#wrapper").show();
@@ -237,6 +237,6 @@ function setup_camera_click() {
     // Re-add event handler for all matching elements
     $("#webcam").on("click", function() {
         printer.cameraAction();
-		return false;
+				return false;
     });
 }

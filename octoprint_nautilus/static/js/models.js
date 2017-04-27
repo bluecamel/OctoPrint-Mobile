@@ -644,20 +644,14 @@ function PrinterModel(){
 	
 	self.cameraAction = function(){
 		self.zoom( !self.zoom() );
-		return;
-		if ( printer.printing() ) {
-			self.zoom( !self.zoom() );
-		} else {
-			if ( has_switch_plugin() ) buttons.toggleLights();
-		}
 	}
 	
 	self.zoom.subscribe(function(value){
 		if (value) {
-			touch_ui(true);
+			camera_setup(true);
 		} else {
 			if (document.documentElement.clientWidth == window.innerWidth || document.documentElement.scrollWidth == window.innerWidth) { //no "pinch zoom"
-				touch_ui(false);
+				camera_setup(false);
 			}
 		}
 	});
