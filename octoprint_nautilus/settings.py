@@ -25,10 +25,13 @@ def default(config):
 	config.set("printer", "nozzle_temperatures", "100, 160, 180, 200, 210, 230, 250")
 	config.set("printer", "bed_temperatures", "60, 70, 80, 90, 100, 110, 120")
 
+	config.set("printer", "; mirrored tool (yes/no): no = left T0, right T1")
+	config.set("printer", "mirrored_tool", "no")
+	
 	config.set("printer", "; flow and feed sliders up and down adjustemnt limit %")
 	config.set("printer", "flow_adjustment_percentage", "10")
 	config.set("printer", "feed_adjustment_percentage", "25")
-	
+
 	config.set("printer", "; %tool will be replaced with the tool id (0 or 1) and %flow with the slider value")
 	config.set("printer", "flow_adjustment", "M221 T%tool S%flow, {{beep}}")
 	config.set("printer", "; %feed will be replaced with the slider value")

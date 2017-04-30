@@ -113,9 +113,9 @@ $("#tool_select").bootstrapSwitch({
 
 		onSwitchChange: function(event, state){
 			if(state){
-				sendCommand('T0');
+				sendCommand('T'+action.getLeftTool() );
 			} else {
-				sendCommand('T1');
+				sendCommand('T'+action.getRightTool() );
 			}
 		}
 	});

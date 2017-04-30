@@ -158,7 +158,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		self.on_after_startup()
 			
 	def get_settings_version(self):
-		return 6
+		return 7
 
 	def on_settings_migrate(self, target, current):
 		#settings.ini version
