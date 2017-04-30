@@ -191,11 +191,27 @@ function ActionModel(){
 		sendCommand("G1 "+data);
 	}
 	
+	self.getLeftTool = function(){
+			if (settings.printer.mirrored_tool == "yes") {
+				return "1";
+			} else {
+				return "0";
+			}
+	}
+
+	self.getRightTool = function(){
+			if (settings.printer.mirrored_tool == "yes") {
+				return "0";
+			} else {
+				return "1";
+			}
+	}
+	
 	self.sendExtruder0Temperature = function(){
 		if (self.extruder0_slider_value() == 0) {
-			sendCommand( settings.printer.nozzle_heater_off.replace("%tool", 0).split(",") );
+			sendCommand( settings.printer.nozzle_heater_off.replace("%tool", self.getLeftTool() ).split(",") );
 		} else {
-			sendCommand( settings.printer.nozzle_heater_on.replace("%tool", 0).replace("%temp", self.config_extruder0_temp()).split(",") );
+			sendCommand( settings.printer.nozzle_heater_on.replace("%tool", self.getLeftTool() ).replace("%temp", self.config_extruder0_temp()).split(",") );
 			self.extruder0_slider_value(0);
 			switchPanel("status");
 		}
@@ -203,9 +219,9 @@ function ActionModel(){
 
 	self.sendExtruder1Temperature = function(){
 		if (self.extruder1_slider_value() == 0) {
-			sendCommand( settings.printer.nozzle_heater_off.replace("%tool", 1).split(",") );
+			sendCommand( settings.printer.nozzle_heater_off.replace("%tool", self.getRightTool() ).split(",") );
 		} else {
-			sendCommand( settings.printer.nozzle_heater_on.replace("%tool", 1).replace("%temp", self.config_extruder1_temp()).split(",") );
+			sendCommand( settings.printer.nozzle_heater_on.replace("%tool", self.getRightTool() ).replace("%temp", self.config_extruder1_temp()).split(",") );
 			self.extruder1_slider_value(0);
 			switchPanel("status");
 		}
@@ -231,12 +247,12 @@ function ActionModel(){
 	}
 	
 	self.sendFlow0 = function(){
-			sendCommand( settings.printer.flow_adjustment.replace("%tool", 0).replace("%flow", self.extruder0_flow_value()).split(",") );
+			sendCommand( settings.printer.flow_adjustment.replace("%tool", self.getLeftTool() ).replace("%flow", self.extruder0_flow_value()).split(",") );
 			self.extruder0_flow_value(100);
 	}
 
 	self.sendFlow1 = function(){
-			sendCommand( settings.printer.flow_adjustment.replace("%tool", 1).replace("%flow", self.extruder1_flow_value()).split(",") );
+			sendCommand( settings.printer.flow_adjustment.replace("%tool", self.getRightTool()).replace("%flow", self.extruder1_flow_value()).split(",") );
 			self.extruder1_flow_value(100);
 	}
 	
