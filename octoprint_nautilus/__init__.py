@@ -16,9 +16,14 @@ from octoprint_nautilus import settings
 from jinja2 import Template
 from StringIO import StringIO
 import collections
+import json
 
 from struct import unpack
 from socket import AF_INET
+
+from httplib import HTTPSConnection
+from urllib import urlencode
+import ssl
 
 import sys
 if sys.platform == "win32":
@@ -27,6 +32,26 @@ if sys.platform == "win32":
 from socket import inet_pton
 
 home_folder = os.path.expanduser("~")
+
+intervals = (
+	('weeks', 604800),  # 60 * 60 * 24 * 7
+	('days', 86400),	# 60 * 60 * 24
+	('hours', 3600),	# 60 * 60
+	('minutes', 60),
+	('seconds', 1),
+	)
+
+def display_time(seconds, granularity=2):
+	result = []
+
+	for name, count in intervals:
+		value = seconds // count
+		if value:
+			seconds -= value * count
+			if value == 1:
+				name = name.rstrip('s')
+			result.append("{} {}".format(int(value), name))
+	return ' and '.join(result[:granularity])
 
 def is_external(ip):
 	f = unpack('!I',inet_pton(AF_INET,ip))[0]
@@ -55,6 +80,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		self.zchange = ""
 		self.tool = 0
 		self.show_M117 = True
+		self.registered_devices = dict()
 		self._logger.info("Nautilus - OctoPrint mobile shell, started.")
 
 	def on_after_startup(self):	
@@ -75,6 +101,8 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			self.show_M117 = False
 			self._logger.info( "M117 message will be ignored (Detailed Progress plugin)...")
 	
+		self.registered_devices = self._settings.get(["registered_devices"])
+		
 	def read_profile(self):
 		#hotend info from profile
 		self.extruders = self._printer_profile_manager.get_current_or_default().get('extruder').get('count')
@@ -127,7 +155,8 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			external_only_webcam = True,
 			ignore_M117 = False,
 			debug = False,
-			terminal = False
+			terminal = False,
+			registered_devices = dict()
 		)
 
 	def on_settings_load(self):
@@ -270,6 +299,17 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		self._printer.unselect_file()
 		return "OK"
 	
+	@octoprint.plugin.BlueprintPlugin.route("/register", methods=["POST"])
+	def register_device(self):
+		data = json.loads(request.data)
+		self._logger.debug("Registering device with token ["+ str(data) +"]")
+		
+		self.registered_devices[data["token"]] = ( data["name"], data["id"] )
+		self._settings.set(["registered_devices"], self.registered_devices)
+		self._settings.save()
+		
+		return "OK"
+	
 	@octoprint.plugin.BlueprintPlugin.route("/settings/", methods=["GET"])
 	@octoprint.plugin.BlueprintPlugin.route("/settings/<identifier>", methods=["GET"])
 	def get_config(self, identifier = "preview"):
@@ -280,7 +320,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		
 		md5 = hashlib.md5(ini_as_text).hexdigest()
 		
-		#self._logger.debug("gcode version: remote ["  +identifier +"] vs local ["+md5+"] ...")
+		self._logger.debug("gcode version: remote ["  +identifier +"] vs local ["+md5+"] ...")
 		if identifier == md5:
 			return jsonify(update=False)
 
@@ -354,9 +394,63 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		if event == Events.CONNECTED:
 			self.read_profile()
 			self._plugin_manager.send_plugin_message(self._identifier, dict(zchange = self.zchange, port=self._printer.get_current_connection()[1], tool = self.tool, nozzles = self.nozzles, nozzle_size = self.nozzle_size, extruders = self.extruders, nozzle_name = self.nozzle_name))
-		if event == Events.CLIENT_OPENED:
+		elif event == Events.CLIENT_OPENED:
 			self.read_profile()
 			self._plugin_manager.send_plugin_message(self._identifier, dict(zchange = self.zchange, port=self._printer.get_current_connection()[1], tool = self.tool, nozzles = self.nozzles, nozzle_size = self.nozzle_size, extruders = self.extruders, nozzle_name = self.nozzle_name))
+
+		elif event == Events.PRINT_DONE:
+			self.notify_done( payload.get("name"), display_time(payload.get("time")) )
+			
+		elif event == Events.PRINT_PAUSED:
+			self.notify_pause()
+
+		elif event == Events.PRINT_FAILED:
+			try:
+				self.notify_failed(payload.get("name"))
+			except:
+				self.notify_failed(None)
+
+		elif event == Events.ERROR:
+			self.notify_error(payload.get("error"))
+
+	
+	def notify_done(self, job, duration):
+		self.notify(Events.PRINT_DONE, "Finished printing \"{0}\" printed in {1}.".format(job, duration) )
+
+	def notify_pause(self):
+		self.notify(Events.PRINT_PAUSED, "Paused.")
+
+	def notify_failed(self, job):
+		if job:
+			self.notify(Events.PRINT_FAILED, "Failed to complete printing of \"{0}\".".format(job) )
+		else:
+			self.notify(Events.PRINT_FAILED, "Failed to complete printing.") 
+
+	def notify_error(self, reason):
+		self.notify(Events.PRINT_FAILED, reason)
+	
+	def notify(self, notification, message):
+		try:
+			data = []
+			for device, printer in self.registered_devices.iteritems():
+				data.append(json.dumps(
+				{
+					'device': device,
+					'id':printer[1],
+					'printer': printer[0].encode('utf8'), 
+					'message': message.encode('utf8'),
+					'type': notification
+				}))
+			if data:
+				params = {'notifications[]': data}
+				http_handler = HTTPSConnection("sandbox.api.nautilus4ios.com", context=ssl._create_unverified_context())
+				headers = { 'User-Agent': "nautilus/v%s"%self._plugin_version }
+				headers['Content-type'] = "application/x-www-form-urlencoded"
+				http_handler.request("POST", "/", urlencode(params, True), headers)
+				resp = http_handler.getresponse()
+				self._logger.debug(resp.read())
+		except Exception as e:
+			self._logger.warning(e) 
 	
 	##plugin auto update
 	def get_version(self):
