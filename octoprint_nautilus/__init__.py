@@ -80,7 +80,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		self.zchange = ""
 		self.tool = 0
 		self.show_M117 = True
-		self.registered_devices = dict()
+		self.read_devices()
 		self._logger.info("Nautilus - OctoPrint mobile shell, started.")
 
 	def on_after_startup(self):	
@@ -100,8 +100,16 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		if self._plugin_manager.get_plugin("detailedprogress"):
 			self.show_M117 = False
 			self._logger.info( "M117 message will be ignored (Detailed Progress plugin)...")
-	
-		self.registered_devices = self._settings.get(["registered_devices"])
+		
+	def read_devices(self):
+		try:
+			self.registered_devices = json.load(open(os.path.join(self.get_plugin_data_folder(), "registered_devices.json")))
+		except:
+			self.registered_devices = dict()
+		self._logger.info("%s device(s) will receive notifications..."%len( self.registered_devices) )
+			
+	def save_devices(self):
+		json.dump(self.registered_devices, open(os.path.join(self.get_plugin_data_folder(), "registered_devices.json"),'w'))
 		
 	def read_profile(self):
 		#hotend info from profile
@@ -302,11 +310,11 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 	@octoprint.plugin.BlueprintPlugin.route("/register", methods=["POST"])
 	def register_device(self):
 		data = json.loads(request.data)
-		self._logger.debug("Registering device with token ["+ str(data) +"]")
+		if self.registered_devices.get( data["token"], "Unknown" )  == "Unknown":
+			self._logger.info("Registering device with token ["+ data["token"] +"]")
 		
 		self.registered_devices[data["token"]] = ( data["name"], data["id"] )
-		self._settings.set(["registered_devices"], self.registered_devices)
-		self._settings.save()
+		self.save_devices()
 		
 		return "OK"
 	
@@ -432,6 +440,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 	def notify(self, notification, message):
 		try:
 			data = []
+			self._logger.info(">>>> Sending notification type [%s] to %s device(s)"%(notification, len( self.registered_devices )))
 			for device, printer in self.registered_devices.iteritems():
 				data.append(json.dumps(
 				{
@@ -443,12 +452,22 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 				}))
 			if data:
 				params = {'notifications[]': data}
-				http_handler = HTTPSConnection("sandbox.api.nautilus4ios.com", context=ssl._create_unverified_context())
+				http_handler = HTTPSConnection("notify.nautilus4ios.com")
 				headers = { 'User-Agent': "nautilus/v%s"%self._plugin_version }
 				headers['Content-type'] = "application/x-www-form-urlencoded"
 				http_handler.request("POST", "/", urlencode(params, True), headers)
 				resp = http_handler.getresponse()
-				self._logger.debug(resp.read())
+				result = resp.read()
+				self._logger.debug(result)
+				if resp.status == 200:
+					for r in json.loads(result):
+						if r["result"] == "Unregister":
+							self._logger.warning(">>>> Device [%s] no longer registered. Removing."%r["id"])
+							del self.registered_devices[ r["id"] ]
+							
+					self.save_devices()
+		
+				
 		except Exception as e:
 			self._logger.warning(e) 
 	
