@@ -321,7 +321,6 @@
 	const SCREEN_WIDTH = window.innerWidth + "px";
 	const SCREEN_HEIGHT = window.innerHeight + "px";
 	const v1 = {{request.user_agent.string.startswith('Nautilus/1') | lower }};
-	const v2 = {{request.user_agent.string.startswith('Nautilus/2') | lower }};
 
 	const has_switch_plugin = ko.observable({{ (buttons == "switch_plugin") | lower}});
 	const has_power_buttons = ko.observable({{ (buttons == "custom_power") | lower}});
