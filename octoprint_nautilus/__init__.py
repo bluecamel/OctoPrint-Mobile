@@ -423,19 +423,19 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 
 	
 	def notify_done(self, job, duration):
-		self.notify(Events.PRINT_DONE, "Finished printing \"{0}\" printed in {1}.".format(job, duration) )
+		self.notify("info", "Finished printing \"{0}\" printed in {1}.".format(job, duration))
 
 	def notify_pause(self):
-		self.notify(Events.PRINT_PAUSED, "Paused.")
+		self.notify("warning", "Paused.")
 
 	def notify_failed(self, job):
 		if job:
-			self.notify(Events.PRINT_FAILED, "Failed to complete printing of \"{0}\".".format(job) )
+			self.notify("error", "Failed to complete printing of \"{0}\".".format(job))
 		else:
-			self.notify(Events.PRINT_FAILED, "Failed to complete printing.") 
+			self.notify("error", "Failed to complete printing.") 
 
 	def notify_error(self, reason):
-		self.notify(Events.PRINT_FAILED, reason)
+		self.notify("error", reason)
 	
 	def notify(self, notification, message):
 		try:
