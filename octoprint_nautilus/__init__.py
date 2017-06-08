@@ -16,9 +16,14 @@ from octoprint_nautilus import settings
 from jinja2 import Template
 from StringIO import StringIO
 import collections
+import json
 
 from struct import unpack
 from socket import AF_INET
+
+from httplib import HTTPSConnection
+from urllib import urlencode
+import ssl
 
 import sys
 if sys.platform == "win32":
@@ -27,6 +32,26 @@ if sys.platform == "win32":
 from socket import inet_pton
 
 home_folder = os.path.expanduser("~")
+
+intervals = (
+	('weeks', 604800),  # 60 * 60 * 24 * 7
+	('days', 86400),	# 60 * 60 * 24
+	('hours', 3600),	# 60 * 60
+	('minutes', 60),
+	('seconds', 1),
+	)
+
+def display_time(seconds, granularity=2):
+	result = []
+
+	for name, count in intervals:
+		value = seconds // count
+		if value:
+			seconds -= value * count
+			if value == 1:
+				name = name.rstrip('s')
+			result.append("{} {}".format(int(value), name))
+	return ' and '.join(result[:granularity])
 
 def is_external(ip):
 	f = unpack('!I',inet_pton(AF_INET,ip))[0]
@@ -43,11 +68,14 @@ def is_external(ip):
 
 class NautilusPlugin(octoprint.plugin.UiPlugin,
 			octoprint.plugin.TemplatePlugin,
+			octoprint.plugin.AssetPlugin,
 			octoprint.plugin.BlueprintPlugin,
 			octoprint.plugin.EventHandlerPlugin,
 			octoprint.plugin.SettingsPlugin,
 			octoprint.plugin.StartupPlugin):
 
+	NOTIFICATION_SERVER = "notify.nautilus4ios.com"
+	
   ##octoprint.plugin.core.Plugin
 	def initialize(self):
 		#remember this values to send it when we reconnect
@@ -55,6 +83,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		self.zchange = ""
 		self.tool = 0
 		self.show_M117 = True
+		self.read_devices()
 		self._logger.info("Nautilus - OctoPrint mobile shell, started.")
 
 	def on_after_startup(self):	
@@ -74,7 +103,17 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		if self._plugin_manager.get_plugin("detailedprogress"):
 			self.show_M117 = False
 			self._logger.info( "M117 message will be ignored (Detailed Progress plugin)...")
-	
+		
+	def read_devices(self):
+		try:
+			self.registered_devices = json.load(open(os.path.join(self.get_plugin_data_folder(), "registered_devices.json")))
+		except:
+			self.registered_devices = dict()
+		self._logger.info("%s device(s) will receive notifications..."%len( self.registered_devices) )
+			
+	def save_devices(self):
+		json.dump(self.registered_devices, open(os.path.join(self.get_plugin_data_folder(), "registered_devices.json"),'w'))
+		
 	def read_profile(self):
 		#hotend info from profile
 		self.extruders = self._printer_profile_manager.get_current_or_default().get('extruder').get('count')
@@ -114,9 +153,14 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			self._logger.debug( "Can't read the hotend config file. Default values used.")
 		
 	##octoprint.plugin.TemplatePlugin
+	def get_assets(self):
+		return dict(
+			js=["js/nautilus_settings.js"]
+		)
+	
 	def get_template_configs(self):
 		return [
-			dict(type="settings", template="nautilus_settings.jinja2", custom_bindings=False)
+			dict(type="settings", template="nautilus_settings.jinja2", custom_bindings=True)
 		]
 	
 	##octoprint.plugin.SettingsPlugin
@@ -127,7 +171,8 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			external_only_webcam = True,
 			ignore_M117 = False,
 			debug = False,
-			terminal = False
+			terminal = False,
+			registered_devices = dict()
 		)
 
 	def on_settings_load(self):
@@ -270,17 +315,61 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		self._printer.unselect_file()
 		return "OK"
 	
-	@octoprint.plugin.BlueprintPlugin.route("/settings/", methods=["GET"])
+	@octoprint.plugin.BlueprintPlugin.route("/register", methods=["POST"])
+	def register_device(self):
+		data = json.loads(request.data)
+		if self.registered_devices.get( data["token"], "Unknown" )  == "Unknown":
+			self._logger.info("Registering device with token ["+ data["token"] +"]")
+		
+		self.registered_devices[data["token"]] = ( data["name"], data["id"] )
+		self.save_devices()
+		
+		return "OK"
+	
+	@octoprint.plugin.BlueprintPlugin.route("/notify/<identifier>", methods=["GET"])
+	def test_notification(self, identifier):
+		if self.notify(identifier, "This is a '%s' notification test message."%identifier):
+			return "1"
+		return "0"
+		
+	@octoprint.plugin.BlueprintPlugin.route("/check_notification_server", methods=["GET"])
+	def check_notification_server(self):
+		http_handler = HTTPSConnection(self.NOTIFICATION_SERVER)
+		headers = { 'User-Agent': "nautilus/v%s"%self._plugin_version }
+		http_handler.request("GET", "/status/", None, headers)
+		resp = http_handler.getresponse()
+		result = resp.read()
+		self._logger.debug(result)
+		if resp.status == 200:
+			if result == "1":
+				if bool(self.registered_devices):
+					return "2"
+				else:
+					return "1"
+			else:
+				return "0"
+		else:
+			return "-1"
+	
+	@octoprint.plugin.BlueprintPlugin.route("/test_settings", methods=["POST"])
+	def test_settings(self):
+		data = request.form['data']
+		self._logger.debug(data)
+		return self.get_config("preview", data)
+		
 	@octoprint.plugin.BlueprintPlugin.route("/settings/<identifier>", methods=["GET"])
-	def get_config(self, identifier = "preview"):
+	def get_config(self, identifier = "preview", data = None):
+		md5 = None
 		
-		inifile = os.path.join(self.get_plugin_data_folder(), "settings.ini")
-		with open(inifile) as foo:
-			ini_as_text = foo.read()
+		if identifier != "preview":
+			inifile = os.path.join(self.get_plugin_data_folder(), "settings.ini")
+			with open(inifile) as foo:
+				ini_as_text = foo.read()
 		
-		md5 = hashlib.md5(ini_as_text).hexdigest()
+			md5 = hashlib.md5(ini_as_text).hexdigest()
 		
-		#self._logger.debug("gcode version: remote ["  +identifier +"] vs local ["+md5+"] ...")
+			self._logger.debug("gcode version: remote ["  +identifier +"] vs local ["+md5+"] ...")
+
 		if identifier == md5:
 			return jsonify(update=False)
 
@@ -289,8 +378,12 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			retval = {}
 			
 			config = ConfigParser.ConfigParser()
-			config.readfp(StringIO(ini_as_text))
-		
+			
+			if data:
+				config.readfp(StringIO(data))
+			else:
+				config.readfp(StringIO(ini_as_text))
+				
 			try:
 				profile  = dict([a, int(x) if x.isdigit() else x] for a, x in config.items("profile"))
 			except:
@@ -354,10 +447,76 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		if event == Events.CONNECTED:
 			self.read_profile()
 			self._plugin_manager.send_plugin_message(self._identifier, dict(zchange = self.zchange, port=self._printer.get_current_connection()[1], tool = self.tool, nozzles = self.nozzles, nozzle_size = self.nozzle_size, extruders = self.extruders, nozzle_name = self.nozzle_name))
-		if event == Events.CLIENT_OPENED:
+		elif event == Events.CLIENT_OPENED:
 			self.read_profile()
 			self._plugin_manager.send_plugin_message(self._identifier, dict(zchange = self.zchange, port=self._printer.get_current_connection()[1], tool = self.tool, nozzles = self.nozzles, nozzle_size = self.nozzle_size, extruders = self.extruders, nozzle_name = self.nozzle_name))
+
+		elif event == Events.PRINT_DONE:
+			self.notify_done( payload.get("name"), display_time(payload.get("time")) )
+			
+		elif event == Events.PRINT_PAUSED:
+			self.notify_pause()
+
+		elif event == Events.PRINT_FAILED:
+			try:
+				self.notify_failed(payload.get("name"))
+			except:
+				self.notify_failed(None)
+
+		elif event == Events.ERROR:
+			self.notify_error(payload.get("error"))
+
 	
+	def notify_done(self, job, duration):
+		self.notify("info", "Finished printing \"{0}\" printed in {1}.".format(job, duration))
+
+	def notify_pause(self):
+		self.notify("warning", "Paused.")
+
+	def notify_failed(self, job):
+		if job:
+			self.notify("error", "Failed to complete printing of \"{0}\".".format(job))
+		else:
+			self.notify("error", "Failed to complete printing.") 
+
+	def notify_error(self, reason):
+		self.notify("error", reason)
+	
+	def notify(self, notification, message):
+		try:
+			data = []
+			self._logger.info(">>>> Sending notification type [%s] to %s device(s)"%(notification, len( self.registered_devices )))
+			for device, printer in self.registered_devices.iteritems():
+				data.append(json.dumps(
+				{
+					'device': device,
+					'id':printer[1],
+					'printer': printer[0].encode('utf8'), 
+					'message': message.encode('utf8'),
+					'type': notification
+				}))
+			if data:
+				params = {'notifications[]': data}
+				http_handler = HTTPSConnection(self.NOTIFICATION_SERVER)
+				headers = { 'User-Agent': "nautilus/v%s"%self._plugin_version }
+				headers['Content-type'] = "application/x-www-form-urlencoded"
+				http_handler.request("POST", "/", urlencode(params, True), headers)
+				resp = http_handler.getresponse()
+				result = resp.read()
+				self._logger.debug(result)
+				if resp.status == 200:
+					for r in json.loads(result):
+						if r["result"] == "Unregister":
+							self._logger.warning(">>>> Device [%s] no longer registered. Removing."%r["id"])
+							del self.registered_devices[ r["id"] ]
+							
+					self.save_devices()
+					return True
+				
+		except Exception as e:
+			self._logger.warning(e) 
+
+		
 	##plugin auto update
 	def get_version(self):
 		return self._plugin_version

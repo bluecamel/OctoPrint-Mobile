@@ -67,3 +67,4 @@ So please, open a [Github issue](https://github.com/MoonshineSG/OctoPrint-Mobile
  - ver 1.10 (plugin) : feed rate and flow rate adjustments 
  - ver 1.11 (plugin) : prepare for iOS release 2
  - ver 1.12 (plugin) : support mirrored tool (see https://github.com/MoonshineSG/OctoPrint-Mobile/issues/41)
+ - ver 1.13 (plugin) / 2.1 (ios) : events notifcations

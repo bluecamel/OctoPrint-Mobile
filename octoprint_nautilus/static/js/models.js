@@ -165,6 +165,12 @@ function ActionModel(){
 		});
 	}
 
+	self.loadLastPrintedFile = function(){
+		getGcodeFiles(function(result){
+			//console.log(_.last(_.sortBy(result.files, ""prints.last.date"")).name);
+			sendLoadFile(_.last(_.sortBy(result.files, "prints.last.date")).name);
+		});
+	}
 	self.showInfo = function(){
 		var data = printer.fileInfo();
 		var message = "Material : " + data.material +"<br/>Hotend : " + data.hotend +"<br/>Nozzle : " + data.nozzle +" mm<br/>Layer height : " +data.layer+" mm<br/>Extrusion width : " +data.width+" mm<br/>Speed : " + data.speed +" mm/min"
