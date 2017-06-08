@@ -349,7 +349,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			else:
 				return "0"
 		else:
-			return -1
+			return "-1"
 	
 	@octoprint.plugin.BlueprintPlugin.route("/test_settings", methods=["POST"])
 	def test_settings(self):
