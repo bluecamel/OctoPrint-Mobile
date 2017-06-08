@@ -9,7 +9,7 @@
           <span>Notification server status&nbsp;</span>
           <span data-bind="visible: notify() == '-1'" style="color:#cc0d0d">not available. Connection problem ?</span>
           <span class="icon-circle" data-bind="visible: notify() == '0'" style="color:#cc0d0d">&nbsp;</span>
-          <span class="icon-circle" data-bind="visible: notify() == '1'" style="color:#28dc0b">&nbsp;</span> 
+          <span class="icon-circle" data-bind="visible: notify() == '1' || notify() == '2'  " style="color:#28dc0b">&nbsp;</span> 
           <br/>
       </div>
       
@@ -39,9 +39,9 @@
     <div class="control-group">
       <form class="form-horizontal">
           <span>  Send test notification type: </span>
-          <button data-bind="enable: notify() == '1' && notify_info(), click: send_notification.bind($data, 'info')">Info</button>
-          <button data-bind="enable: notify() == '1' && notify_warning(), click: send_notification.bind($data, 'warning')">Warning</button>
-          <button data-bind="enable: notify() == '1' && notify_error(), click: send_notification.bind($data, 'error')">Error</button>
+          <button data-bind="enable: notify() == '2' && notify_info(), click: send_notification.bind($data, 'info')">Info</button>
+          <button data-bind="enable: notify() == '2' && notify_warning(), click: send_notification.bind($data, 'warning')">Warning</button>
+          <button data-bind="enable: notify() == '2' && notify_error(), click: send_notification.bind($data, 'error')">Error</button>
           
       </form>
     </div>

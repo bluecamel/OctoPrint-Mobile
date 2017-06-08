@@ -341,7 +341,13 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		result = resp.read()
 		self._logger.debug(result)
 		if resp.status == 200:
-			return result
+			if result == "1":
+				if bool(self.registered_devices):
+					return "2"
+				else:
+					return "1"
+			else:
+				return "0"
 		else:
 			return -1
 	

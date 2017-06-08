@@ -39,7 +39,8 @@ $(function() {
 				self.show_results(false);
 				OctoPrint.get("plugin/nautilus/check_notification_server").done(function(result){
 					self.notify(result);
-					if (self.notify() == "1") console.log("Notification server is available.");
+					if (self.notify() == "2") console.log("Notification server is available.");
+					if (self.notify() == "1") console.log("Notification server is available. But no devices are registered.");
 					if (self.notify() == "0") console.log("Notification server is not available.");
 					if (self.notify() == "-1") console.log("Notification server not available. Connection problem ?");
 				});
