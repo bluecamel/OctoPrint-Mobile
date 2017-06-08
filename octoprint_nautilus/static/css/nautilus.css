@@ -372,8 +372,8 @@ body {
 }
  
 .slider-tick-label {
-  font-size: 4vh;
-  line-height: 5vh;
+  font-size: 3.5vh;
+  line-height: 1vh;
 	width: 6vw !important;
 	margin-left: -3vw !important;
 }

@@ -83,7 +83,7 @@ function getFileInfo(filename){
 
 function getGcodeFiles(callback){
 		$.ajax({
-			url:  BASE_URL+"api/files",
+			url:  BASE_URL+"api/files?recursive=true",
 			method: "GET",
 		}).done(function(data){if (typeof callback === "function") callback(data);});
 }

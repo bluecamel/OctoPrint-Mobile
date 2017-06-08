@@ -125,7 +125,8 @@
 							</div>
 						</div>
 						<div class="row printer_row_3">
-							<button type="button" class="btn btn-success" data-bind="enable:printer.ready, visible: !printer.isFileLoaded(), click: loadLatestFile"><span class="fa fa-lg fa-file-text"></span> Load latest file</button>
+							<button type="button" class="btn btn-success" data-bind="enable:printer.ready, visible: !printer.isFileLoaded(), click: loadLatestFile"><span class="fa fa-file-o"></span> Last uploaded file</button>
+							<button type="button" class="btn btn-success" data-bind="enable:printer.ready, visible: !printer.isFileLoaded(), click: loadLastPrintedFile"><span class="fa fa-file-text-o"></span> Last printed file</button>
 							<button type="button" class="btn btn-link" data-bind="click:deselectFile, visible: printer.isFileLoaded()"><span class="fa fa-lg fa-file-text"></span>&nbsp;<span data-bind="text: printer.fileToPrint"><span></button>
 							<button type="button" class="btn btn-link" data-bind="click:showInfo, visible: printer.fileInfo() != null"><span class="fa fa-lg fa-info-circle info-file"></span></button>
 						</div>

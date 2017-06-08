@@ -68,11 +68,14 @@ def is_external(ip):
 
 class NautilusPlugin(octoprint.plugin.UiPlugin,
 			octoprint.plugin.TemplatePlugin,
+			octoprint.plugin.AssetPlugin,
 			octoprint.plugin.BlueprintPlugin,
 			octoprint.plugin.EventHandlerPlugin,
 			octoprint.plugin.SettingsPlugin,
 			octoprint.plugin.StartupPlugin):
 
+	NOTIFICATION_SERVER = "notify.nautilus4ios.com"
+	
   ##octoprint.plugin.core.Plugin
 	def initialize(self):
 		#remember this values to send it when we reconnect
@@ -150,9 +153,14 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			self._logger.debug( "Can't read the hotend config file. Default values used.")
 		
 	##octoprint.plugin.TemplatePlugin
+	def get_assets(self):
+		return dict(
+			js=["js/nautilus_settings.js"]
+		)
+	
 	def get_template_configs(self):
 		return [
-			dict(type="settings", template="nautilus_settings.jinja2", custom_bindings=False)
+			dict(type="settings", template="nautilus_settings.jinja2", custom_bindings=True)
 		]
 	
 	##octoprint.plugin.SettingsPlugin
@@ -318,17 +326,44 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		
 		return "OK"
 	
-	@octoprint.plugin.BlueprintPlugin.route("/settings/", methods=["GET"])
+	@octoprint.plugin.BlueprintPlugin.route("/notify/<identifier>", methods=["GET"])
+	def test_notification(self, identifier):
+		if self.notify(identifier, "This is a '%s' notification test message."%identifier):
+			return "1"
+		return "0"
+		
+	@octoprint.plugin.BlueprintPlugin.route("/check_notification_server", methods=["GET"])
+	def check_notification_server(self):
+		http_handler = HTTPSConnection(self.NOTIFICATION_SERVER)
+		headers = { 'User-Agent': "nautilus/v%s"%self._plugin_version }
+		http_handler.request("GET", "/status/", None, headers)
+		resp = http_handler.getresponse()
+		result = resp.read()
+		self._logger.debug(result)
+		if resp.status == 200:
+			return result
+		else:
+			return -1
+	
+	@octoprint.plugin.BlueprintPlugin.route("/test_settings", methods=["POST"])
+	def test_settings(self):
+		data = request.form['data']
+		self._logger.debug(data)
+		return self.get_config("preview", data)
+		
 	@octoprint.plugin.BlueprintPlugin.route("/settings/<identifier>", methods=["GET"])
-	def get_config(self, identifier = "preview"):
+	def get_config(self, identifier = "preview", data = None):
+		md5 = None
 		
-		inifile = os.path.join(self.get_plugin_data_folder(), "settings.ini")
-		with open(inifile) as foo:
-			ini_as_text = foo.read()
+		if identifier != "preview":
+			inifile = os.path.join(self.get_plugin_data_folder(), "settings.ini")
+			with open(inifile) as foo:
+				ini_as_text = foo.read()
 		
-		md5 = hashlib.md5(ini_as_text).hexdigest()
+			md5 = hashlib.md5(ini_as_text).hexdigest()
 		
-		self._logger.debug("gcode version: remote ["  +identifier +"] vs local ["+md5+"] ...")
+			self._logger.debug("gcode version: remote ["  +identifier +"] vs local ["+md5+"] ...")
+
 		if identifier == md5:
 			return jsonify(update=False)
 
@@ -337,8 +372,12 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			retval = {}
 			
 			config = ConfigParser.ConfigParser()
-			config.readfp(StringIO(ini_as_text))
-		
+			
+			if data:
+				config.readfp(StringIO(data))
+			else:
+				config.readfp(StringIO(ini_as_text))
+				
 			try:
 				profile  = dict([a, int(x) if x.isdigit() else x] for a, x in config.items("profile"))
 			except:
@@ -452,7 +491,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 				}))
 			if data:
 				params = {'notifications[]': data}
-				http_handler = HTTPSConnection("notify.nautilus4ios.com")
+				http_handler = HTTPSConnection(self.NOTIFICATION_SERVER)
 				headers = { 'User-Agent': "nautilus/v%s"%self._plugin_version }
 				headers['Content-type'] = "application/x-www-form-urlencoded"
 				http_handler.request("POST", "/", urlencode(params, True), headers)
@@ -466,11 +505,12 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 							del self.registered_devices[ r["id"] ]
 							
 					self.save_devices()
-		
+					return True
 				
 		except Exception as e:
 			self._logger.warning(e) 
-	
+
+		
 	##plugin auto update
 	def get_version(self):
 		return self._plugin_version

@@ -1,21 +1,54 @@
+<style>
+.setting_string { color: #3e3980; }
+.setting_key { color: #0088cc; }
+.setting_error { color: red; }
+</style>
 <form class="form-horizontal">
+<div data-bind="visible: !show_results()">
       <div class="control-group">
-          <textarea class="input-block-level" cols="60" rows="30" data-bind="value: settings.plugins.nautilus.gcodes"></textarea>
+          <span>Notification server status&nbsp;</span>
+          <span data-bind="visible: notify() == '-1'" style="color:#cc0d0d">not available. Connection problem ?</span>
+          <span class="icon-circle" data-bind="visible: notify() == '0'" style="color:#cc0d0d">&nbsp;</span>
+          <span class="icon-circle" data-bind="visible: notify() == '1'" style="color:#28dc0b">&nbsp;</span> 
+          <br/>
       </div>
+      
+      <div class="control-group">
+          <textarea id="settings_gcodes" class="input-block-level" cols="60" rows="16" data-bind="value: settings.gcodes"></textarea>
+          <button data-bind="click: test_settings">Test</button>
+      </div>
+
     <div class="control-group">
         <label class="checkbox">
-            <input type="checkbox" data-bind="checked: settings.plugins.nautilus.external_only_webcam">External access show only webcam
+            <input type="checkbox" data-bind="checked: settings.external_only_webcam">External access show only webcam
         </label>
         <label class="checkbox">
-            <input type="checkbox" data-bind="checked: settings.plugins.nautilus.ignore_M117">Ignore all M117 messages
-        </label>
-    </div>        
-    <div class="control-group">
-        <label class="checkbox">
-            <input type="checkbox" data-bind="checked: settings.plugins.nautilus.terminal">Terminal
-        </label>
-        <label class="checkbox">
-            <input type="checkbox" data-bind="checked: settings.plugins.nautilus.debug">Debug
+            <input type="checkbox" data-bind="checked: settings.ignore_M117">Ignore all M117 messages
         </label>
     </div>
+
+    <div class="control-group">
+        <label class="checkbox">
+            <input type="checkbox" data-bind="checked: settings.terminal">Terminal
+        </label>
+        <label class="checkbox">
+            <input type="checkbox" data-bind="checked: settings.debug">Debug
+        </label>
+    </div>
+
+    <div class="control-group">
+      <form class="form-horizontal">
+          <span>  Send test notification type: </span>
+          <button data-bind="enable: notify() == '1' && notify_info(), click: send_notification.bind($data, 'info')">Info</button>
+          <button data-bind="enable: notify() == '1' && notify_warning(), click: send_notification.bind($data, 'warning')">Warning</button>
+          <button data-bind="enable: notify() == '1' && notify_error(), click: send_notification.bind($data, 'error')">Error</button>
+          
+      </form>
+    </div>
+</div>
+<div data-bind="visible: show_results">
+  <button data-bind="click: hide_results">Hide</button>
+  <pre data-bind="html: gcode_results"></pre>
+</div>
+
 </form>
