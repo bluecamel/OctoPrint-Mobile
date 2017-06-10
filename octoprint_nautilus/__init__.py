@@ -318,11 +318,19 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 	@octoprint.plugin.BlueprintPlugin.route("/register", methods=["POST"])
 	def register_device(self):
 		data = json.loads(request.data)
-		if self.registered_devices.get( data["token"], "Unknown" )  == "Unknown":
-			self._logger.info("Registering device with token ["+ data["token"] +"]")
+		save = False
+		if "token" in data:
+			if data["token"] not in self.registered_devices:
+				self._logger.info("Registering device with token ["+ data["token"] +"]")
+				save = True
+			
+			elif (self.registered_devices.get(data["token"])[0] != data["name"] or self.registered_devices.get(data["token"])[1] != data["id"]):
+				self._logger.info("Updating device with token ["+ data["token"] +"]")
+				save = True
 		
-		self.registered_devices[data["token"]] = ( data["name"], data["id"] )
-		self.save_devices()
+		if save:
+			self.registered_devices[data["token"]] = ( data["name"], data["id"] )
+			self.save_devices()
 		
 		return "OK"
 	
@@ -480,6 +488,8 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			self.notify("error", "Failed to complete printing.") 
 
 	def notify_error(self, reason):
+		if not reason:
+			reason = "Unknown error."
 		self.notify("error", reason)
 	
 	def notify(self, notification, message):

@@ -160,15 +160,17 @@ function ActionModel(){
 	
 	self.loadLatestFile = function(){
 		getGcodeFiles(function(result){
-			//console.log(_.last(_.sortBy(result.files, "date")).name);
-			sendLoadFile(_.last(_.sortBy(result.files, "date")).name);
+			if(result.files.length > 0) {
+				sendLoadFile(_.last(_.sortBy(result.files, "date")).name);
+			}
 		});
 	}
 
 	self.loadLastPrintedFile = function(){
 		getGcodeFiles(function(result){
-			//console.log(_.last(_.sortBy(result.files, ""prints.last.date"")).name);
-			sendLoadFile(_.last(_.sortBy(result.files, "prints.last.date")).name);
+			if(result.files.length > 0) {
+				sendLoadFile(_.last(_.sortBy(result.files, "prints.last.date")).name);
+			}
 		});
 	}
 	self.showInfo = function(){
