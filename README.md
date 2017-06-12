@@ -13,9 +13,9 @@ See the [installation guide](https://github.com/MoonshineSG/OctoPrint-Mobile/wik
 
 ## Issues
 
-If you have problems with the plugin, don't write it in the Apple Appstore as a review. That, is a one way communication, and since I don't know who you are, I can't contact you. More often than not, information provided is not enough to solve the problem. 
+If you have problems with the plugin, don't write it in the Apple Appstore as a review. More often than not, information provided is not enough to solve the problem. 
 
-So please, open a [Github issue](https://github.com/MoonshineSG/OctoPrint-Mobile/issues/new).
+Open a [Github issue](https://github.com/MoonshineSG/OctoPrint-Mobile/issues/new) and help will be provided. Be that guidance on how to solve the problem or a fix can be implemented if needed.
 
 ## Printing in progress
 
