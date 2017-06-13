@@ -68,3 +68,4 @@ Open a [Github issue](https://github.com/MoonshineSG/OctoPrint-Mobile/issues/new
  - ver 1.11 (plugin) : prepare for iOS release 2
  - ver 1.12 (plugin) : support mirrored tool (see https://github.com/MoonshineSG/OctoPrint-Mobile/issues/41)
  - ver 1.13 (plugin) / 2.1 (ios) : events notifcations
+ - ver 1.14 (plugin) : M70 custom notifications support and settings for event notifcations (always/errors/never)
