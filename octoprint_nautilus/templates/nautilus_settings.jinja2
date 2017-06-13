@@ -2,53 +2,96 @@
 .setting_string { color: #3e3980; }
 .setting_key { color: #0088cc; }
 .setting_error { color: red; }
+
+div.nautilus_box {
+	width: 100%;
+}
+
+div.nautilus_left {
+	width: 50%;
+	height: 100%;
+	float: left;
+}
+
+div.nautilus_right {
+	width: 50%;
+	height: 100%;
+	float: right;
+}
+
+div.nautilus_clear {
+	clear: both;
+	height: 1px;
+	overflow: hidden;
+	font-size: 0pt;
+	margin-top: -1px;
+}
 </style>
-<form class="form-horizontal">
+<form class="form-horizontal" style="padding-left:2px;">
 <div data-bind="visible: !show_results()">
-      <div class="control-group">
-          <span>Notification server status&nbsp;</span>
-          <span data-bind="visible: notify() == '-1'" style="color:#cc0d0d">not available. Connection problem ?</span>
-          <span class="icon-circle" data-bind="visible: notify() == '0'" style="color:#cc0d0d">&nbsp;</span>
-          <span class="icon-circle" data-bind="visible: notify() == '1' || notify() == '2'  " style="color:#28dc0b">&nbsp;</span> 
-          <br/>
-      </div>
-      
-      <div class="control-group">
-          <textarea id="settings_gcodes" class="input-block-level" cols="60" rows="16" data-bind="value: settings.gcodes"></textarea>
-          <button data-bind="click: test_settings">Preview</button>
-      </div>
+		<div class="control-group">
+			<span>Notification server status&nbsp;</span>
+			<span data-bind="visible: notify() == '-1'" style="color:#cc0d0d">not available. Connection problem ?</span>
+			<span class="icon-circle" data-bind="visible: notify() == '0'" style="color:#cc0d0d">&nbsp;</span>
+			<span class="icon-circle" data-bind="visible: notify() == '1' || notify() == '2'	" style="color:#28dc0b">&nbsp;</span> 
+			<br/>
+		</div>
+		
+		<div class="control-group">
+			<textarea id="settings_gcodes" class="input-block-level" cols="60" rows="12" data-bind="value: settings.gcodes"></textarea>
+			<button style="float: right;" data-bind="click: test_settings">Preview</button>
+		</div>
 
-    <div class="control-group">
-        <label class="checkbox">
-            <input type="checkbox" data-bind="checked: settings.external_only_webcam">External access show only webcam
-        </label>
-        <label class="checkbox">
-            <input type="checkbox" data-bind="checked: settings.ignore_M117">Ignore all M117 messages
-        </label>
-    </div>
+	<div class="control-group nautilus_box">
+		<div class="nautilus_left">
+			<div class="input-group">
+				Send iOS notifications:
+				<label class="radio">
+					<input type="radio" value="99" data-bind="checked: settings.notify_events"> always (on supported events)
+				</label>
+				<label class="radio">
+					<input type="radio" value="1" data-bind="checked: settings.notify_events"> only on errors
+				</label>
+				<label class="radio">
+					<input type="radio" value="0" data-bind="checked: settings.notify_events"> never
+				</label>
+			</div>	
+			<label class="checkbox">
+				<input type="checkbox" data-bind="checked: settings.notify_M70">iOS notifications on M70 (regardless of above settings)
+			</label>
+			
+		</div>
+		<div class="nautilus_right">
+			<label class="checkbox">
+				<input type="checkbox" data-bind="checked: settings.terminal">Terminal
+			</label>
+			<label class="checkbox">
+				<input type="checkbox" data-bind="checked: settings.external_only_webcam">Show only webcam on external access
+			</label>
+			<label class="checkbox">
+				<input type="checkbox" data-bind="checked: settings.ignore_M117">Ignore all M117 messages
+			</label>
+			<label class="checkbox">
+				<input type="checkbox" data-bind="checked: settings.debug">Debug
+			</label>
+		</div>
+		<div class="nautilus_clear"></div>
+	</div>
 
-    <div class="control-group">
-        <label class="checkbox">
-            <input type="checkbox" data-bind="checked: settings.terminal">Terminal
-        </label>
-        <label class="checkbox">
-            <input type="checkbox" data-bind="checked: settings.debug">Debug
-        </label>
-    </div>
-
-    <div class="control-group">
-      <form class="form-horizontal">
-          <span>  Send test notification type: </span>
-          <button data-bind="enable: notify() == '2' && notify_info(), click: send_notification.bind($data, 'info')">Info</button>
-          <button data-bind="enable: notify() == '2' && notify_warning(), click: send_notification.bind($data, 'warning')">Warning</button>
-          <button data-bind="enable: notify() == '2' && notify_error(), click: send_notification.bind($data, 'error')">Error</button>
-          
-      </form>
-    </div>
+	<div class="control-group">
+		<span>Test notification. Send: </span>
+		<button data-bind="enable: notify() == '2' && notify_info(), click: send_notification.bind($data, 'info')">Info</button>
+		<button data-bind="enable: notify() == '2' && notify_warning(), click: send_notification.bind($data, 'warning')">Warning</button>
+		<button data-bind="enable: notify() == '2' && notify_error(), click: send_notification.bind($data, 'error')">Error</button>
+	</div>
 </div>
 <div data-bind="visible: show_results">
-  <button data-bind="click: hide_results">Hide</button>
-  <pre data-bind="html: gcode_results"></pre>
+	<div style="margin-left: 92%;">
+		<button style="position: fixed;" data-bind="click: hide_results">Hide</button>
+	</div>
+	<div>
+		<pre data-bind="html: gcode_results"></pre>
+	</div>
 </div>
 
 </form>

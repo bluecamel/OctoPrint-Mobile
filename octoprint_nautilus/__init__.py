@@ -20,6 +20,7 @@ import json
 
 from struct import unpack
 from socket import AF_INET
+import thread
 
 from httplib import HTTPSConnection
 from urllib import urlencode
@@ -76,6 +77,16 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 
 	NOTIFICATION_SERVER = "notify.nautilus4ios.com"
 	
+	NOTIFY_ALWAYS = 99
+	NOTIFY_NEVER = 0
+	
+	SOUNDS = {Events.PRINT_DONE: "info",
+			Events.PRINT_PAUSED: "warning",
+			Events.PRINT_FAILED: "error",
+			Events.PRINT_PAUSED: "error",
+			"M70": "warning"
+		}
+	
   ##octoprint.plugin.core.Plugin
 	def initialize(self):
 		#remember this values to send it when we reconnect
@@ -83,6 +94,8 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		self.zchange = ""
 		self.tool = 0
 		self.show_M117 = True
+		self.notify_events = self.NOTIFY_ALWAYS
+		self.notify_M70 = True
 		self.read_devices()
 		self._logger.info("Nautilus - OctoPrint mobile shell, started.")
 
@@ -95,9 +108,11 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			self._logger.info( "Logging level is INFO.")
 		
 		#user specficaly asked for messages to be ignored
-		if self._settings.get_boolean(["ignore_M117"]):
-			self.show_M117 = False
-			self._logger.info( "M117 message will be ignored (settings)...")
+		self.show_M117 = not self._settings.get_boolean(["ignore_M117"])
+		
+		#notification settings
+		self.notify_events = self._settings.get_int(["notify_events"]) 
+		self.notify_M70 = self._settings.get_boolean(["notify_M70"])
 		
 		#detailedprogress sends too many messages. ignore them
 		if self._plugin_manager.get_plugin("detailedprogress"):
@@ -170,6 +185,8 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			_settings_version = None,
 			external_only_webcam = True,
 			ignore_M117 = False,
+			notify_M70 = True,
+			notify_events = 2,
 			debug = False,
 			terminal = False,
 			registered_devices = dict()
@@ -336,7 +353,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 	
 	@octoprint.plugin.BlueprintPlugin.route("/notify/<identifier>", methods=["GET"])
 	def test_notification(self, identifier):
-		if self.notify(identifier, "This is a '%s' notification test message."%identifier):
+		if self.notify(identifier, "This is a '%s' notification test message."%identifier, True):
 			return "1"
 		return "0"
 		
@@ -447,9 +464,16 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			self._plugin_manager.send_plugin_message(self._identifier, dict(tool = self.tool))
 
 	def M117Message(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
-		if gcode and cmd.startswith("M117") and self.show_M117:
+		if gcode and gcode == "M117" and self.show_M117:
 				self._plugin_manager.send_plugin_message(self._identifier, dict(message=cmd[4:].strip()))
-					
+
+	def M70Message(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
+		if gcode and gcode == "M70":
+			if self.notify_M70:
+				self.notify(gcode, cmd[4:].strip() )
+			else:
+				comm_instance._log("User requested for silence. Not sending notification.")
+
 	##octoprint.plugin.EventHandlerPlugin
 	def on_event(self, event, payload):
 		if event == Events.CONNECTED:
@@ -459,41 +483,44 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			self.read_profile()
 			self._plugin_manager.send_plugin_message(self._identifier, dict(zchange = self.zchange, port=self._printer.get_current_connection()[1], tool = self.tool, nozzles = self.nozzles, nozzle_size = self.nozzle_size, extruders = self.extruders, nozzle_name = self.nozzle_name))
 
-		elif event == Events.PRINT_DONE:
-			self.notify_done( payload.get("name"), display_time(payload.get("time")) )
+		elif event == Events.PRINT_DONE and self.notify_events == self.NOTIFY_ALWAYS:			
+			self.notify(Events.PRINT_DONE, "Finished printing \"{0}\" printed in {1}.".format(payload.get("name"), display_time(payload.get("time"))))
 			
-		elif event == Events.PRINT_PAUSED:
-			self.notify_pause()
+		elif event == Events.PRINT_PAUSED  and self.notify_events == self.NOTIFY_ALWAYS:
+			self.notify(Events.PRINT_PAUSED, "Paused.")
 
-		elif event == Events.PRINT_FAILED:
-			try:
-				self.notify_failed(payload.get("name"))
-			except:
-				self.notify_failed(None)
+		elif event == Events.PRINT_FAILED  and self.notify_events >  self.NOTIFY_NEVER:
+			if payload.get("name", None):
+				self.notify(Events.PRINT_FAILED, "Failed to complete printing of \"{0}\".".format(payload.get("name")))
+			else:
+				self.notify(Events.PRINT_FAILED, "Failed to complete printing.") 
 
-		elif event == Events.ERROR:
-			self.notify_error(payload.get("error"))
+		elif event == Events.ERROR and self.notify_events > self.NOTIFY_NEVER:
+			if payload.get("error", None):
+				self.notify(Events.ERROR, payload.get("error"))
+			else:
+				reason = "Unknown error."
 
-	
-	def notify_done(self, job, duration):
-		self.notify("info", "Finished printing \"{0}\" printed in {1}.".format(job, duration))
-
-	def notify_pause(self):
-		self.notify("warning", "Paused.")
-
-	def notify_failed(self, job):
-		if job:
-			self.notify("error", "Failed to complete printing of \"{0}\".".format(job))
-		else:
-			self.notify("error", "Failed to complete printing.") 
-
-	def notify_error(self, reason):
-		if not reason:
-			reason = "Unknown error."
-		self.notify("error", reason)
-	
-	def notify(self, notification, message):
+	def notify(self, event, message, wait_for_results = False):
+		def send_notifications(params):
+			http_handler = HTTPSConnection(self.NOTIFICATION_SERVER)
+			headers = { 'User-Agent': "nautilus/v%s"%self._plugin_version }
+			headers['Content-type'] = "application/x-www-form-urlencoded"
+			http_handler.request("POST", "/", urlencode(params, True), headers)
+			resp = http_handler.getresponse()
+			result = resp.read()
+			self._logger.debug(result)
+			if resp.status == 200:
+				for r in json.loads(result):
+					if r["result"] == "Unregister":
+						self._logger.warning(">>>> Device [%s] no longer registered. Removing."%r["id"])
+						del self.registered_devices[ r["id"] ]
+					
+				self.save_devices()
+				return True
+			
 		try:
+			notification = self.SOUNDS.get(event, event)
 			data = []
 			self._logger.info(">>>> Sending notification type [%s] to %s device(s)"%(notification, len( self.registered_devices )))
 			for device, printer in self.registered_devices.iteritems():
@@ -503,25 +530,15 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 					'id':printer[1],
 					'printer': printer[0].encode('utf8'), 
 					'message': message.encode('utf8'),
-					'type': notification
+					'type': notification,
+					'event': event
 				}))
 			if data:
 				params = {'notifications[]': data}
-				http_handler = HTTPSConnection(self.NOTIFICATION_SERVER)
-				headers = { 'User-Agent': "nautilus/v%s"%self._plugin_version }
-				headers['Content-type'] = "application/x-www-form-urlencoded"
-				http_handler.request("POST", "/", urlencode(params, True), headers)
-				resp = http_handler.getresponse()
-				result = resp.read()
-				self._logger.debug(result)
-				if resp.status == 200:
-					for r in json.loads(result):
-						if r["result"] == "Unregister":
-							self._logger.warning(">>>> Device [%s] no longer registered. Removing."%r["id"])
-							del self.registered_devices[ r["id"] ]
-							
-					self.save_devices()
-					return True
+				if wait_for_results:
+					return send_notifications(params)
+				else:
+					thread.start_new_thread(send_notifications, (params,))
 				
 		except Exception as e:
 			self._logger.warning(e) 
@@ -555,6 +572,7 @@ def __plugin_load__():
 	global __plugin_hooks__
 	__plugin_hooks__ = {"octoprint.comm.protocol.action": __plugin_implementation__.custom_action_handler,
 		"octoprint.comm.protocol.gcode.queuing": __plugin_implementation__.M117Message,
+		"octoprint.comm.protocol.gcode.sending": __plugin_implementation__.M70Message,
 		"octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
 	}
 
