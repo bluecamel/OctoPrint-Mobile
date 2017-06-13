@@ -83,7 +83,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 	SOUNDS = {Events.PRINT_DONE: "info",
 			Events.PRINT_PAUSED: "warning",
 			Events.PRINT_FAILED: "error",
-			Events.PRINT_PAUSED: "error",
+			Events.ERROR: "error",
 			"M70": "warning"
 		}
 	
