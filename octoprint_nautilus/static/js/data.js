@@ -75,7 +75,7 @@ function onCurrentData(current){
   if ( printer.error() || printer.closedOrError() ) {
 	  printer.fileToPrint(null);
   } else {
-    printer.fileToPrint(current.job.file.name);
+    printer.fileToPrint(current.job.file.path);
   }
   
 	onMessageData(current.messages);
@@ -145,6 +145,12 @@ function onEventData(type, payload) {
 				offset.current_z(   (parseFloat(payload.z) + parseFloat(settings.profile.max_m851)).toFixed(2) );
 			} else {
 				offset.current_z(payload.z);	
+			}
+			break;
+		case "UpdatedFiles":
+			if (payload.type == "printables" ) {
+				files.allfiles = null;
+				files.reload();
 			}
 			break;
 	}
