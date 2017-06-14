@@ -12,6 +12,7 @@ function connect(){
 	
 	socket.onopen = function() {
 		getSettings();
+		files.allfiles = null;
 		switchView("main");
 		retry_count = -1;
 		if ( has_switch_plugin() ) sendSwitchCommand("status");
