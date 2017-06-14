@@ -42,12 +42,13 @@
 							<div data-bind="html: printer.status"></div>
 						</div>
 						<div class="status_bar printing_time_elapsed" data-bind="visible: printer.inProgress, text: formatSeconds(printer.time_elapsed())"></div>
-						<div class="status_bar printing_time_left" data-bind="visible: printer.inProgress, style: { backgroundColor: printer.printTimeLeftOriginClass}">
-							<div data-bind="text: printer.aprox_time_left"></div>
-							<div class="print_time_origin" style="display: none" data-bind="visible: printer.printTimeLeftOrigin, text: printer.printTimeLeftOriginString"></div>
-						</div>
-						<div class="status_bar extruder_temp"><div data-bind="visible: temp_visible">
-							<span class='fa fa-lg fa-fire'></span><span data-bind="html:extruder_temp"></span></div>
+							<div class="status_bar printing_time_left" data-bind="visible: printer.inProgress, style: { backgroundColor: printer.printTimeLeftOriginClass}">
+								<div data-bind="text: printer.aprox_time_left"></div>
+								<div class="print_time_origin" style="display: none" data-bind="visible: printer.printTimeLeftOrigin, text: printer.printTimeLeftOriginString"></div>
+							</div>
+							<div class="status_bar extruder_temp"><div data-bind="visible: temp_visible">
+								<span class='fa fa-lg fa-fire'></span><span data-bind="html:extruder_temp"></span>
+							</div>
 						</div>
 						<div class="status_bar bed_temp"><div data-bind="visible: printer.bed_actual() > 0 "><span class='fa fa-lg fa-bed'></span><span data-bind="html:bed_temp"></span></div></div>
 					</div>
@@ -126,9 +127,10 @@
 						</div>
 						<div class="row printer_row_3">
 							<button type="button" class="btn btn-success" data-bind="enable:printer.ready, visible: !printer.isFileLoaded(), click: loadLatestFile"><span class="fa fa-file-o"></span> Last uploaded file</button>
-							<button type="button" class="btn btn-success" data-bind="enable:printer.ready, visible: !printer.isFileLoaded(), click: loadLastPrintedFile"><span class="fa fa-file-text-o"></span> Last printed file</button>
-							<button type="button" class="btn btn-link" data-bind="click:deselectFile, visible: printer.isFileLoaded()"><span class="fa fa-lg fa-file-text"></span>&nbsp;<span data-bind="text: printer.fileToPrint"><span></button>
+							<button type="button" class="btn btn-success" data-bind="enable:printer.ready, visible: !printer.isFileLoaded(), click: loadLastPrintedFile"><span class="fa fa-file-text-o"></span> Last printed file</button>	
+							<button type="button" class="btn btn-link" data-bind="click:deselectFile, visible: printer.isFileLoaded()"><span class="fa fa-lg fa-file-text"></span>&nbsp;<span data-bind="leftTruncatedText: printer.fileToPrint(), maxTextLength: 45"></span></button>
 							<button type="button" class="btn btn-link" data-bind="click:showInfo, visible: printer.fileInfo() != null"><span class="fa fa-lg fa-info-circle info-file"></span></button>
+							<button type="button" class="btn btn-success" data-bind="enable:printer.ready, visible: !printer.isFileLoaded() || action.canStartPrinting(),  click: loadFiles"><span class="fa fa-ellipsis-h"></span></button>
 						</div>
 						<div class="row printer_row_4">
 							<div class="btn-group btn-group-justified">
@@ -260,7 +262,7 @@
 								<button type="button" class="btn btn-lg btn-default" data-bind="click: saveOffset, enable: prepared()"><span class='fa fa-lg fa-save'></span> Save Z offset</button>
 								<button type="button" class="btn btn-lg btn-default" data-bind="click: offsetDone, enable: !prepared()"><span class='fa fa-lg  fa-home'></span> Go Home</button>
 							</div>
-							<div class="offset_bar">								
+							<div class="offset_bar">
 								<div class="btn-group">
 									<button type="button" class="btn btn-lg btn-default" data-bind="click: macro1, enable: !prepared() && m1()"><span class='fa fa-lg fa-file-o'></span> M1</button>
 									<button type="button" class="btn btn-lg btn-default" data-bind="click: macro2, enable: !prepared() && m2()"><span class='fa fa-lg fa-file-o'></span> M2</button>
@@ -310,6 +312,40 @@
 		{{ "<div class=\"rotate90\">" if webcam[2] }}
 			<img class="{{"flipH" if webcam[0]}} {{"flipV" if webcam[1]}}" id="webcam_alone"/>
 		{{ "</div>" if webcam[2] }}
+	</div>
+
+	<div id="files_view" class="view">
+		<div class="folder_header">
+			<i class="fa fa-refresh reload" data-bind="click: reload"></i>
+			<span class="sort" data-bind="click: sort_by.bind($data, 'name')">
+				<span class="fa-stack">
+				  <i class="fa fa-sort-up fa-stack-1x" data-bind="style: { color: sorting_criteria() == 'name' ?  sorting_order() ? '#06ea07': '#EEE' : '#EEE' }"></i>
+				  <i class="fa fa-sort-down fa-stack-1x" data-bind="style: { color: sorting_criteria() == 'name' ?  sorting_order() ? '#EEE': '#06ea07' : '#EEE' }"></i>
+				</span>	
+				<span>By Name</span>
+			</span>
+			<span class="sort" data-bind="click: sort_by.bind($data, 'date')">
+				<span class="fa-stack">
+				  <i class="fa fa-sort-up fa-stack-1x" data-bind="style: { color: sorting_criteria() == 'date' ?  sorting_order() ? '#06ea07': '#EEE' : '#EEE' }"></i>
+				  <i class="fa fa-sort-down fa-stack-1x" data-bind="style: { color: sorting_criteria() == 'date' ?  sorting_order() ? '#EEE': '#06ea07' : '#EEE' }"></i>
+				</span>
+				<span>Upload Date</span>
+			</span>
+			<i class="fa fa-lg fa-times close" data-bind="click: close"></i>
+		</div>
+		<div data-bind="visible: current() != 'root', click: go_back" class="folder_navigate">
+				<span><i class="fa fa-chevron-left"></i>&nbsp;Back</span>
+				<span class="folder_name">Currently in&nbsp;<span data-bind="leftTruncatedText: current(), maxTextLength: 60"></span></span>
+		</div>
+		<ul data-bind="foreach: show_files" class="folder_list">
+			<li data-bind="visible: folder, click: $parent.show_folder.bind($data, path), css: { 'odd-row': $index() % 2 === 0, 'even-row': $index() % 2 === 1 }" class="folder">
+					<i class="fa fa-folder-open-o"></i>&nbsp;<span data-bind="html: name"></span> <i class="fa fa-chevron-right open_folder"></i>
+			</li>
+			<li data-bind="visible: file, click: $parent.load_file.bind($data, path), style: { color: last_success ? '#468847' :  failures > 0 ? '#b94a48' : '#606369' }, css: { 'odd-row': $index() % 2 === 0, 'even-row': $index() % 2 === 1 } " class="file">
+				<span data-bind="text: name"></span>
+			</li>
+		</ul>
+		<div id="folder_loading"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i><div>
 	</div>
 
     {% include 'nautilus_javascript_lib.jinja2' %}

@@ -153,3 +153,15 @@ function message(message){
 function info(message){
 	bootbox.alert({ closeButton: false, className: "bootbox-info", message: message});
 }
+
+ko.bindingHandlers.leftTruncatedText = {
+    update: function (element, valueAccessor, allBindingsAccessor) {
+				originalText  = "";
+				if ( valueAccessor() != undefined) originalText = valueAccessor();
+				length = ko.utils.unwrapObservable(allBindingsAccessor().maxTextLength) || 20 ;
+			 	truncatedText = originalText.length > length ? "..." + originalText.substring(originalText.length - length) : originalText;
+				ko.bindingHandlers.text.update(element, function () {
+					return truncatedText; 
+				});
+			}
+};

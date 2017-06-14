@@ -1,3 +1,152 @@
+
+function FilesModel(){
+	var self = this;	
+
+	self.allfiles = null;
+	
+	self.show_files = ko.observableArray();
+
+	self.stack = [];	
+	
+	self.previous = ko.observable(null);
+	self.current = ko.observable(null);
+	
+	self.sorting_criteria = $.cookie('sorting_criteria'); 
+	if (self.sorting_criteria == undefined) self.sorting_criteria = "name"
+	
+	self.sorting_order = $.cookie('sorting_order'); 
+	if (self.sorting_order == undefined) {
+			self.sorting_order = "false"
+	}
+	self.sorting_order  = JSON.parse(self.sorting_order);
+	
+	self.sorting_criteria = ko.observable(self.sorting_criteria);
+	self.sorting_order = ko.observable(self.sorting_order);
+	
+	self.load = function(){
+		if (self.allfiles == null) {
+			self.reload(function(){
+				$(".view").hide();
+				$("#files_view").show();
+			});
+		} else {
+			$(".view").hide();
+			$("#files_view").show();
+	  }
+	}
+	
+	self.reload = function(callback){
+		$("#folder_loading").show();
+		getGcodeFiles(function(result){
+			self.stack = [];	
+			self.current('root');
+			self.previous(null);
+			
+			self.allfiles = result.files;
+			self.currentfiles = self.allfiles;
+			self.refresh(self.allfiles);
+			
+			if (typeof callback === "function") {callback();}
+			$("#folder_loading").hide();
+		});		
+	}
+	
+	self.refresh = function(currentfiles){
+			self.currentfiles = currentfiles;
+			if (self.sorting_order() ) {
+				self.currentfiles = _.sortBy(currentfiles, self.sorting_criteria());
+			} else {
+				self.currentfiles = _.sortBy(currentfiles, self.sorting_criteria()).reverse();
+			}
+		
+			html = [];
+			_.each(self.currentfiles, function(file) {
+				if ( file.type == "folder" && file.children.length > 0 ) {
+					f = {}
+					f.name = file.name;
+					f.path = file.path;
+					f.folder = true;
+					f.file = false;
+					f.failures = false;
+					f.last_success = true;
+					html.push(f);
+				}
+			 });
+ 			_.each(self.currentfiles, function(file) {
+				if ( file.type == "machinecode") {
+ 					f = {}
+ 					f.name = file.name;
+ 					f.uploaded = file.date;
+ 					f.path = file.path;
+ 					f.folder = false;
+ 					f.file = true;
+ 					f.failures = 0;
+ 					f.last_success = false;
+					
+ 					if ( typeof file.prints != "undefined" ) { 
+ 						f.failures = file.prints.failure;
+ 						f.last_success = file.prints.last.success;
+ 					}
+ 					html.push(f);
+				}
+ 			 });
+			 self.show_files(html);
+	}
+	
+	self.go_back = function(){
+			self.current(self.stack.pop());
+			self.previous(_.last(self.stack));
+			if (self.current() == "root") {
+				self.refresh( self.allfiles );
+			} else {				
+				self.refresh( self.find_folder_by_path(self.current()) );
+			}
+	}
+		
+	self.show_folder = function(name){
+		self.previous(self.current());
+		self.stack.push(self.previous());
+		self.current(name);
+		
+		self.refresh( self.find_folder_by_path(self.current()) );
+	}
+	
+	self.find_folder_by_path = function(path){
+			var recursiveSearch = function(location, elements) {
+							if (location.length == 0) {
+								return elements;
+							}
+							var name = location.shift();
+							t = _.find(elements, function(o){return o.type == "folder" && o.name == name;});
+							if (t != undefined ) {
+								return recursiveSearch(location, t.children);
+							} 
+			}
+			return recursiveSearch(path.split("/"), self.allfiles);
+	}
+
+	self.load_file = function(path){
+		sendLoadFile(path);
+		self.close();
+	}
+
+	self.close = function(){
+		$(".view").hide();
+		$("#main_view").show();
+	}
+		
+	self.sort_by = function(criteria){
+		self.sorting_criteria(criteria);
+		self.sorting_order( ! self.sorting_order() ) ;
+		$.cookie('sorting_criteria', criteria);
+		$.cookie('sorting_order', self.sorting_order() );
+		self.refresh(self.currentfiles);
+	}
+	
+
+}
+
+
 function ActionModel(){
 
 	var self = this;
@@ -161,7 +310,7 @@ function ActionModel(){
 	self.loadLatestFile = function(){
 		getGcodeFiles(function(result){
 			if(result.files.length > 0) {
-				sendLoadFile(_.last(_.sortBy(result.files, "date")).name);
+				sendLoadFile(_.last(_.sortBy(_.filter(result.files, function(f){return f.type=="machinecode";}), "date")).name);
 			}
 		});
 	}
@@ -169,10 +318,16 @@ function ActionModel(){
 	self.loadLastPrintedFile = function(){
 		getGcodeFiles(function(result){
 			if(result.files.length > 0) {
-				sendLoadFile(_.last(_.sortBy(result.files, "prints.last.date")).name);
+				sendLoadFile(_.last(_.sortBy(_.filter(result.files, function(f){return (f.type=="machinecode" && typeof f.prints == 'object');}), "prints.last.date")).name);
 			}
 		});
 	}
+
+	self.loadFiles = function(){
+			files.load();
+	}
+
+	
 	self.showInfo = function(){
 		var data = printer.fileInfo();
 		var message = "Material : " + data.material +"<br/>Hotend : " + data.hotend +"<br/>Nozzle : " + data.nozzle +" mm<br/>Layer height : " +data.layer+" mm<br/>Extrusion width : " +data.width+" mm<br/>Speed : " + data.speed +" mm/min"
@@ -389,7 +544,11 @@ function PrinterModel(){
 			$(".status_bar").css({"line-height": "20vh"});
 			self.operational(false);
 		} else {
-			$(".status_bar").css({"line-height": $(".status_bar").css("height")});
+			if ( self.printing() ) {
+				$(".status_bar").css({"height": "20vh", "line-height": "20vh"});
+			} else {
+				$(".status_bar").css({"line-height": $(".status_bar").css("height")});
+			}
 		}
 	});
 	
@@ -802,6 +961,7 @@ function PowerButtonsModel(){
 var printer;
 var action;
 var offset;
+var files;
 var buttons;
 
 function applyBindings(){
@@ -812,6 +972,7 @@ function applyBindings(){
 	printer = new PrinterModel();
 	offset = new OffsetModel();
 	action = new ActionModel();
+	files = new FilesModel();
 	
 	if ( has_switch_plugin() ) buttons = new SwitchPluginModel();	
 	if ( has_power_buttons() ) buttons = new PowerButtonsModel();
@@ -823,6 +984,7 @@ function applyBindings(){
 	ko.applyBindings(printer,document.getElementById("sidebar"));
 	ko.applyBindings(offset, document.getElementById("offset_panel"));
 	ko.applyBindings(printer, document.getElementById("disconnected_view"));
+	ko.applyBindings(files, document.getElementById("files_view"));
 	
 }
 
