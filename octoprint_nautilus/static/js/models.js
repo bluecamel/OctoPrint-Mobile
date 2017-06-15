@@ -23,19 +23,21 @@ function FilesModel(){
 	self.sorting_criteria = ko.observable(self.sorting_criteria);
 	self.sorting_order = ko.observable(self.sorting_order);
 	
-	self.load = function(){
+	self.open = function(){
+		$(".view").hide();
+		$("#files_view").show();	
 		if (self.allfiles == null) {
-			self.reload(function(){
-				$(".view").hide();
-				$("#files_view").show();
-			});
-		} else {
-			$(".view").hide();
-			$("#files_view").show();
+			self.reload()
 	  }
 	}
 	
-	self.reload = function(callback){
+	self.close = function(){
+		$(".view").hide();
+		$("#main_view").show();
+	}
+	
+	
+	self.reload = function(){
 		$("#folder_loading").show();
 		getGcodeFiles(function(result){
 			self.stack = [];	
@@ -46,14 +48,13 @@ function FilesModel(){
 			self.currentfiles = self.allfiles;
 			self.refresh(self.allfiles);
 			
-			if (typeof callback === "function") {callback();}
 			$("#folder_loading").hide();
 		});		
 	}
 	
 	self.refresh = function(currentfiles){
 			self.currentfiles = currentfiles;
-			if (self.sorting_order() ) {
+			if ( self.sorting_order() ) {
 				self.currentfiles = _.sortBy(currentfiles, self.sorting_criteria());
 			} else {
 				self.currentfiles = _.sortBy(currentfiles, self.sorting_criteria()).reverse();
@@ -63,23 +64,26 @@ function FilesModel(){
 			_.each(self.currentfiles, function(file) {
 				if ( file.type == "folder" && file.children.length > 0 ) {
 					f = {}
+					f.template = "files_template_folder";
 					f.name = file.name;
 					f.path = file.path;
-					f.folder = true;
-					f.file = false;
-					f.failures = false;
-					f.last_success = true;
+					if ( file.children.length == 1) {
+						f.file_count = "1 file";	
+					} else {
+						f.file_count = file.children.length + " files";
+					}
+					
 					html.push(f);
 				}
 			 });
  			_.each(self.currentfiles, function(file) {
 				if ( file.type == "machinecode") {
  					f = {}
+					f.template = "files_template_machinecode";
  					f.name = file.name;
- 					f.uploaded = file.date;
+ 					f.uploaded = " uploaded " + formatTimeAgo(file.date);
+					f.size = formatSize(file.size);
  					f.path = file.path;
- 					f.folder = false;
- 					f.file = true;
  					f.failures = 0;
  					f.last_success = false;
 					
@@ -90,6 +94,7 @@ function FilesModel(){
  					html.push(f);
 				}
  			 });
+			 console.log(html);
 			 self.show_files(html);
 	}
 	
@@ -98,7 +103,7 @@ function FilesModel(){
 			self.previous(_.last(self.stack));
 			if (self.current() == "root") {
 				self.refresh( self.allfiles );
-			} else {				
+			} else {
 				self.refresh( self.find_folder_by_path(self.current()) );
 			}
 	}
@@ -109,6 +114,11 @@ function FilesModel(){
 		self.current(name);
 		
 		self.refresh( self.find_folder_by_path(self.current()) );
+	}
+	
+	self.load_file = function(path){
+		sendLoadFile(path);
+		self.close();
 	}
 	
 	self.find_folder_by_path = function(path){
@@ -125,24 +135,16 @@ function FilesModel(){
 			return recursiveSearch(path.split("/"), self.allfiles);
 	}
 
-	self.load_file = function(path){
-		sendLoadFile(path);
-		self.close();
-	}
-
-	self.close = function(){
-		$(".view").hide();
-		$("#main_view").show();
-	}
-		
 	self.sort_by = function(criteria){
-		self.sorting_criteria(criteria);
-		self.sorting_order( ! self.sorting_order() ) ;
-		$.cookie('sorting_criteria', criteria);
-		$.cookie('sorting_order', self.sorting_order() );
+		if ( criteria === self.sorting_criteria() ) {
+			self.sorting_order( ! self.sorting_order() ) ;
+			$.cookie('sorting_order', self.sorting_order() );
+		} else {
+			self.sorting_criteria(criteria);
+			$.cookie('sorting_criteria', criteria);
+		}
 		self.refresh(self.currentfiles);
 	}
-	
 
 }
 
@@ -324,7 +326,7 @@ function ActionModel(){
 	}
 
 	self.loadFiles = function(){
-			files.load();
+			files.open();
 	}
 
 	

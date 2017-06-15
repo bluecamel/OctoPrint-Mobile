@@ -145,6 +145,23 @@ function formatFuzzyPrintTime(totalSeconds) {
     return sprintf(text, replacements);
 }
 
+function formatSize(bytes) {
+    if (!bytes) return "-";
+
+    var units = ["bytes", "KB", "MB", "GB"];
+    for (var i = 0; i < units.length; i++) {
+        if (bytes < 1024) {
+            return sprintf("%3.1f%s", bytes, units[i]);
+        }
+        bytes /= 1024;
+    }
+    return sprintf("%.1f%s", bytes, "TB");
+}
+
+function formatTimeAgo(unixTimestamp) {
+    if (!unixTimestamp) return "-";
+    return moment.unix(unixTimestamp).fromNow();
+}
 
 function message(message){
 	bootbox.alert({ closeButton: false, className: "bootbox-message", message: message});
