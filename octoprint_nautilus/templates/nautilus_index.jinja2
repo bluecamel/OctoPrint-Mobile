@@ -325,12 +325,19 @@
 				</span>	
 				<span>By Name</span>
 			</span>
+			<span class="sort" data-bind="click: sort_by.bind($data, 'size')">
+				<span class="fa-stack">
+				  <i class="fa fa-sort-up fa-stack-1x" data-bind="style: { color: sorting_criteria() == 'size' ?  sorting_order() ?  '#06ea07': '#EEE': '#EEE' }"></i>
+				  <i class="fa fa-sort-down fa-stack-1x" data-bind="style: { color: sorting_criteria() == 'size' ?  sorting_order() ? '#EEE': '#06ea07' : '#EEE' }"></i>
+				</span>
+				<span>By Size</span>
+			</span>
 			<span class="sort" data-bind="click: sort_by.bind($data, 'date')">
 				<span class="fa-stack">
-				  <i class="fa fa-sort-up fa-stack-1x" data-bind="style: { color: sorting_criteria() == 'date' ?  sorting_order() ? '#06ea07': '#EEE' : '#EEE' }"></i>
-				  <i class="fa fa-sort-down fa-stack-1x" data-bind="style: { color: sorting_criteria() == 'date' ?  sorting_order() ? '#EEE': '#06ea07' : '#EEE' }"></i>
+				  <i class="fa fa-sort-up fa-stack-1x" data-bind="style: { color: sorting_criteria() == 'date' ?  sorting_order() ? '#EEE': '#06ea07' : '#EEE' }"></i>
+				  <i class="fa fa-sort-down fa-stack-1x" data-bind="style: { color: sorting_criteria() == 'date' ?  sorting_order() ? '#06ea07': '#EEE' : '#EEE' }"></i>
 				</span>
-				<span>Upload Date</span>
+				<span>By Upload Date</span>
 			</span>
 			<i class="fa fa-lg fa-times close" data-bind="click: close"></i>
 		</div>
@@ -338,15 +345,24 @@
 				<span><i class="fa fa-chevron-left"></i>&nbsp;Back</span>
 				<span class="folder_name">Currently in&nbsp;<span data-bind="leftTruncatedText: current(), maxTextLength: 60"></span></span>
 		</div>
-		<ul data-bind="foreach: show_files" class="folder_list">
-			<li data-bind="visible: folder, click: $parent.show_folder.bind($data, path), css: { 'odd-row': $index() % 2 === 0, 'even-row': $index() % 2 === 1 }" class="folder">
-					<i class="fa fa-folder-open-o"></i>&nbsp;<span data-bind="html: name"></span> <i class="fa fa-chevron-right open_folder"></i>
+		<ul class="folder_list" data-bind="foreach: show_files">
+			<!-- ko template: { name: template, data: $data } -->
+			<!-- /ko -->
+		</ul>	
+		<script type="text/html" id="files_template_machinecode">
+			<li data-bind="click: $root.load_file.bind($data, path), style: { color: last_success ? '#468847' :  failures > 0 ? '#b94a48' : '#606369' }, css: { 'odd-row': $index() % 2 === 0, 'even-row': $index() % 2 === 1 } " class="file">
+				<span data-bind="text: name"></span><br/>
+				<span class="file_details" data-bind="text: size"></span>
+				<span class="file_details" data-bind="text: uploaded"></span>
 			</li>
-			<li data-bind="visible: file, click: $parent.load_file.bind($data, path), style: { color: last_success ? '#468847' :  failures > 0 ? '#b94a48' : '#606369' }, css: { 'odd-row': $index() % 2 === 0, 'even-row': $index() % 2 === 1 } " class="file">
-				<span data-bind="text: name"></span>
+		</script>
+		<script type="text/html" id="files_template_folder">
+			<li data-bind="click: $root.show_folder.bind($data, path), css: { 'odd-row': $index() % 2 === 0, 'even-row': $index() % 2 === 1 }" class="folder">
+					<i class="fa fa-chevron-right open_folder"></i>
+					<i class="fa fa-folder-open-o"></i>&nbsp;<span data-bind="html: name"></span><br/>
+					<span class="file_details" data-bind="text: file_count"></span>
 			</li>
-		</ul>
-		
+		</script>
 	</div>
 
     {% include 'nautilus_javascript_lib.jinja2' %}

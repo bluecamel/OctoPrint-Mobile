@@ -548,7 +548,8 @@ body {
 
 .folder, .file {
   font-size: 6vh;
-  line-height: 8.5vh;
+  line-height: 6vh;
+  height: 14vh;
   padding-top: 5px;
   padding-bottom: 5px;
   border-bottom: #5e7284;
@@ -559,6 +560,7 @@ body {
 
 .open_folder {
   float: right;
+  line-height: 10vh;
 }
 
 .folder_navigate {
@@ -606,4 +608,9 @@ body {
   text-align: center;
   color: #ccd9e4;
   background-color: #22527B;
+}
+
+.file_details {
+  font-size: 3vh;
+  color: #848484;
 }
