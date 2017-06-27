@@ -1,0 +1,50 @@
+	<div id="files_view" class="view">
+		<div id="folder_loading"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>
+		<div class="folder_header">
+			<i class="fa fa-refresh reload" data-bind="click: reload"></i>
+			<span class="sort" data-bind="click: sort_by.bind($data, 'name')">
+				<span class="fa-stack">
+				  <i class="fa fa-sort-up fa-stack-1x" data-bind="style: { color: sorting_criteria() == 'name' ?  sorting_order() ? '#06ea07': '#EEE' : '#EEE' }"></i>
+				  <i class="fa fa-sort-down fa-stack-1x" data-bind="style: { color: sorting_criteria() == 'name' ?  sorting_order() ? '#EEE': '#06ea07' : '#EEE' }"></i>
+				</span>	
+				<span>By Name</span>
+			</span>
+			<span class="sort" data-bind="click: sort_by.bind($data, 'size')">
+				<span class="fa-stack">
+				  <i class="fa fa-sort-up fa-stack-1x" data-bind="style: { color: sorting_criteria() == 'size' ?  sorting_order() ?  '#06ea07': '#EEE': '#EEE' }"></i>
+				  <i class="fa fa-sort-down fa-stack-1x" data-bind="style: { color: sorting_criteria() == 'size' ?  sorting_order() ? '#EEE': '#06ea07' : '#EEE' }"></i>
+				</span>
+				<span>By Size</span>
+			</span>
+			<span class="sort" data-bind="click: sort_by.bind($data, 'date')">
+				<span class="fa-stack">
+				  <i class="fa fa-sort-up fa-stack-1x" data-bind="style: { color: sorting_criteria() == 'date' ?  sorting_order() ? '#EEE': '#06ea07' : '#EEE' }"></i>
+				  <i class="fa fa-sort-down fa-stack-1x" data-bind="style: { color: sorting_criteria() == 'date' ?  sorting_order() ? '#06ea07': '#EEE' : '#EEE' }"></i>
+				</span>
+				<span>By Upload Date</span>
+			</span>
+			<i class="fa fa-lg fa-times close" data-bind="click: close"></i>
+		</div>
+		<div data-bind="visible: current() != 'root', click: go_back" class="folder_navigate">
+				<span><i class="fa fa-chevron-left"></i>&nbsp;Back</span>
+				<span class="folder_name">Currently in&nbsp;<span data-bind="leftTruncatedText: current(), maxTextLength: 60"></span></span>
+		</div>
+		<ul class="folder_list" data-bind="foreach: show_files, style: { height: current() != 'root' ? '73vh' : '85vh' }">
+			<!-- ko template: { name: template, data: $data } -->
+			<!-- /ko -->
+		</ul>	
+		<script type="text/html" id="files_template_machinecode">
+			<li data-bind="click: $root.load_file.bind($data, path), style: { color: last_success ? '#468847' :  failures > 0 ? '#b94a48' : '#606369' }, css: { 'odd-row': $index() % 2 === 0, 'even-row': $index() % 2 === 1 } " class="file">
+				<span data-bind="text: name"></span><br/>
+				<span class="file_details" data-bind="text: size"></span>
+				<span class="file_details" data-bind="text: uploaded"></span>
+			</li>
+		</script>
+		<script type="text/html" id="files_template_folder">
+			<li data-bind="click: $root.show_folder.bind($data, path), css: { 'odd-row': $index() % 2 === 0, 'even-row': $index() % 2 === 1 }" class="folder">
+					<i class="fa fa-chevron-right open_folder"></i>
+					<i class="fa fa-folder-open-o"></i>&nbsp;<span data-bind="html: name"></span><br/>
+					<span class="file_details" data-bind="text: file_count"></span>
+			</li>
+		</script>
+	</div>

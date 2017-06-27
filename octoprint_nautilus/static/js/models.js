@@ -12,7 +12,7 @@ function FilesModel(){
 	self.current = ko.observable(null);
 	
 	self.sorting_criteria = $.cookie('sorting_criteria'); 
-	if (self.sorting_criteria == undefined) self.sorting_criteria = "name"
+	if (self.sorting_criteria == undefined) self.sorting_criteria = "date"
 	
 	self.sorting_order = $.cookie('sorting_order'); 
 	if (self.sorting_order == undefined) {
@@ -45,7 +45,6 @@ function FilesModel(){
 			self.previous(null);
 			
 			self.allfiles = result.files;
-			self.currentfiles = self.allfiles;
 			self.refresh(self.allfiles);
 			
 			$("#folder_loading").hide();
@@ -76,25 +75,24 @@ function FilesModel(){
 					html.push(f);
 				}
 			 });
- 			_.each(self.currentfiles, function(file) {
+			_.each(self.currentfiles, function(file) {
 				if ( file.type == "machinecode") {
- 					f = {}
+					f = {}
 					f.template = "files_template_machinecode";
- 					f.name = file.name;
- 					f.uploaded = " uploaded " + formatTimeAgo(file.date);
+					f.name = file.name;
+					f.uploaded = " uploaded " + formatTimeAgo(file.date);
 					f.size = formatSize(file.size);
- 					f.path = file.path;
- 					f.failures = 0;
- 					f.last_success = false;
-					
- 					if ( typeof file.prints != "undefined" ) { 
- 						f.failures = file.prints.failure;
- 						f.last_success = file.prints.last.success;
- 					}
- 					html.push(f);
+					f.path = file.path;
+					f.failures = 0;
+					f.last_success = false;
+				
+					if ( typeof file.prints != "undefined" ) { 
+						f.failures = file.prints.failure;
+						f.last_success = file.prints.last.success;
+					}
+					html.push(f);
 				}
- 			 });
-			 console.log(html);
+			 });
 			 self.show_files(html);
 	}
 	

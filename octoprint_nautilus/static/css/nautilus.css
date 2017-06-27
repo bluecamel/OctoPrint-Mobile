@@ -503,22 +503,33 @@ body {
   -webkit-transform:rotate(-90deg);
 }
 
-.folder_list, .folder_header {
-  padding: 13px;
-  border: #ccd9e4;
-  border-style: solid;
-  border-width: 4px;
-  font-family: 'Nunito', sans-serif;
- }
+#files_view {
+  background-color: #ccd9e4;
+  padding: 3px;
+}
+
+.folder_header {
+  background-color: #22527B;
+  color: #EEE;
+}
+
+.folder_header .close {
+  color: #EEE;
+  opacity: 0.7;
+  line-height: 14vh;
+}
+
+.folder_header {
+  padding-left: 13px;
+  padding-right: 13px;  
+}
 
 .folder_list {
-  height: 86vh;
-  border-bottom-right-radius: 2px;
-  border-bottom-left-radius: 2px;
-  border-top-style: none;
+  padding-left: 10px;
+  padding-right: 10px;  
   overflow-y: scroll;
   top: 14vh;
-  background-color: #EEE;
+  background-color: #eee;
   color: #606369;
 }
 
@@ -529,33 +540,16 @@ body {
   background-color: #e6e6e6;
 }
 
-.folder_header {
-  width: 100vw;
-  border-top-right-radius: 2px;
-  border-top-left-radius: 2px;
-  border-bottom-style: none;
-  background-color: #22527B;
-  color: #EEE;
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-.folder_header .close {
-  color: #EEE;
-  opacity: 0.7;
-  line-height: 14vh;
-}
-
 .folder, .file {
-  font-size: 6vh;
-  line-height: 6vh;
+  font-size: 3vw;
+  line-height: 7vh;
   height: 14vh;
-  padding-top: 5px;
-  padding-bottom: 5px;
+  padding-top: 3px;
+  padding-bottom: 2px;
+  -webkit-tap-highlight-color: rgba(51,122,183,0.4);
   border-bottom: #5e7284;
   border-bottom-style: solid;
   border-bottom-width: 1px;
-  -webkit-tap-highlight-color: rgba(51,122,183,0.4);
 }
 
 .open_folder {
@@ -565,28 +559,19 @@ body {
 
 .folder_navigate {
   padding: 13px;
-  border-left: #ccd9e4;
-  border-left-style: solid;
-  border-left-width: 4px;
-  border-right: #ccd9e4;
-  border-right-style: solid;
-  border-right-width: 4px;
   border-bottom: #5e7284;
   border-bottom-style: solid;
   border-bottom-width: 1px;
-
-  font-family: 'Nunito', sans-serif;
   background-color: #d6d6d6;
   color: #606369;
-  
-  font-size: 6vh;
-  line-height: 8.5vh;
+  font-size: 3vw;
+  line-height: 7vh;
 }
 
 .folder_name {
   float: right;
-  font-size: 4vh;
-  line-height: 8.5vh;
+  font-size: 3vh;
+  line-height: 7vh;
 }
 
 .reload {
@@ -595,8 +580,8 @@ body {
 }
 
 .sort {
-  font-size: 5vh;
-  padding-left: 5vw;
+  font-size: 3vw;
+  padding-left: 4vw;
   line-height: 14vh;
   
 }
