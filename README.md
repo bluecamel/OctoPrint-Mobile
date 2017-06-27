@@ -70,5 +70,5 @@ Open a [Github issue](https://github.com/MoonshineSG/OctoPrint-Mobile/issues/new
  - ver 1.13 (plugin) / 2.1 (ios) : events notifcations
  - ver 1.14 (plugin) : M70 custom notifications support and settings for event notifcations (always/errors/never)
  - ver 1.15 (plugin) : added support for selecting files
- - ver 1.16 (plugin) : added additional sorting criteria and some file details
+ - ver 1.16 (plugin) : added additional sorting criteria and some file details (unreleased?)
  - ver 1.17 (plugin) : fixed long files list display
