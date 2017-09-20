@@ -1,4 +1,4 @@
-# Nautilus - mobile shell for OctoPrint
+# Nautilus for OctoPrint
 
 
 A simplified UI replacement for OctoPrint that has been optimised for iOS devices. 
