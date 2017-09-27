@@ -75,7 +75,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 			octoprint.plugin.SettingsPlugin,
 			octoprint.plugin.StartupPlugin):
 
-	NOTIFICATION_SERVER = "notify.nautilus4ios.com"
+	NOTIFICATION_SERVER = "notify.nautilus4octoprint.com"
 	
 	NOTIFY_ALWAYS = 99
 	NOTIFY_NEVER = 0
@@ -97,7 +97,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		self.notify_events = self.NOTIFY_ALWAYS
 		self.notify_M70 = True
 		self.read_devices()
-		self._logger.info("Nautilus - OctoPrint mobile shell, started.")
+		self._logger.info("Nautilus for OctoPrint, started.")
 
 	def on_after_startup(self):	
 		if self._settings.get_boolean(["debug"]):
@@ -551,7 +551,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 	def get_update_information(self):
 		return dict(
 			octoprint_nautilus=dict(
-				displayName="Nautilus - OctoPrint mobile shell",
+				displayName="Nautilus for OctoPrint",
 				displayVersion=self._plugin_version,
 				
 				# version check: github repository
