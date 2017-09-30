@@ -252,7 +252,7 @@ class NautilusPlugin(octoprint.plugin.UiPlugin,
 		self._logger.debug( "on_ui_render request headers:" )
 		self._logger.debug( request.headers )
 		
-		nautilus_url="plugin/%s"%self._identifier
+		nautilus_url="taz6/plugin/%s"%self._identifier
 		
 		buttons = None
 		custom_power, confirm = self.has_custom_power()
