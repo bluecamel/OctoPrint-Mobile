@@ -36,8 +36,7 @@
 		<script type="text/html" id="files_template_machinecode">
 			<li data-bind="click: $root.load_file.bind($data, path), style: { color: last_success ? '#468847' :  failures > 0 ? '#b94a48' : '#606369' }, css: { 'odd-row': $index() % 2 === 0, 'even-row': $index() % 2 === 1 } " class="file">
 				<span data-bind="text: name"></span><br/>
-				<span class="file_details" data-bind="text: size"></span>
-				<span class="file_details" data-bind="text: uploaded"></span>
+<span class="file_details" data-bind="text: size"></span><span class="file_details" data-bind="text: uploaded"></span><span class="file_details" data-bind="text: estimatedPrintTime"></span>
 			</li>
 		</script>
 		<script type="text/html" id="files_template_folder">

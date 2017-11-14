@@ -7,7 +7,7 @@ function syntaxHighlight(json) {
 			if (/:$/.test(match)) {
 				cls = 'setting_key';
 			} else {
-				console.log(match);
+				//console.log(match);
 				if (match != "\"M117 Command configuration error.\"") {
 					cls = 'setting_string';
 				}
