@@ -37,13 +37,17 @@ $("#reconnect").click(function(){
 
 function start_camera(alone){
 	d = new Date();
+	var p = "?";
+	if (WEBCAM_URL.indexOf("?") !== -1)  {
+		p = "&";
+	}
 	if (alone) {
 		switchView("camera");
-		$("#webcam_alone").error(function(){$(this).attr("src", MOBILE_URL+"/static/img/no_camera.png");}).attr("src", WEBCAM_URL+"&"+d.getTime());
+		$("#webcam_alone").error(function(){$(this).attr("src", MOBILE_URL+"/static/img/no_camera.png");}).attr("src", WEBCAM_URL+p+d.getTime());
 	} else {
 		switchPanel("camera");
 		if ( clearCameraTimeout() ) {
-			$("#webcam").error(function(){$(this).attr("src", MOBILE_URL+"/static/img/no_camera.png");}).attr("src", WEBCAM_URL+"&"+d.getTime());	
+			$("#webcam").error(function(){$(this).attr("src", MOBILE_URL+"/static/img/no_camera.png");}).attr("src", WEBCAM_URL+p+d.getTime());	
 		} 
 	}
 }
