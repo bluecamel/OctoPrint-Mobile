@@ -74,3 +74,4 @@ Open a [Github issue](https://github.com/MoonshineSG/OctoPrint-Mobile/issues/new
  - ver 1.17 (plugin) : fixed long files list display
  - ver 2.1.1 (ios) : ios 11 compatibility and bug fixes (mainly handling timeout connections). 
  - ver 1.18 (plugin) : added estimated print time in the file manager
+ - ver 1.19 (plugin) : camera URL fix
