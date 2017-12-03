@@ -94,7 +94,7 @@ function onCurrentData(current){
 		}
 	}
 		
-	if(current.state.flags.printing){
+	if(printer.printing() || printer.paused()){
 		//console.log(formatSeconds(current.progress.printTimeLeft));
 		printer.progress(parseFloat(current.progress.completion));
 		printer.time_elapsed(parseInt(current.progress.printTime));

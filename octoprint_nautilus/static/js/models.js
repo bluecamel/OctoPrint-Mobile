@@ -90,9 +90,15 @@ function FilesModel(){
 						f.failures = file.prints.failure;
 						f.last_success = file.prints.last.success;
 					}
+					if ( typeof file.gcodeAnalysis != "undefined" ) { 
+						f.estimatedPrintTime = ", estimated printing time: "+formatFuzzyPrintTime(file.gcodeAnalysis.estimatedPrintTime);
+					} else {
+					    f.estimatedPrintTime = ", printing time unknown";
+					}
 					html.push(f);
 				}
 			 });
+             console.log(html);
 			 self.show_files(html);
 	}
 	
@@ -698,7 +704,6 @@ function PrinterModel(){
 	
 	//self.alwaysAcceptsCommands.extend({ notify: 'always' }); 
 	
-	
 	self.operational.subscribe(function(value) {
 		if (!value) {
 			action.extruder0_slider_value(0);
@@ -712,7 +717,7 @@ function PrinterModel(){
 			self.zchange("");
 			$(".status_bar").css({"height": "100vh", "line-height": "100vh"});
 		} else {
-			$(".status_bar").css({"height": "33.34vh", "line-height": "33.34vh"});
+			$(".status_bar").css({"height": "33.34vh", "line-height": "33.34vh"});	
 		}
 	});
 	
@@ -727,14 +732,15 @@ function PrinterModel(){
 	self.inProgress.subscribe(function(value) {
 		if (value) {
 			$(".status_bar").css({"height": "20vh", "line-height": "20vh"});
-			self.progress(0.1); //make sure the colors change
+			if ( ! self.paused() ) {
+				self.progress(0.1); //make sure the colors change	
+			}
 		} else {
 			$(".status_bar").css({"height": "33.34vh", "line-height": "33.34vh"});
 			printer.zoom(false);
 			self.progress(0); 
 		}
 	});
-	
 	
 	//self.acceptsCommands.extend({ notify: 'always' }); 
 	
@@ -760,8 +766,10 @@ function PrinterModel(){
 			}
 			$("#tool_select").bootstrapSwitch('disabled', false );
 
-			$(".status_bar").css({"height": "33.34vh", "line-height": "33.34vh"});
-			self.progress(0);
+			if ( ! self.inProgress() ) {
+				$(".status_bar").css({"height": "33.34vh", "line-height": "33.34vh"});
+				self.progress(0);
+			}
 		} else {
 			action.extruder0_slider_value(0);
 			action.extruder1_slider_value(0);
